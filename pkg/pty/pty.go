@@ -17,9 +17,7 @@ type Backend struct {
 // It returns the PTY master file for reading/writing.
 func Start(command string, args []string, env []string, dir string, cols, rows int) (*Backend, error) {
     cmd := exec.Command(command, args...)
-    if len(env) > 0 {
-        cmd.Env = env
-    }
+    cmd.Env = env
     if dir != "" {
         cmd.Dir = dir
     }

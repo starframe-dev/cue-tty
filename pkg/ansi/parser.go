@@ -4,12 +4,16 @@ import "unicode/utf8"
 
 // Parser feeds raw terminal bytes into a Screen.
 type Parser struct {
-	screen   *Screen
-	state    parseState
-	params   []int
-	intermed []byte
-	pending  []byte
-	csiPriv  bool // true if CSI started with ?
+	screen       *Screen
+	state        parseState
+	params       []int
+	intermed     []byte
+	pending      []byte
+	csiPriv      bool // true if CSI started with ?
+	utfBuf       [4]byte
+	utfLen       int
+	utfRemaining int
+	pendingCSI   []byte // buffered incomplete CSI/escape sequence across Feed calls
 }
 
 type parseState int
@@ -22,6 +26,7 @@ const (
 	stateOSCString
 	stateSS2
 	stateSS3
+	stateUTF8
 )
 
 // NewParser creates a parser bound to a screen.
@@ -30,10 +35,130 @@ func NewParser(screen *Screen) *Parser {
 }
 
 // Feed processes a chunk of raw terminal bytes.
+// Incomplete escape/CSI/OSC/UTF-8 sequences at the end of the chunk are
+// buffered and prepended to the next Feed call. This prevents sequences
+// that are split across PTY reads from being mis-parsed.
 func (p *Parser) Feed(data []byte) {
+	if len(p.pendingCSI) > 0 {
+		data = append(p.pendingCSI, data...)
+		p.pendingCSI = p.pendingCSI[:0]
+	}
+
+	cut := findIncompleteSequenceStart(data)
+	if cut >= 0 {
+		p.pendingCSI = append(p.pendingCSI, data[cut:]...)
+		data = data[:cut]
+	}
+
 	for _, b := range data {
 		p.feedByte(b)
 	}
+}
+
+// findIncompleteSequenceStart returns the index of the first byte of the
+// last incomplete escape/CSI/OSC/UTF-8 sequence in data, or -1 if the last
+// such sequence is complete or none exists.
+func findIncompleteSequenceStart(data []byte) int {
+	for i := len(data) - 1; i >= 0; i-- {
+		b := data[i]
+		if b == 0x1B {
+			if complete, _ := completeEscapeSequence(data[i:]); complete {
+				return -1
+			}
+			return i
+		}
+		if b >= 0xC0 && b < 0xF8 {
+			if complete, _ := completeUTF8(data[i:]); complete {
+				return -1
+			}
+			return i
+		}
+	}
+	return -1
+}
+
+// completeEscapeSequence reports whether data starts with a complete escape,
+// CSI or OSC sequence and returns its byte length.
+func completeEscapeSequence(data []byte) (bool, int) {
+	if len(data) < 2 || data[0] != 0x1B {
+		return false, 0
+	}
+	second := data[1]
+	switch second {
+	case '[':
+		return completeCSI(data)
+	case ']':
+		return completeOSC(data)
+	default:
+		// ESC followed by any byte is a complete (possibly unknown) two-byte
+		// escape sequence. Only a bare ESC at the end of the chunk is incomplete.
+		if len(data) >= 2 {
+			return true, 2
+		}
+	}
+	return false, 0
+}
+
+// completeCSI scans a CSI sequence and reports whether it is complete.
+func completeCSI(data []byte) (bool, int) {
+	if len(data) < 3 || data[0] != 0x1B || data[1] != '[' {
+		return false, 0
+	}
+	for i := 2; i < len(data); i++ {
+		b := data[i]
+		if b >= 0x40 && b <= 0x7E {
+			return true, i + 1
+		}
+		if b == 0x1B {
+			// Another ESC started before this CSI finished — treat current as incomplete.
+			return false, 0
+		}
+		// Bytes 0x20-0x3F are valid inside CSI (params, intermediates).
+		if b < 0x20 || b > 0x3F {
+			return false, 0
+		}
+	}
+	return false, 0
+}
+
+// completeOSC scans an OSC sequence and reports whether it is complete.
+func completeOSC(data []byte) (bool, int) {
+	if len(data) < 3 || data[0] != 0x1B || data[1] != ']' {
+		return false, 0
+	}
+	for i := 2; i < len(data); i++ {
+		b := data[i]
+		if b == 0x07 {
+			return true, i + 1
+		}
+		if b == 0x1B && i+1 < len(data) && data[i+1] == 0x5C {
+			return true, i + 2
+		}
+	}
+	return false, 0
+}
+
+// completeUTF8 reports whether data starts with a complete UTF-8 rune.
+func completeUTF8(data []byte) (bool, int) {
+	if len(data) == 0 {
+		return false, 0
+	}
+	b := data[0]
+	var size int
+	switch {
+	case b >= 0xC0 && b < 0xE0:
+		size = 2
+	case b >= 0xE0 && b < 0xF0:
+		size = 3
+	case b >= 0xF0 && b < 0xF8:
+		size = 4
+	default:
+		return false, 0
+	}
+	if len(data) < size {
+		return false, 0
+	}
+	return true, size
 }
 
 // FeedString processes a string of raw terminal bytes.
@@ -57,6 +182,8 @@ func (p *Parser) feedByte(b byte) {
 		p.handleSS2(b)
 	case stateSS3:
 		p.handleSS3(b)
+	case stateUTF8:
+		p.handleUTF8(b)
 	}
 }
 
@@ -64,9 +191,15 @@ func (p *Parser) handleGround(b byte) {
 	switch b {
 	case 0x1B:
 		p.state = stateEscape
+	case '^':
+		// Some PTY implementations (e.g. creack/pty on macOS) represent the
+		// escape character as a two-byte '^[' sequence. Treat '^[' as ESC.
+		p.state = stateEscape
 	case 0x0D:
+		p.screen.clearWrapPending()
 		p.screen.CurrentCursor().Col = 0
 	case 0x0A, 0x0B, 0x0C:
+		p.screen.clearWrapPending()
 		cur := p.screen.CurrentCursor()
 		cur.Row++
 		if cur.Row > p.screen.ScrollBottom {
@@ -74,12 +207,14 @@ func (p *Parser) handleGround(b byte) {
 			cur.Row = p.screen.ScrollBottom
 		}
 	case 0x09:
+		p.screen.clearWrapPending()
 		cur := p.screen.CurrentCursor()
 		cur.Col = (cur.Col/8 + 1) * 8
 		if cur.Col >= p.screen.Cols {
 			cur.Col = p.screen.Cols - 1
 		}
 	case 0x08:
+		p.screen.clearWrapPending()
 		cur := p.screen.CurrentCursor()
 		if cur.Col > 0 {
 			cur.Col--
@@ -87,9 +222,47 @@ func (p *Parser) handleGround(b byte) {
 	case 0x07:
 		// Bell — ignore
 	default:
-		if b >= 0x20 {
+		switch {
+		case b >= 0x20 && b < 0x80:
 			p.screen.Put(rune(b))
+		case b >= 0xC0 && b < 0xE0:
+			// 2-byte UTF-8 lead
+			p.utfBuf[0] = b
+			p.utfLen = 1
+			p.utfRemaining = 1
+			p.state = stateUTF8
+		case b >= 0xE0 && b < 0xF0:
+			// 3-byte UTF-8 lead
+			p.utfBuf[0] = b
+			p.utfLen = 1
+			p.utfRemaining = 2
+			p.state = stateUTF8
+		case b >= 0xF0 && b < 0xF8:
+			// 4-byte UTF-8 lead
+			p.utfBuf[0] = b
+			p.utfLen = 1
+			p.utfRemaining = 3
+			p.state = stateUTF8
 		}
+		// Continuation bytes (0x80-0xBF) outside a sequence are ignored.
+	}
+}
+
+func (p *Parser) handleUTF8(b byte) {
+	if b&0xC0 == 0x80 {
+		// Valid continuation byte
+		p.utfBuf[p.utfLen] = b
+		p.utfLen++
+		p.utfRemaining--
+		if p.utfRemaining == 0 {
+			r, _ := utf8.DecodeRune(p.utfBuf[:p.utfLen])
+			p.screen.Put(r)
+			p.state = stateGround
+		}
+	} else {
+		// Invalid continuation: discard partial sequence and reprocess byte
+		p.state = stateGround
+		p.feedByte(b)
 	}
 }
 

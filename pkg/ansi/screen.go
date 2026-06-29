@@ -14,6 +14,7 @@ type Screen struct {
     ScrollTop    int
     ScrollBottom int
     Style        Style
+    wrapPending  bool // true when cursor is at end of line awaiting wrap
 }
 
 // Cursor tracks the current cursor position.
@@ -109,15 +110,15 @@ func (s *Screen) CurrentCursor() *Cursor {
 }
 
 // Put writes a rune at the current cursor with the current style.
+// Implements the standard terminal "wrap pending" behaviour: writing to the
+// last column does not immediately scroll; the next printable character does.
 func (s *Screen) Put(ch rune) {
     cur := s.CurrentCursor()
-    if cur.Row < 0 || cur.Row >= s.Rows || cur.Col < 0 || cur.Col >= s.Cols {
+    if cur.Row < 0 || cur.Row >= s.Rows {
         return
     }
-    s.cell(cur.Row, cur.Col).Rune = ch
-    s.cell(cur.Row, cur.Col).Style = s.Style
-    cur.Col++
-    if cur.Col >= s.Cols {
+    if s.wrapPending {
+        s.wrapPending = false
         cur.Col = 0
         cur.Row++
         if cur.Row > s.ScrollBottom {
@@ -125,6 +126,21 @@ func (s *Screen) Put(ch rune) {
             cur.Row = s.ScrollBottom
         }
     }
+    if cur.Col < 0 || cur.Col >= s.Cols {
+        return
+    }
+    s.cell(cur.Row, cur.Col).Rune = ch
+    s.cell(cur.Row, cur.Col).Style = s.Style
+    cur.Col++
+    if cur.Col >= s.Cols {
+        s.wrapPending = true
+        cur.Col = s.Cols - 1
+    }
+}
+
+// clearWrapPending resets the wrap-pending flag.
+func (s *Screen) clearWrapPending() {
+    s.wrapPending = false
 }
 
 // MoveCursor sets the cursor position (0-based, clamped).
@@ -132,6 +148,7 @@ func (s *Screen) MoveCursor(row, col int) {
     cur := s.CurrentCursor()
     cur.Row = clamp(row, 0, s.Rows-1)
     cur.Col = clamp(col, 0, s.Cols-1)
+    s.clearWrapPending()
 }
 
 // MoveCursorRel moves the cursor relative to current position.

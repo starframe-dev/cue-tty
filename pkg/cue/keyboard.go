@@ -66,7 +66,7 @@ func ResolveKey(key string) []byte {
 func MouseSGR(button, x, y int, release bool) []byte {
     b := byte(button)
     if release {
-        b |= 0x80
+        b = 0 // release button is always 0 in SGR 1006
     }
     suffix := byte('M')
     if release {
@@ -75,6 +75,12 @@ func MouseSGR(button, x, y int, release bool) []byte {
     // ESC[ < button ; x+1 ; y+1 M/m
     // Using strconv for speed over fmt.Sprintf
     return []byte("\x1b[<" + itoa(int(b)) + ";" + itoa(x+1) + ";" + itoa(y+1) + string(suffix))
+}
+
+// MouseSGRMove encodes a mouse motion event using the SGR 1006 protocol.
+// Motion uses button value 35 and reports current coordinates without press/release.
+func MouseSGRMove(x, y int) []byte {
+	return []byte("\x1b[<35;" + itoa(x+1) + ";" + itoa(y+1) + "M")
 }
 
 // fast itoa for small integers (mouse coords are small)

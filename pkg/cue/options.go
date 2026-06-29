@@ -6,12 +6,13 @@ import (
 
 // Options configure an App launch.
 type Options struct {
-    Args    []string
-    Env     []string
-    Dir     string
-    Width   int
-    Height  int
-    Timeout time.Duration
+    Args       []string
+    Env        []string
+    EnvReplaced bool
+    Dir        string
+    Width      int
+    Height     int
+    Timeout    time.Duration
 }
 
 // DefaultOptions returns sensible defaults (80x24, no timeout).
@@ -42,9 +43,19 @@ func WithSize(cols, rows int) Option {
 }
 
 // WithEnv sets environment variables.
+// Variables are appended to the current process environment unless
+// WithReplaceEnv is used.
 func WithEnv(env ...string) Option {
     return func(o *Options) {
         o.Env = env
+    }
+}
+
+// WithReplaceEnv replaces the entire environment for the child process.
+func WithReplaceEnv(env ...string) Option {
+    return func(o *Options) {
+        o.Env = env
+        o.EnvReplaced = true
     }
 }
 

@@ -8,7 +8,10 @@ import (
 
 // Page provides Playwright-like API for interacting with a TUI page.
 type Page struct {
-	app *App
+	app     *App
+	dragBtn int // button currently held for drag (-1 if none)
+	dragX   int // last reported drag X
+	dragY   int // last reported drag Y
 }
 
 // Press sends a key press.
@@ -34,8 +37,7 @@ func (p *Page) Type(text string) error {
 
 // Text returns the visible screen as plain text (no ANSI).
 func (p *Page) Text() (string, error) {
-	s := p.app.screenState()
-	return s.RenderText(), nil
+	return p.app.RenderText(), nil
 }
 
 // Lines returns each row as a string.
@@ -90,12 +92,29 @@ func (p *Page) MouseScrollDown(x, y int) error {
 // MouseDown sends a mouse button-down event.
 // button: 0=left, 1=middle, 2=right.
 func (p *Page) MouseDown(button, x, y int) error {
+	p.dragBtn = button
+	p.dragX = x
+	p.dragY = y
 	return p.app.write(MouseSGR(button, x, y, false))
 }
 
 // MouseUp sends a mouse button-up event.
 func (p *Page) MouseUp(button, x, y int) error {
+	p.dragBtn = -1
 	return p.app.write(MouseSGR(button, x, y, true))
+}
+
+// MouseMove sends a mouse motion event at (x, y) using SGR protocol.
+// If a button is currently held (from MouseDown), the motion is reported as
+// a drag event (same button with motion flag) instead of a plain hover motion.
+func (p *Page) MouseMove(x, y int) error {
+	if p.dragBtn >= 0 {
+		p.dragX = x
+		p.dragY = y
+		// SGR motion with button held: button value |= 32 (bit 5 set).
+		return p.app.write(MouseSGR(p.dragBtn|0x20, x, y, false))
+	}
+	return p.app.write(MouseSGRMove(x, y))
 }
 
 // EnableMouse enables mouse tracking in the terminal (SGR protocol).

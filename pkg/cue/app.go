@@ -2,6 +2,7 @@ package cue
 
 import (
 	"bytes"
+	"os"
 	"sync"
 	"time"
 
@@ -26,6 +27,12 @@ func Launch(command string, opts ...Option) (*App, error) {
 	o := DefaultOptions()
 	for _, fn := range opts {
 		fn(&o)
+	}
+
+	// Merge with the current process environment by default so that env vars
+	// set by the application under test (e.g. WARP_HTTP_PORT) remain visible.
+	if !o.EnvReplaced {
+		o.Env = append(os.Environ(), o.Env...)
 	}
 
 	backend, err := pty.Start(command, o.Args, o.Env, o.Dir, o.Width, o.Height)
@@ -128,6 +135,13 @@ func (a *App) screenState() *ansi.Screen {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	return a.screen
+}
+
+// RenderText returns the screen as plain text, locked.
+func (a *App) RenderText() string {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.screen.RenderText()
 }
 
 // RawLog returns the raw bytes captured from the PTY (for debugging).
