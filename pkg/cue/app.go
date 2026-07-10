@@ -17,6 +17,7 @@ type App struct {
 	screen     *ansi.Screen
 	opts       Options
 	mu         sync.Mutex
+	closeOnce  sync.Once
 	done       chan struct{}
 	stopReader chan struct{}
 	rawLog     []byte // debug: raw PTY output
@@ -72,7 +73,9 @@ func (a *App) Resize(cols, rows int) error {
 
 // Close kills the application.
 func (a *App) Close() error {
-	close(a.stopReader)
+	a.closeOnce.Do(func() {
+		close(a.stopReader)
+	})
 	return a.backend.Close()
 }
 

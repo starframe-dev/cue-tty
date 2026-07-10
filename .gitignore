@@ -33,6 +33,6 @@ Thumbs.db
 .env
 .env.local
 
-# Test artifacts
-artifacts/
-tmp/
+# cuetty-cli artifacts
+cuetty-cli
+cuetty-artifacts/
