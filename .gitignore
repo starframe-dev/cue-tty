@@ -36,3 +36,6 @@ Thumbs.db
 # cuetty-cli artifacts
 cuetty-cli
 cuetty-artifacts/
+
+# demo binaries
+examples/warp-demo/warp-demo
