@@ -202,9 +202,9 @@ func (p *Parser) handleGround(b byte) {
 		p.screen.clearWrapPending()
 		cur := p.screen.CurrentCursor()
 		cur.Row++
-		if cur.Row > p.screen.ScrollBottom {
+		if cur.Row > p.screen.ScrollBottom() {
 			p.screen.scrollUp(1)
-			cur.Row = p.screen.ScrollBottom
+			cur.Row = p.screen.ScrollBottom()
 		}
 	case 0x09:
 		p.screen.clearWrapPending()
@@ -355,22 +355,20 @@ func (p *Parser) executeCSI(final byte) {
 		case 0:
 			p.screen.ClearLine()
 			cur := p.screen.CurrentCursor()
-			cells := p.screen.Current()
 			for r := cur.Row + 1; r < p.screen.Rows; r++ {
 				for c := 0; c < p.screen.Cols; c++ {
-					cells[r*p.screen.Cols+c] = EmptyCell()
+					p.screen.Cells[r][c] = Cell{}
 				}
 			}
 		case 1:
 			cur := p.screen.CurrentCursor()
-			cells := p.screen.Current()
 			for r := 0; r < cur.Row; r++ {
 				for c := 0; c < p.screen.Cols; c++ {
-					cells[r*p.screen.Cols+c] = EmptyCell()
+					p.screen.Cells[r][c] = Cell{}
 				}
 			}
 			for c := 0; c <= cur.Col; c++ {
-				cells[cur.Row*p.screen.Cols+c] = EmptyCell()
+				p.screen.Cells[cur.Row][c] = Cell{}
 			}
 		case 2:
 			p.screen.ClearScreen()
@@ -396,8 +394,7 @@ func (p *Parser) executeCSI(final byte) {
 		top := param(0, 1) - 1
 		bottom := param(1, p.screen.Rows) - 1
 		if top >= 0 && bottom < p.screen.Rows && top < bottom {
-			p.screen.ScrollTop = top
-			p.screen.ScrollBottom = bottom
+			p.screen.SetScrollRegion(top+1, bottom+1)
 		}
 	case 's':
 		// Save cursor — not implemented

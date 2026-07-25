@@ -1,288 +1,215 @@
 package ansi
 
-import "bytes"
+import (
+	"fmt"
 
-// Screen is a virtual terminal screen backed by a flat cell slice.
-type Screen struct {
-    Cols         int
-    Rows         int
-    cells        []Cell
-    altCells     []Cell
-    Cursor       Cursor
-    AltCursor    Cursor
-    UseAltBuffer bool
-    ScrollTop    int
-    ScrollBottom int
-    Style        Style
-    wrapPending  bool // true when cursor is at end of line awaiting wrap
-}
+	"github.com/Starframe/portalis"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/rivo/uniseg"
+)
+
+// Cell is a single character on the screen.
+type Cell = portalis.Cell
 
 // Cursor tracks the current cursor position.
-type Cursor struct {
-    Row int
-    Col int
+type Cursor = portalis.Cursor
+
+// EmptyCell returns a zero-value cell (empty).
+func EmptyCell() Cell { return Cell{} }
+
+// Screen is a virtual terminal screen backed by portalis.Screen.
+type Screen struct {
+	*portalis.Screen
+	Style Style
 }
 
 // NewScreen creates a screen with the given dimensions.
 func NewScreen(cols, rows int) *Screen {
-    n := cols * rows
-    s := &Screen{
-        Cols:         cols,
-        Rows:         rows,
-        cells:        make([]Cell, n),
-        altCells:     make([]Cell, n),
-        ScrollTop:    0,
-        ScrollBottom: rows - 1,
-        Style:        Reset(),
-    }
-    for i := range s.cells {
-        s.cells[i] = EmptyCell()
-    }
-    for i := range s.altCells {
-        s.altCells[i] = EmptyCell()
-    }
-    return s
-}
-
-func (s *Screen) cell(r, c int) *Cell {
-    return &s.current()[r*s.Cols+c]
-}
-
-// Current returns the active buffer as a flat slice.
-func (s *Screen) Current() []Cell {
-    if s.UseAltBuffer {
-        return s.altCells
-    }
-    return s.cells
-}
-
-func (s *Screen) current() []Cell {
-    return s.Current()
+	return &Screen{Screen: portalis.NewScreen(rows, cols), Style: Reset()}
 }
 
 // Resize changes the screen size, preserving top-left content.
 func (s *Screen) Resize(cols, rows int) {
-    oldCells := s.current()
-    oldCols, oldRows := s.Cols, s.Rows
-
-    newN := cols * rows
-    newCells := make([]Cell, newN)
-    for i := range newCells {
-        newCells[i] = EmptyCell()
-    }
-    for r := 0; r < min(rows, oldRows); r++ {
-        for c := 0; c < min(cols, oldCols); c++ {
-            newCells[r*cols+c] = oldCells[r*oldCols+c]
-        }
-    }
-
-    if s.UseAltBuffer {
-        s.altCells = newCells
-        s.cells = make([]Cell, newN)
-        for i := range s.cells {
-            s.cells[i] = EmptyCell()
-        }
-    } else {
-        s.cells = newCells
-        s.altCells = make([]Cell, newN)
-        for i := range s.altCells {
-            s.altCells[i] = EmptyCell()
-        }
-    }
-
-    s.Cols = cols
-    s.Rows = rows
-    s.ScrollBottom = rows - 1
-    if s.Cursor.Row >= rows {
-        s.Cursor.Row = rows - 1
-    }
-    if s.Cursor.Col >= cols {
-        s.Cursor.Col = cols - 1
-    }
-}
-
-// CurrentCursor returns the active cursor.
-func (s *Screen) CurrentCursor() *Cursor {
-    if s.UseAltBuffer {
-        return &s.AltCursor
-    }
-    return &s.Cursor
-}
-
-// Put writes a rune at the current cursor with the current style.
-// Implements the standard terminal "wrap pending" behaviour: writing to the
-// last column does not immediately scroll; the next printable character does.
-func (s *Screen) Put(ch rune) {
-    cur := s.CurrentCursor()
-    if cur.Row < 0 || cur.Row >= s.Rows {
-        return
-    }
-    if s.wrapPending {
-        s.wrapPending = false
-        cur.Col = 0
-        cur.Row++
-        if cur.Row > s.ScrollBottom {
-            s.scrollUp(1)
-            cur.Row = s.ScrollBottom
-        }
-    }
-    if cur.Col < 0 || cur.Col >= s.Cols {
-        return
-    }
-    s.cell(cur.Row, cur.Col).Rune = ch
-    s.cell(cur.Row, cur.Col).Style = s.Style
-    cur.Col++
-    if cur.Col >= s.Cols {
-        s.wrapPending = true
-        cur.Col = s.Cols - 1
-    }
-}
-
-// clearWrapPending resets the wrap-pending flag.
-func (s *Screen) clearWrapPending() {
-    s.wrapPending = false
-}
-
-// MoveCursor sets the cursor position (0-based, clamped).
-func (s *Screen) MoveCursor(row, col int) {
-    cur := s.CurrentCursor()
-    cur.Row = clamp(row, 0, s.Rows-1)
-    cur.Col = clamp(col, 0, s.Cols-1)
-    s.clearWrapPending()
-}
-
-// MoveCursorRel moves the cursor relative to current position.
-func (s *Screen) MoveCursorRel(dy, dx int) {
-    cur := s.CurrentCursor()
-    s.MoveCursor(cur.Row+dy, cur.Col+dx)
+	s.Screen.Resize(rows, cols)
 }
 
 // ClearScreen clears the entire active buffer.
 func (s *Screen) ClearScreen() {
-    cells := s.current()
-    for i := range cells {
-        cells[i] = EmptyCell()
-    }
+	s.Screen.Clear()
 }
 
-// ClearLine clears the current line from cursor to end.
-func (s *Screen) ClearLine() {
-    cur := s.CurrentCursor()
-    if cur.Row < 0 || cur.Row >= s.Rows {
-        return
-    }
-    start := cur.Row * s.Cols
-    for i := start + cur.Col; i < start+s.Cols; i++ {
-        s.current()[i] = EmptyCell()
-    }
+// CurrentCursor returns the active cursor.
+func (s *Screen) CurrentCursor() *Cursor {
+	return &s.Screen.Cursor
 }
 
-// ClearLineLeft clears from start of line to cursor.
-func (s *Screen) ClearLineLeft() {
-    cur := s.CurrentCursor()
-    if cur.Row < 0 || cur.Row >= s.Rows {
-        return
-    }
-    start := cur.Row * s.Cols
-    for i := start; i <= start+cur.Col; i++ {
-        s.current()[i] = EmptyCell()
-    }
+// MoveCursor sets the cursor position (0-based, clamped).
+func (s *Screen) MoveCursor(row, col int) {
+	s.Screen.SetCursor(row, col)
 }
 
-// ClearLineAll clears the entire current line.
-func (s *Screen) ClearLineAll() {
-    cur := s.CurrentCursor()
-    if cur.Row < 0 || cur.Row >= s.Rows {
-        return
-    }
-    start := cur.Row * s.Cols
-    for i := start; i < start+s.Cols; i++ {
-        s.current()[i] = EmptyCell()
-    }
+// MoveCursorRel moves the cursor relative to current position.
+func (s *Screen) MoveCursorRel(dy, dx int) {
+	if dy < 0 {
+		s.Screen.CursorUp(-dy)
+	} else if dy > 0 {
+		s.Screen.CursorDown(dy)
+	}
+	if dx < 0 {
+		s.Screen.CursorBackward(-dx)
+	} else if dx > 0 {
+		s.Screen.CursorForward(dx)
+	}
 }
 
-// ScrollUp scrolls the scroll region up by n lines.
+// scrollUp scrolls the scroll region up by n lines.
 func (s *Screen) scrollUp(n int) {
-    cells := s.current()
-    for i := 0; i < n; i++ {
-        top := s.ScrollTop * s.Cols
-        bot := (s.ScrollBottom+1)*s.Cols - 1
-        // Shift rows up within scroll region
-        for r := s.ScrollTop; r < s.ScrollBottom; r++ {
-            dst := r * s.Cols
-            src := (r + 1) * s.Cols
-            copy(cells[dst:dst+s.Cols], cells[src:src+s.Cols])
-        }
-        // Clear bottom line
-        b := s.ScrollBottom * s.Cols
-        for j := b; j < b+s.Cols; j++ {
-            cells[j] = EmptyCell()
-        }
-        _ = bot
-        _ = top
-    }
+	s.Screen.ScrollRegionUp(n)
 }
 
 // scrollDown scrolls the scroll region down by n lines.
 func (s *Screen) scrollDown(n int) {
-    cells := s.current()
-    for i := 0; i < n; i++ {
-        for r := s.ScrollBottom; r > s.ScrollTop; r-- {
-            dst := r * s.Cols
-            src := (r - 1) * s.Cols
-            copy(cells[dst:dst+s.Cols], cells[src:src+s.Cols])
-        }
-        t := s.ScrollTop * s.Cols
-        for j := t; j < t+s.Cols; j++ {
-            cells[j] = EmptyCell()
-        }
-    }
+	s.Screen.ScrollRegionDown(n)
 }
 
 // SwitchAltBuffer toggles between main and alternate screen buffer.
 func (s *Screen) SwitchAltBuffer(use bool) {
-    s.UseAltBuffer = use
+	if use {
+		s.Screen.EnterAltScreen()
+	} else {
+		s.Screen.ExitAltScreen()
+	}
 }
 
-// RenderText renders the screen as plain text.
+// RenderText renders the screen as plain text (no ANSI sequences).
 func (s *Screen) RenderText() string {
-    var buf bytes.Buffer
-    cells := s.current()
-    for r := 0; r < s.Rows; r++ {
-        start := r * s.Cols
-        for c := 0; c < s.Cols; c++ {
-            ch := cells[start+c].Rune
-            if ch == 0 {
-                ch = ' '
-            }
-            buf.WriteRune(ch)
-        }
-        if r < s.Rows-1 {
-            buf.WriteByte('\n')
-        }
-    }
-    return buf.String()
+	return stripANSI(s.Screen.Render())
 }
 
-// CellsView returns a read-only slice of the active buffer for inspection.
-// Index with [row*Cols + col].
+// stripANSI removes ANSI escape sequences from a string.
+func stripANSI(s string) string {
+	var out []byte
+	i := 0
+	for i < len(s) {
+		if s[i] == '\x1b' {
+			// Skip escape sequence
+			i++
+			if i < len(s) && s[i] == '[' {
+				i++
+				for i < len(s) && !(s[i] >= 0x40 && s[i] <= 0x7E) {
+					i++
+				}
+				if i < len(s) {
+					i++
+				}
+			} else if i < len(s) {
+				// Two-byte escape
+				i++
+			}
+		} else {
+			out = append(out, s[i])
+			i++
+		}
+	}
+	return string(out)
+}
+
+// CellsView returns a flat slice of the active buffer for inspection.
 func (s *Screen) CellsView() []Cell {
-    return s.current()
+	flat := make([]Cell, s.Rows*s.Cols)
+	for r := 0; r < s.Rows; r++ {
+		copy(flat[r*s.Cols:(r+1)*s.Cols], s.Cells[r])
+	}
+	return flat
 }
 
-func clamp(v, min, max int) int {
-    if v < min {
-        return min
-    }
-    if v > max {
-        return max
-    }
-    return v
+// Current returns the active buffer as a flat slice.
+func (s *Screen) Current() []Cell {
+	return s.CellsView()
 }
 
-func min(a, b int) int {
-    if a < b {
-        return a
-    }
-    return b
+// cell returns a pointer to the cell at (r, c).
+func (s *Screen) cell(r, c int) *Cell {
+	return &s.Screen.Cells[r][c]
+}
+
+// clearWrapPending resets the wrap-pending flag.
+func (s *Screen) clearWrapPending() {
+	s.Screen.ClearWrapPending()
+}
+
+// Put writes a rune at the current cursor with the current style.
+// Handles wide characters (CJK, emoji) by advancing cursor by display width.
+func (s *Screen) Put(ch rune) {
+	s.syncStyle()
+	s.Screen.Put(ch)
+}
+
+// syncStyle copies the wrapper Style to the Portalis cursor so Put applies it.
+func (s *Screen) syncStyle() {
+	st := &s.Screen.Cursor
+	st.Style = 0
+	if s.Style.Bold {
+		st.Style |= portalis.StyleBold
+	}
+	if s.Style.Dim {
+		st.Style |= portalis.StyleDim
+	}
+	if s.Style.Italic {
+		st.Style |= portalis.StyleItalic
+	}
+	if s.Style.Underline {
+		st.Style |= portalis.StyleUnderline
+	}
+	if s.Style.Reverse {
+		st.Style |= portalis.StyleReverse
+	}
+	st.FG = colorToLipgloss(s.Style.Fg)
+	st.BG = colorToLipgloss(s.Style.Bg)
+}
+
+// colorToLipgloss converts an ansi.Color to a lipgloss.Color string.
+func colorToLipgloss(c Color) lipgloss.Color {
+	if c.Is256 {
+		return ansi256Color(int(c.Index))
+	}
+	return lipgloss.Color(rgb(int(c.R), int(c.G), int(c.B)))
+}
+
+// ansi256Color converts an ANSI color index (0-255) to a lipgloss.Color string.
+func ansi256Color(n int) lipgloss.Color {
+	if n < 0 || n > 255 {
+		return ""
+	}
+	if n < 16 {
+		colors := []string{
+			"#000000", "#800000", "#008000", "#808000",
+			"#000080", "#800080", "#008080", "#c0c0c0",
+			"#808080", "#ff0000", "#00ff00", "#ffff00",
+			"#0000ff", "#ff00ff", "#00ffff", "#ffffff",
+		}
+		return lipgloss.Color(colors[n])
+	}
+	if n < 232 {
+		n -= 16
+		r := n / 36
+		g := (n / 6) % 6
+		b := n % 6
+		return lipgloss.Color(rgb(r*42+12, g*42+12, b*42+12))
+	}
+	v := (n-232)*10 + 8
+	return lipgloss.Color(rgb(v, v, v))
+}
+
+func rgb(r, g, b int) string {
+	return "#" + hexByte(r) + hexByte(g) + hexByte(b)
+}
+
+func hexByte(n int) string {
+	return fmt.Sprintf("%02x", n)
+}
+
+// StringWidth returns the display width of a string.
+func StringWidth(s string) int {
+	return uniseg.StringWidth(s)
 }
