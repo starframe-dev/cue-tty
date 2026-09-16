@@ -1,0 +1,188 @@
+{
+  "files": {
+    "cmd/cuetty-cli/main.go": {
+      "hash": "9e6c5efba8b2c9ee683bb125cfbd66f28b51cc508d49816c317cb58e6ae338cb",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-122409.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-122409.dsl.json",
+      "error": null
+    },
+    "pkg/ansi/parser.go": {
+      "hash": "52754c1bdce460f47df0afb50da1d9b1fd50629938e50f384348d55743ae6a08",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "strict labeling failed for lines 129-256: invalid labels JSON"
+    },
+    "pkg/ansi/parser_test.go": {
+      "hash": "8638d4e6660fc6e5259db7547921daf05c9dea9024909a7ad8db026e6e699ede",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/ansi/parser_test.go' references unknown file 'pkg/ansi/parser_test.go'"
+    },
+    "pkg/ansi/screen.go": {
+      "hash": "067852bc8c84417863f3afdd7794e7cad1a895adf07bf163210615834f2ab922",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-131058.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-131058.dsl.json",
+      "error": null
+    },
+    "pkg/ansi/screen_test.go": {
+      "hash": "e1e9887f9da42276f35643d5e18acbef2e74e914ab12eda73190fa4ea5e25a72",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/ansi/screen_test.go' references unknown file 'pkg/ansi/screen_test.go'"
+    },
+    "pkg/ansi/style.go": {
+      "hash": "0211545a53210197098aef33341b70c086aba3331c46fbd08270bbaa0b120a7f",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-131216.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-131216.dsl.json",
+      "error": null
+    },
+    "pkg/cli/commands.go": {
+      "hash": "9e7661bc6ee47bd2933879d62001acb1bece015b854902678e3ac522a1c3df61",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "strict labeling failed for lines 1-128: invalid labels JSON"
+    },
+    "pkg/cli/daemon.go": {
+      "hash": "ee6f12c9f733f4bb61c32e38a77bc7c4afd5374a17fccdca2e9c9da8f108dda2",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-133306.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-133306.dsl.json",
+      "error": null
+    },
+    "pkg/cli/elements.go": {
+      "hash": "aa3439c4e5436387dde7a5f482217951d465519e38f2ccadbbed500d5ef457c7",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-133441.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-133441.dsl.json",
+      "error": null
+    },
+    "pkg/cli/elements_test.go": {
+      "hash": "0db050f67e25fc5fbd2e5ccd4591899f8b5e8e72a000330a2b54f41b31eaad89",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/cli/elements_test.go' references unknown file 'pkg/cli/elements_test.go'"
+    },
+    "pkg/cli/nodes.go": {
+      "hash": "54dfc584561294424f7cf5e672a183e272af6c94f8bc04b9a0a061dcff32746b",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "strict labeling failed for lines 1-128: LLM returned an unexpected item 'if:pkg/cli/nodes.go:14603092'"
+    },
+    "pkg/cli/nodes_test.go": {
+      "hash": "c21c02a378b71b7be1384cfa67dad3b42a3bef5a0f737ba3425ada48fe08636b",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/cli/nodes_test.go' references unknown file 'pkg/cli/nodes_test.go'"
+    },
+    "pkg/cli/repl.go": {
+      "hash": "9dc4f03b9ef0d86f6e3683c734ceb4afbc7708d20700a90cbe9fd323e493028d",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-135444.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-135444.dsl.json",
+      "error": null
+    },
+    "pkg/cli/repl_test.go": {
+      "hash": "376ff7fe70de8ed5825110d5833408f363049541dc11177f695e4a63636d258e",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/cli/repl_test.go' references unknown file 'pkg/cli/repl_test.go'"
+    },
+    "pkg/cli/session.go": {
+      "hash": "b1c16dc4b7c297135300330985742d92fd3111469d3867afaf1886ee5e59944f",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-135915.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-135915.dsl.json",
+      "error": null
+    },
+    "pkg/cue/app.go": {
+      "hash": "b0ffd13de6caa4ba84da2e9492435ce0e72dd35fa2d72633d9545df46c4965db",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-140858.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-140858.dsl.json",
+      "error": null
+    },
+    "pkg/cue/artifact.go": {
+      "hash": "eef8d356eee3dcb6a8d198aa26e470514fb804b015ba8ce931b113b61b538f79",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-141119.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-141119.dsl.json",
+      "error": null
+    },
+    "pkg/cue/bubbletea_test.go": {
+      "hash": "62c381b7a28ee1a66c72812944edab4ffe9609acf50345ced184e9e0f1231eb1",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/cue/bubbletea_test.go' references unknown file 'pkg/cue/bubbletea_test.go'"
+    },
+    "pkg/cue/expect.go": {
+      "hash": "7b5be15a5e15b6e20e7568716ad7c358c0804160f008289587a59ae0ae1c4a57",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-141359.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-141359.dsl.json",
+      "error": null
+    },
+    "pkg/cue/expect_test.go": {
+      "hash": "115d27e210d4d359f26da7072a4111d1fbb9c641fdc266a883a2fbbe13bb95d4",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/cue/expect_test.go' references unknown file 'pkg/cue/expect_test.go'"
+    },
+    "pkg/cue/integration_test.go": {
+      "hash": "314c746e83255558a82dcf1bc822f6f2b42fb70aea2770d876f73ea9b8e8a127",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/cue/integration_test.go' references unknown file 'pkg/cue/integration_test.go'"
+    },
+    "pkg/cue/keyboard.go": {
+      "hash": "26a826b7a365d302b8a8a685cd6f1295a10e8cc77cff7caf2611ffd66bf89ac6",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142009.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142009.dsl.json",
+      "error": null
+    },
+    "pkg/cue/keyboard_test.go": {
+      "hash": "394a53803a97bf8f7eac26018f1059397fb1b354cab1bb04687075a829f905c1",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "",
+      "dsl_path": "",
+      "error": "node 'file:pkg/cue/keyboard_test.go' references unknown file 'pkg/cue/keyboard_test.go'"
+    },
+    "pkg/cue/options.go": {
+      "hash": "44bd5fc8ffa474f55f24abb8a74d8a0f28122e367e2c8d4fa5ede9b270cf2c31",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142221.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142221.dsl.json",
+      "error": null
+    },
+    "pkg/cue/page.go": {
+      "hash": "1257c8739dbb2469a0b4ab24f60219d82a971553d9f69e9869637d577a523154",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142522.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142522.dsl.json",
+      "error": null
+    },
+    "pkg/pty/pty.go": {
+      "hash": "65c192beb3215b4acbc159adc75790fd3ec90c183c6be021ee50b098e8dd95f9",
+      "cache_key": "38b7cdfbdcabc5d6ab2d97dcb3606d64d56ede5d493521feae1ea4af778a9956",
+      "report_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142735.html",
+      "dsl_path": "/Users/a/Space/Projects/Starframe/cue-tty/.graphloom/report-file-20260830-142735.dsl.json",
+      "error": null
+    }
+  },
+  "functions": {},
+  "project": null
+}

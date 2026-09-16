@@ -1,0 +1,444 @@
+{
+  "title": "pkg/cue/options.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cue/options.go",
+      "kind": "group",
+      "label": "файл пакета cue",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cue/options.go",
+        "start_line": 1,
+        "end_line": 74
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит определения структуры и функций для конфигурации запуска приложения.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/cue/options.go:Options:12379790",
+          "kind": "group",
+          "label": "структура опций",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 8,
+            "end_line": 16
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Options",
+          "summary": "Структура хранит параметры конфигурации запуска, такие как аргументы, окружение и размеры терминала.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/options.go:DefaultOptions:12380033",
+          "kind": "group",
+          "label": "функция получения опций по умолчанию",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 19,
+            "end_line": 25
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.DefaultOptions",
+          "summary": "Функция возвращает структуру с предустановленными значениями, например стандартными размерами экрана.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380069",
+              "kind": "output",
+              "label": "возврат структуры опций",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 20,
+                "end_line": 24
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает заполненную структуру опций с начальными значениями.",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380069"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Launch",
+              "file": "pkg/cue/app.go",
+              "label": "← Launch in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "type:pkg/cue/options.go:Option:12380218",
+          "kind": "group",
+          "label": "тип функционального опциона",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 28,
+            "end_line": 28
+          },
+          "element_type": null,
+          "symbol": null,
+          "summary": "Тип представляет функцию, принимающую указатель на структуру опций для её модификации.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithArgs:12380277",
+          "kind": "group",
+          "label": "функция установки аргументов",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 31,
+            "end_line": 35
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithArgs",
+          "summary": "Функция возвращает опционал, который устанавливает список аргументов командной строки.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380320",
+              "kind": "output",
+              "label": "возврат функционального опциона",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 32,
+                "end_line": 34
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращаемая функция принимает структуру опций и присваивает ей переданные аргументы.",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380320"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithSize:12380415",
+          "kind": "group",
+          "label": "функция установки размеров",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 38,
+            "end_line": 43
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithSize",
+          "summary": "Функция возвращает опционал для настройки ширины и высоты терминала.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380458",
+              "kind": "output",
+              "label": "возврат функционального опциона",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 39,
+                "end_line": 42
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Внутренняя функция присваивает поля ширины и высоты переданным значениям.",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380458"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithEnv:12380674",
+          "kind": "group",
+          "label": "функция добавления переменных окружения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 48,
+            "end_line": 52
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithEnv",
+          "summary": "Функция возвращает опционал, добавляющий переменные окружения к текущему списку.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380715",
+              "kind": "output",
+              "label": "возврат функционального опциона",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 49,
+                "end_line": 51
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Внутренняя функция присваивает массив переменных окружения структуре опций.",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380715"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithReplaceEnv:12380843",
+          "kind": "group",
+          "label": "функция замены переменных окружения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 55,
+            "end_line": 60
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithReplaceEnv",
+          "summary": "Функция возвращает опционал, который полностью заменяет окружение и устанавливает флаг замены.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380891",
+              "kind": "output",
+              "label": "возврат функционального опциона",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 56,
+                "end_line": 59
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Внутренняя функция присваивает переменные окружения и устанавливает флаг замены.",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380891"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithDir:12381010",
+          "kind": "group",
+          "label": "функция установки рабочей директории",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 63,
+            "end_line": 67
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithDir",
+          "summary": "Функция возвращает опционал для задания директории запуска приложения.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12381048",
+              "kind": "output",
+              "label": "возврат функционального опциона",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 64,
+                "end_line": 66
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Внутренняя функция присваивает переданный путь полю директории.",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12381048"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithTimeout:12381152",
+          "kind": "group",
+          "label": "функция установки таймаута",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 70,
+            "end_line": 74
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithTimeout",
+          "summary": "Функция возвращает опционал, задающий общее время ожидания для запуска приложения.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12381199",
+              "kind": "output",
+              "label": "возврат функционального опциона",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 71,
+                "end_line": 73
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Внутренняя функция присваивает значение таймаута структуре опций.",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12381199"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

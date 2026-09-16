@@ -1,0 +1,415 @@
+{
+  "title": "pkg/cue/options.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cue/options.go",
+      "kind": "group",
+      "label": "Файл пакета cue с настройками запуска",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cue/options.go",
+        "start_line": 1,
+        "end_line": 74
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит определения структуры опций и функций для конфигурации запуска приложения",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/cue/options.go:Options:12379790",
+          "kind": "group",
+          "label": "Структура Options для конфигурации запуска",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 8,
+            "end_line": 16
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Options",
+          "summary": "Структура хранит аргументы, переменные окружения, директорию, размеры терминала и тайм-аут приложения",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380069",
+              "kind": "output",
+              "label": "Возвращаемое значение функции DefaultOptions",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 20,
+                "end_line": 24
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создает инициализированную структуру Options с базовыми параметрами запуска",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380069"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "type:pkg/cue/options.go:Option:12380218",
+          "kind": "group",
+          "label": "Тип функциональной опции",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 28,
+            "end_line": 28
+          },
+          "element_type": null,
+          "symbol": null,
+          "summary": "Тип представляет функцию-заглушку для функционального стиля конфигурации запуска приложения",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithArgs:12380277",
+          "kind": "group",
+          "label": "Функция установки аргументов команды",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 31,
+            "end_line": 35
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithArgs",
+          "summary": "Возвращает функцию-заглушку, которая устанавливает переданные аргументы в поле Args структуры Options",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380320",
+              "kind": "output",
+              "label": "Возвращаемая функция-заглушка WithArgs",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 32,
+                "end_line": 34
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Принимает указанный курсор и сохраняет переданные аргументы в поле Args структуры",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380320"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithSize:12380415",
+          "kind": "group",
+          "label": "Функция установки размеров терминала",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 38,
+            "end_line": 43
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithSize",
+          "summary": "Возвращает функцию-заглушку, которая устанавливает ширину и высоту терминала в структуре Options",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380458",
+              "kind": "output",
+              "label": "Возвращаемая функция-заглушка WithSize",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 39,
+                "end_line": 42
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Принимает курсор и устанавливает переданные значения ширины и высоты в структуру Options",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380458"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithEnv:12380674",
+          "kind": "group",
+          "label": "Функция добавления переменных окружения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 48,
+            "end_line": 52
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithEnv",
+          "summary": "Возвращает функцию-заглушку, которая добавляет переменные окружения к текущему окружению процесса",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380715",
+              "kind": "output",
+              "label": "Возвращаемая функция-заглушка WithEnv",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 49,
+                "end_line": 51
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Принимает курсор и сохраняет переданные переменные окружения в поле Env структуры",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380715"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithReplaceEnv:12380843",
+          "kind": "group",
+          "label": "Функция замены переменных окружения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 55,
+            "end_line": 60
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithReplaceEnv",
+          "summary": "Возвращает функцию-заглушку, которая полностью заменяет переменные окружения и устанавливает флаг замены",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12380891",
+              "kind": "output",
+              "label": "Возвращаемая функция-заглушка WithReplaceEnv",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 56,
+                "end_line": 59
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Принимает курсор, устанавливает переменные окружения и активирует флаг полной замены окружения",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12380891"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithDir:12381010",
+          "kind": "group",
+          "label": "Функция установки рабочей директории",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 63,
+            "end_line": 67
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithDir",
+          "summary": "Возвращает функцию-заглушку, которая устанавливает указанную директорию в качестве рабочей директории",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12381048",
+              "kind": "output",
+              "label": "Возвращаемая функция-заглушка WithDir",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 64,
+                "end_line": 66
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Принимает курсор и сохраняет переданную директорию в поле Dir структуры Options",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12381048"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/options.go:WithTimeout:12381152",
+          "kind": "group",
+          "label": "Функция установки тайм-аута",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/options.go",
+            "start_line": 70,
+            "end_line": 74
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithTimeout",
+          "summary": "Возвращает функцию-заглушку, которая устанавливает общий тайм-аут для запуска приложения",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/options.go:12381199",
+              "kind": "output",
+              "label": "Возвращаемая функция-заглушка WithTimeout",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/options.go",
+                "start_line": 71,
+                "end_line": 73
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Принимает курсор и сохраняет переданный тайм-аут в поле Timeout структуры Options",
+              "coverage_ids": [
+                "return:pkg/cue/options.go:12381199"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

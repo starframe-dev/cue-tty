@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Graphloom</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #09090b; color: #e4e4e7; font: 14px/1.5 system-ui, sans-serif; overflow: hidden; }
+  #bar { position: fixed; top: 0; left: 0; right: 0; min-height: 36px; padding: 4px 10px; background: rgba(9,9,11,.94);
+         border-bottom: 1px solid #27272a; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; align-content: center; z-index: 5; }
+  #file-description { display: none; flex: 0 0 100%; min-width: 0; padding: 2px 4px 3px; color: #a1a1aa; font-size: 11px; line-height: 1.35; }
+  #file-description strong { color: #f4f4f5; font-weight: 600; }
+  #file-description span { margin-left: 8px; color: #71717a; }
+  #bar h1 { font-size: 14px; font-weight: 600; white-space: nowrap; }
+  #bar .crumb { min-width: 0; flex: 1; font-size: 12px; color: #a1a1aa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #layers { display: flex; flex: 0 0 auto; gap: 7px; align-items: center; }
+  .lchk { font-size: 11px; color: #a1a1aa; display: flex; gap: 3px; align-items: center; cursor: pointer; white-space: nowrap; }
+  #search { flex: 0 0 150px; background: #18181b; border: 1px solid #3f3f46; border-radius: 6px; color: #e4e4e7;
+            padding: 4px 8px; font-size: 12px; width: 150px; }
+  .nav, .tool { background: #27272a; border: 1px solid #3f3f46; color: #e4e4e7; border-radius: 6px;
+         cursor: pointer; font-size: 12px; }
+  .nav { padding: 4px 9px; }
+  .nav:disabled, .tool:disabled { opacity: .4; cursor: default; }
+  .tool { width: 28px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+  .tool:hover:not(:disabled), .nav:hover:not(:disabled) { background: #3f3f46; }
+  .tool svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8;
+              stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  #stage { position: fixed; inset: 0; top: 36px; overflow: auto; padding: 0; background: #0b0d12; }
+  #stage::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22;
+                  background-image: linear-gradient(#202533 1px, transparent 1px), linear-gradient(90deg, #202533 1px, transparent 1px);
+                  background-size: 32px 32px; }
+  svg { display: block; position: relative; z-index: 1; overflow: visible; }
+  .scope-region { pointer-events: none; }
+  .scope-region rect { stroke-width: 1.2; }
+  .scope-region.dim { opacity: .14; }
+  .node { cursor: pointer; }
+  .collapse-toggle { cursor: pointer; }
+  .collapse-toggle text { pointer-events: none; }
+  .collapse-toggle:hover rect { filter: brightness(1.25); }
+  .node rect { transition: filter .15s, stroke-width .15s; }
+  .node:hover rect { filter: brightness(1.18); }
+  .node.root rect { stroke-width: 2.5; }
+  .node.dim, .edge.dim { opacity: .14; }
+  .edge { stroke: #4b5563; stroke-width: 1.25; fill: none; opacity: .9; }
+  .edge.inferred { stroke-dasharray: 5 4; }
+  .elabel-bg { fill: #09090b; stroke: #27272a; stroke-width: 1; }
+  .elabel { font-size: 10px; fill: #a1a1aa; }
+  .nlabel { font-size: 11px; fill: #f4f4f5; font-weight: 500; }
+  .nsummary { font-size: 9px; fill: #71717a; }
+  .nkind { font-size: 11px; }
+  .hit { stroke: #facc15; stroke-width: 2.5; }
+  #sidebar { position: fixed; top: 36px; right: 0; bottom: 0; width: 380px; background: #18181b;
+             border-left: 1px solid #27272a; padding: 16px; overflow: auto; display: none; z-index: 6; }
+  #sidebar h2 { font-size: 16px; margin-bottom: 2px; padding-right: 20px; }
+  #sidebar .meta { font-size: 12px; color: #a1a1aa; margin-bottom: 10px; }
+  #close { position: absolute; top: 10px; right: 12px; cursor: pointer; color: #71717a;
+           background: none; border: none; font-size: 16px; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; margin-right: 4px; }
+  .chip.on { background: #064e3b; color: #6ee7b7; }
+  .chip.off { background: #27272a; color: #71717a; }
+  pre.code { margin-top: 12px; background: #09090b; border: 1px solid #27272a; border-radius: 8px;
+             padding: 10px; font: 11px/1.6 ui-monospace, monospace; overflow: auto; }
+  pre.code .ln { color: #52525b; display: inline-block; width: 34px; user-select: none; }
+  pre.code .hl { background: #27272a; display: block; }
+  .expand { margin-top: 10px; background: #1d4ed8; color: #fff; border: none; border-radius: 6px;
+            padding: 5px 12px; cursor: pointer; font-size: 12px; }
+  .expand { margin-top: 10px; background: #1d4ed8; color: #fff; border: none; border-radius: 6px;
+            padding: 5px 12px; cursor: pointer; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="bar">
+  <h1>Graphloom</h1>
+  <button class="nav" id="back">←</button>
+  <button class="nav" id="fwd">→</button>
+  <span class="crumb" id="crumb"></span>
+  <span id="layers"></span>
+  <input id="search" placeholder="Поиск…" />
+  <div id="file-description"><strong id="file-label"></strong><span id="file-summary"></span></div>
+</div>
+<div id="stage"><svg id="svg"></svg></div>
+<div id="sidebar">
+  <button id="close" aria-label="Закрыть">×</button>
+  <h2 id="s-title"></h2>
+  <div class="meta" id="s-meta"></div>
+  <div id="s-tests"></div>
+  <p id="s-summary" style="margin-top:8px;font-size:13px"></p>
+  <div id="s-refs" style="margin-top:10px;font-size:12px"></div>
+  <div id="s-extra"></div>
+  <pre class="code" id="s-code" style="display:none"></pre>
+</div>
+<script>
+const viz = {"title":"pkg/cli/session.go","level":"file","nodes":[{"id":"file:pkg/cli/session.go","kind":"group","label":"Файл пакета cli","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":1,"end_line":152},"element_type":null,"symbol":null,"summary":"Этот файл содержит определение структуры сессий и менеджера сессий для интерактивного REPL cue-tty.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"type:pkg/cli/session.go:Session:14573664","kind":"group","label":"Структура Session","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":14,"end_line":20},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Session","summary":"Представляет собой сессию TUI с именем, приложением, страницей, HTTP-адресом API и рабочей директорией.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"type:pkg/cli/session.go:SessionManager:14573923","kind":"group","label":"Структура SessionManager","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":23,"end_line":26},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager","summary":"Управляет набором именованных сессий с использованием мьютекса для синхронизации доступа.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cli/session.go:NewSessionManager:14574053","kind":"group","label":"Функция создания менеджера сессий","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":29,"end_line":33},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.NewSessionManager","summary":"Инициализирует новый менеджер сессий, создавая пустую карту для хранения сессий.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/session.go:14574097","kind":"output","label":"Возврат менеджера сессий","layer":"data","source":{"file":"pkg/cli/session.go","start_line":30,"end_line":32},"element_type":null,"symbol":null,"summary":"Возвращает только что созданный менеджер сессий с пустой картой сессий.","coverage_ids":["return:pkg/cli/session.go:14574097"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.NewDaemon","file":"pkg/cli/daemon.go","label":"← NewDaemon in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Run","file":"pkg/cli/repl.go","label":"← Run in pkg/cli/repl.go"}]},{"id":"func:pkg/cli/session.go:GetOrCreate:14574231","kind":"group","label":"Функция получения или создания сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":36,"end_line":47},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.GetOrCreate","summary":"Возвращает существующую сессию по имени или создаёт новую, если сессия не найдена.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14574294","kind":"action","label":"Блокировка мьютекса","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":37,"end_line":37},"element_type":null,"symbol":null,"summary":"Защищает доступ к карте сессий с помощью блокировки мьютекса.","coverage_ids":["statement:pkg/cli/session.go:14574294"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574308","kind":"action","label":"Отмена блокировки мьютекса","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":38,"end_line":38},"element_type":null,"symbol":null,"summary":"Планирует разблокировку мьютекса после завершения критической секции.","coverage_ids":["statement:pkg/cli/session.go:14574308"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/session.go:14574331","kind":"decision","label":"Условие существования сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":40,"end_line":42},"element_type":null,"symbol":null,"summary":"Проверяет, существует ли сессия с указанным именем в карте сессий.","coverage_ids":["if:pkg/cli/session.go:14574331"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14574334","kind":"action","label":"Проверка существования сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":38,"end_line":38},"element_type":null,"symbol":null,"summary":"Извлекает сессию из карты по имени и проверяет её существование.","coverage_ids":["statement:pkg/cli/session.go:14574334"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14574369","kind":"output","label":"Возврат существующей сессии","layer":"data","source":{"file":"pkg/cli/session.go","start_line":41,"end_line":41},"element_type":null,"symbol":null,"summary":"Возвращает найденную сессию, если она существует в карте.","coverage_ids":["return:pkg/cli/session.go:14574369"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574383","kind":"action","label":"Создание новой сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":44,"end_line":44},"element_type":null,"symbol":null,"summary":"Инициализирует новую сессию с указанным именем для последующего добавления в карту.","coverage_ids":["statement:pkg/cli/session.go:14574383"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574410","kind":"action","label":"Добавление сессии в карту","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":45,"end_line":45},"element_type":null,"symbol":null,"summary":"Добавляет созданную сессию в карту сессий под её именем.","coverage_ids":["statement:pkg/cli/session.go:14574410"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14574433","kind":"output","label":"Возврат созданной сессии","layer":"data","source":{"file":"pkg/cli/session.go","start_line":46,"end_line":46},"element_type":null,"symbol":null,"summary":"Возвращает только что созданную сессию после её добавления в карту.","coverage_ids":["return:pkg/cli/session.go:14574433"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleCommand","file":"pkg/cli/daemon.go","label":"← handleCommand in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Run","file":"pkg/cli/repl.go","label":"← Run in pkg/cli/repl.go"}]},{"id":"func:pkg/cli/session.go:Get:14574479","kind":"group","label":"Функция получения сессии по имени","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":50,"end_line":55},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Get","summary":"Возвращает сессию по имени и флаг её существования без создания новой.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14574542","kind":"action","label":"Блокировка мьютекса при получении","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":51,"end_line":51},"element_type":null,"symbol":null,"summary":"Защищает доступ к карте сессий с помощью блокировки мьютекса.","coverage_ids":["statement:pkg/cli/session.go:14574542"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574556","kind":"action","label":"Отмена блокировки мьютекса при получении","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":52,"end_line":52},"element_type":null,"symbol":null,"summary":"Планирует разблокировку мьютекса после завершения критической секции.","coverage_ids":["statement:pkg/cli/session.go:14574556"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574578","kind":"action","label":"Извлечение сессии из карты","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":52,"end_line":52},"element_type":null,"symbol":null,"summary":"Получает сессию из карты по имени и проверяет её существование.","coverage_ids":["statement:pkg/cli/session.go:14574578"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14574606","kind":"output","label":"Возврат сессии и флага","layer":"data","source":{"file":"pkg/cli/session.go","start_line":54,"end_line":54},"element_type":null,"symbol":null,"summary":"Возвращает сессию и булевый флаг, указывающий на её существование.","coverage_ids":["return:pkg/cli/session.go:14574606"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.makeCmdList","file":"pkg/cli/commands.go","label":"← makeCmdList in pkg/cli/commands.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.makeCmdShow","file":"pkg/cli/commands.go","label":"← makeCmdShow in pkg/cli/commands.go"}]},{"id":"func:pkg/cli/session.go:List:14574657","kind":"group","label":"Функция получения списка сессий","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":58,"end_line":66},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.List","summary":"Возвращает массив всех имён существующих сессий в менеджере.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14574702","kind":"action","label":"Блокировка мьютекса при перечислении","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":59,"end_line":59},"element_type":null,"symbol":null,"summary":"Защищает доступ к карте сессий с помощью блокировки мьютекса.","coverage_ids":["statement:pkg/cli/session.go:14574702"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574716","kind":"action","label":"Отмена блокировки мьютекса при перечислении","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":60,"end_line":60},"element_type":null,"symbol":null,"summary":"Планирует разблокировку мьютекса после завершения критической секции.","coverage_ids":["statement:pkg/cli/session.go:14574716"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574738","kind":"action","label":"Создание массива имён сессий","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":61,"end_line":61},"element_type":null,"symbol":null,"summary":"Инициализирует пустой массив для хранения имён всех сессий.","coverage_ids":["statement:pkg/cli/session.go:14574738"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"loop:pkg/cli/session.go:14574784","kind":"loop","label":"Перебор сессий в карте","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":62,"end_line":64},"element_type":null,"symbol":null,"summary":"Итерируется по всем сессиям в карте для извлечения их имён.","coverage_ids":["loop:pkg/cli/session.go:14574784"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14574818","kind":"action","label":"Добавление имени в массив","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":63,"end_line":63},"element_type":null,"symbol":null,"summary":"Добавляет текущее имя сессии в массив для последующего возврата.","coverage_ids":["statement:pkg/cli/session.go:14574818"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14574850","kind":"output","label":"Возврат списка имён сессий","layer":"data","source":{"file":"pkg/cli/session.go","start_line":65,"end_line":65},"element_type":null,"symbol":null,"summary":"Возвращает заполненный массив имён всех сессий.","coverage_ids":["return:pkg/cli/session.go:14574850"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.makeCmdList","file":"pkg/cli/commands.go","label":"← makeCmdList in pkg/cli/commands.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.makeCmdShow","file":"pkg/cli/commands.go","label":"← makeCmdShow in pkg/cli/commands.go"}]},{"id":"func:pkg/cli/session.go:Close:14574901","kind":"group","label":"Функция закрытия сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":69,"end_line":83},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close","summary":"Закрывает сессию по имени, удаляя её из менеджера и останавливая приложение.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14574955","kind":"action","label":"Блокировка мьютекса при закрытии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":70,"end_line":70},"element_type":null,"symbol":null,"summary":"Защищает доступ к карте сессий с помощью блокировки мьютекса.","coverage_ids":["statement:pkg/cli/session.go:14574955"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14574969","kind":"action","label":"Извлечение сессии из карты","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":70,"end_line":70},"element_type":null,"symbol":null,"summary":"Получает сессию из карты по имени для последующей проверки существования.","coverage_ids":["statement:pkg/cli/session.go:14574969"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/session.go:14574997","kind":"decision","label":"Проверка существования сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":72,"end_line":75},"element_type":null,"symbol":null,"summary":"Проверяет, существует ли сессия с указанным именем в карте.","coverage_ids":["if:pkg/cli/session.go:14574997"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14575008","kind":"action","label":"Разблокировка мьютекса при ошибке","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":73,"end_line":73},"element_type":null,"symbol":null,"summary":"Разблокирует мьютекс, если сессия не найдена в карте.","coverage_ids":["statement:pkg/cli/session.go:14575008"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14575025","kind":"output","label":"Возврат ошибки несуществования сессии","layer":"data","source":{"file":"pkg/cli/session.go","start_line":74,"end_line":74},"element_type":null,"symbol":null,"summary":"Возвращает ошибку, если сессия с указанным именем не найдена.","coverage_ids":["return:pkg/cli/session.go:14575025"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14575077","kind":"action","label":"Удаление сессии из карты","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":76,"end_line":76},"element_type":null,"symbol":null,"summary":"Удаляет сессию из карты сессий после успешной проверки существования.","coverage_ids":["statement:pkg/cli/session.go:14575077"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14575104","kind":"action","label":"Разблокировка мьютекса после удаления","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":77,"end_line":77},"element_type":null,"symbol":null,"summary":"Разблокирует мьютекс после удаления сессии из карты.","coverage_ids":["statement:pkg/cli/session.go:14575104"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/session.go:14575121","kind":"decision","label":"Проверка наличия приложения","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":79,"end_line":81},"element_type":null,"symbol":null,"summary":"Проверяет, запущено ли приложение в сессии для его корректного закрытия.","coverage_ids":["if:pkg/cli/session.go:14575121"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/session.go:14575141","kind":"output","label":"Возврат ошибки закрытия приложения","layer":"data","source":{"file":"pkg/cli/session.go","start_line":80,"end_line":80},"element_type":null,"symbol":null,"summary":"Возвращает ошибку от закрытия приложения, если оно запущено.","coverage_ids":["return:pkg/cli/session.go:14575141"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14575166","kind":"output","label":"Возврат nil при успешном закрытии","layer":"data","source":{"file":"pkg/cli/session.go","start_line":82,"end_line":82},"element_type":null,"symbol":null,"summary":"Возвращает nil, если приложение не запущено или закрылось успешно.","coverage_ids":["return:pkg/cli/session.go:14575166"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.CloseAll","file":"pkg/cli/session.go","label":"← CloseAll in pkg/cli/session.go"}]},{"id":"func:pkg/cli/session.go:CloseAll:14575213","kind":"group","label":"Функция закрытия всех сессий","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":86,"end_line":101},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.CloseAll","summary":"Закрывает все сессии в менеджере и собирает возникшие ошибки.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14575261","kind":"action","label":"Блокировка мьютекса при закрытии всех","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":87,"end_line":87},"element_type":null,"symbol":null,"summary":"Защищает доступ к карте сессий с помощью блокировки мьютекса.","coverage_ids":["statement:pkg/cli/session.go:14575261"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14575275","kind":"action","label":"Создание массива имён сессий","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":88,"end_line":88},"element_type":null,"symbol":null,"summary":"Инициализирует пустой массив для хранения имён всех сессий.","coverage_ids":["statement:pkg/cli/session.go:14575275"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"loop:pkg/cli/session.go:14575321","kind":"loop","label":"Перебор сессий для получения имён","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":89,"end_line":91},"element_type":null,"symbol":null,"summary":"Итерируется по всем сессиям в карте для извлечения их имён.","coverage_ids":["loop:pkg/cli/session.go:14575321"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14575355","kind":"action","label":"Добавление имени в массив","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":90,"end_line":90},"element_type":null,"symbol":null,"summary":"Добавляет текущее имя сессии в массив для последующего использования.","coverage_ids":["statement:pkg/cli/session.go:14575355"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14575387","kind":"action","label":"Разблокировка мьютекса после перебора","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":92,"end_line":92},"element_type":null,"symbol":null,"summary":"Разблокирует мьютекс после завершения перебора сессий.","coverage_ids":["statement:pkg/cli/session.go:14575387"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14575404","kind":"action","label":"Инициализация массива ошибок","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":92,"end_line":92},"element_type":null,"symbol":null,"summary":"Создаёт пустой массив для хранения ошибок при закрытии сессий.","coverage_ids":["statement:pkg/cli/session.go:14575404"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"loop:pkg/cli/session.go:14575422","kind":"loop","label":"Перебор имён для закрытия сессий","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":95,"end_line":99},"element_type":null,"symbol":null,"summary":"Итерируется по всем именам сессий для их последовательного закрытия.","coverage_ids":["loop:pkg/cli/session.go:14575422"],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/session.go:14575453","kind":"decision","label":"Условие наличия ошибки","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":96,"end_line":98},"element_type":null,"symbol":null,"summary":"Проверяет, возникла ли ошибка при закрытии сессии.","coverage_ids":["if:pkg/cli/session.go:14575453"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14575456","kind":"action","label":"Проверка ошибки закрытия","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":96,"end_line":96},"element_type":null,"symbol":null,"summary":"Проверяет результат закрытия сессии и собирает возникшие ошибки.","coverage_ids":["statement:pkg/cli/session.go:14575456"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/session.go:Close:14575463","kind":"call","label":"Вызов закрытия сессии","layer":"calls","source":{"file":"pkg/cli/session.go","start_line":69,"end_line":83},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close","summary":"Вызывает функцию закрытия для каждой сессии в цикле.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close","file":"pkg/cli/session.go","label":"→ Close in pkg/cli/session.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14575495","kind":"action","label":"Добавление ошибки в массив","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":97,"end_line":97},"element_type":null,"symbol":null,"summary":"Добавляет возникшую ошибку в массив ошибок для последующего возврата.","coverage_ids":["statement:pkg/cli/session.go:14575495"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14575528","kind":"output","label":"Возврат массива ошибок","layer":"data","source":{"file":"pkg/cli/session.go","start_line":100,"end_line":100},"element_type":null,"symbol":null,"summary":"Возвращает массив ошибок, возникших при закрытии всех сессий.","coverage_ids":["return:pkg/cli/session.go:14575528"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Run","file":"pkg/cli/repl.go","label":"← Run in pkg/cli/repl.go"}]},{"id":"func:pkg/cli/session.go:Launch:14575732","kind":"group","label":"Функция запуска приложения в сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":106,"end_line":133},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch","summary":"Запускает TUI-приложение в сессии, выделяя порт и настраивая окружение.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/session.go:14575798","kind":"decision","label":"Проверка запущенного приложения","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":107,"end_line":109},"element_type":null,"symbol":null,"summary":"Проверяет, не запущено ли уже приложение в сессии.","coverage_ids":["if:pkg/cli/session.go:14575798"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/session.go:14575818","kind":"output","label":"Возврат ошибки при повторном запуске","layer":"data","source":{"file":"pkg/cli/session.go","start_line":108,"end_line":108},"element_type":null,"symbol":null,"summary":"Возвращает ошибку, если приложение уже запущено в этой сессии.","coverage_ids":["return:pkg/cli/session.go:14575818"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14575960","kind":"action","label":"Присвоение порта сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":112,"end_line":112},"element_type":null,"symbol":null,"summary":"Присваивает найденный порт сессии для формирования HTTP-адреса.","coverage_ids":["statement:pkg/cli/session.go:14575960"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/session.go:findFreePort:14575968","kind":"call","label":"Вызов поиска свободного порта","layer":"calls","source":{"file":"pkg/cli/session.go","start_line":136,"end_line":144},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.findFreePort","summary":"Вызывает функцию поиска свободного TCP порта для HTTP API приложения.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.findFreePort","file":"pkg/cli/session.go","label":"→ findFreePort in pkg/cli/session.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/session.go:14575984","kind":"decision","label":"Условие наличия порта","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":113,"end_line":115},"element_type":null,"symbol":null,"summary":"Проверяет, был ли найден свободный порт для использования.","coverage_ids":["if:pkg/cli/session.go:14575984"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14576000","kind":"action","label":"Установка HTTP-адреса сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":114,"end_line":114},"element_type":null,"symbol":null,"summary":"Устанавливает HTTP-адрес сессии с найденным портом для API элемента дерева.","coverage_ids":["statement:pkg/cli/session.go:14576000"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14576059","kind":"action","label":"Создание опций запуска","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":118,"end_line":118},"element_type":null,"symbol":null,"summary":"Инициализирует массив опций для запуска приложения с аргументами и размером.","coverage_ids":["statement:pkg/cli/session.go:14576059"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/session.go:WithArgs:14576083","kind":"call","label":"Добавление опции аргументов","layer":"calls","source":{"file":"pkg/cli/session.go","start_line":118,"end_line":118},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.WithArgs","summary":"Добавляет опцию передачи аргументов командной строки в список опций.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.WithArgs","file":"pkg/cue/options.go","label":"→ WithArgs in pkg/cue/options.go"}]},{"id":"call:pkg/cli/session.go:WithSize:14576108","kind":"call","label":"Добавление опции размера","layer":"calls","source":{"file":"pkg/cli/session.go","start_line":119,"end_line":119},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.WithSize","summary":"Добавляет опцию размера терминала 80x24 в список опций запуска.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.WithSize","file":"pkg/cue/options.go","label":"→ WithSize in pkg/cue/options.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/session.go:14576134","kind":"decision","label":"Условие наличия порта","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":121,"end_line":123},"element_type":null,"symbol":null,"summary":"Проверяет, был ли найден порт для добавления опции окружения.","coverage_ids":["if:pkg/cli/session.go:14576134"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14576150","kind":"action","label":"Присвоение опций запуска","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":122,"end_line":122},"element_type":null,"symbol":null,"summary":"Присваивает расширенный список опций для запуска приложения.","coverage_ids":["statement:pkg/cli/session.go:14576150"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/session.go:WithEnv:14576170","kind":"call","label":"Добавление опции окружения","layer":"calls","source":{"file":"pkg/cli/session.go","start_line":122,"end_line":122},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.WithEnv","summary":"Добавляет опцию установки переменной окружения для HTTP порта warp.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.WithEnv","file":"pkg/cue/options.go","label":"→ WithEnv in pkg/cue/options.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14576226","kind":"action","label":"Присвоение результата запуска","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":125,"end_line":125},"element_type":null,"symbol":null,"summary":"Присваивает результат запуска приложения и ошибку сессии.","coverage_ids":["statement:pkg/cli/session.go:14576226"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/session.go:Launch:14576238","kind":"call","label":"Вызов запуска приложения","layer":"calls","source":{"file":"pkg/cli/session.go","start_line":125,"end_line":125},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.Launch","summary":"Вызывает функцию запуска приложения из пакета cue с переданными опциями.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Launch","file":"pkg/cue/app.go","label":"→ Launch in pkg/cue/app.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/session.go:14576268","kind":"decision","label":"Проверка ошибки запуска","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":126,"end_line":128},"element_type":null,"symbol":null,"summary":"Проверяет, возникла ли ошибка при запуске приложения.","coverage_ids":["if:pkg/cli/session.go:14576268"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/session.go:14576286","kind":"output","label":"Возврат ошибки запуска","layer":"data","source":{"file":"pkg/cli/session.go","start_line":127,"end_line":127},"element_type":null,"symbol":null,"summary":"Возвращает ошибку запуска с обёрткой ошибки для последующей обработки.","coverage_ids":["return:pkg/cli/session.go:14576286"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14576328","kind":"action","label":"Присваивание приложения сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":131,"end_line":131},"element_type":null,"symbol":null,"summary":"Передаёт объект приложения в поле сессии для последующего использования.","coverage_ids":["statement:pkg/cli/session.go:14576328"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14576341","kind":"action","label":"Присваивание страницы сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":131,"end_line":131},"element_type":null,"symbol":null,"summary":"Записывает полученную страницу в поле сессии для доступа к интерфейсу.","coverage_ids":["statement:pkg/cli/session.go:14576341"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/session.go:Page:14576350","kind":"call","label":"Вызов метода создания страницы","layer":"calls","source":{"file":"pkg/cli/session.go","start_line":131,"end_line":131},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.Page","summary":"Вызывает метод Page у приложения для получения новой страницы сессии.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.App.Page","file":"pkg/cue/app.go","label":"→ Page in pkg/cue/app.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14576362","kind":"output","label":"Возврат nil из конструктора","layer":"data","source":{"file":"pkg/cli/session.go","start_line":132,"end_line":132},"element_type":null,"symbol":null,"summary":"Завершает инициализацию сессии и возвращает nil как успешный результат.","coverage_ids":["return:pkg/cli/session.go:14576362"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.cmdLaunch","file":"pkg/cli/commands.go","label":"← cmdLaunch in pkg/cli/commands.go"}]},{"id":"func:pkg/cli/session.go:findFreePort:14576434","kind":"group","label":"Функция поиска свободного порта","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":136,"end_line":144},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.findFreePort","summary":"Ищет доступный TCP порт для запуска сервера, используя автоматическое назначение.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/session.go:14576461","kind":"action","label":"Создание TCP-слушателя","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":137,"end_line":137},"element_type":null,"symbol":null,"summary":"Инициализирует TCP-слушатель на порту 0 для определения свободного порта.","coverage_ids":["statement:pkg/cli/session.go:14576461"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/session.go:14576497","kind":"decision","label":"Проверка ошибки создания слушателя","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":138,"end_line":140},"element_type":null,"symbol":null,"summary":"Проверяет наличие ошибки при создании TCP-слушателя и обрабатывает её.","coverage_ids":["if:pkg/cli/session.go:14576497"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/session.go:14576515","kind":"output","label":"Возврат нуля при ошибке","layer":"data","source":{"file":"pkg/cli/session.go","start_line":139,"end_line":139},"element_type":null,"symbol":null,"summary":"Возвращает 0 как значение порта в случае неудачи создания слушателя.","coverage_ids":["return:pkg/cli/session.go:14576515"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14576528","kind":"action","label":"Извлечение номера порта","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":141,"end_line":141},"element_type":null,"symbol":null,"summary":"Получает номер порта из адреса слушателя после успешного создания.","coverage_ids":["statement:pkg/cli/session.go:14576528"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/session.go:14576567","kind":"action","label":"Закрытие TCP-слушателя","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":142,"end_line":142},"element_type":null,"symbol":null,"summary":"Закрывает созданный слушатель для освобождения ресурсов перед возвратом порта.","coverage_ids":["statement:pkg/cli/session.go:14576567"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14576579","kind":"output","label":"Возврат найденного порта","layer":"data","source":{"file":"pkg/cli/session.go","start_line":143,"end_line":143},"element_type":null,"symbol":null,"summary":"Возвращает номер свободного порта для использования при запуске сервера.","coverage_ids":["return:pkg/cli/session.go:14576579"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch","file":"pkg/cli/session.go","label":"← Launch in pkg/cli/session.go"}]},{"id":"func:pkg/cli/session.go:Close:14576642","kind":"group","label":"Метод закрытия сессии","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":147,"end_line":152},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Session.Close","summary":"Завершает работу приложения в текущей сессии и освобождает ресурсы.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/session.go:14576677","kind":"decision","label":"Проверка наличия приложения","layer":"flow","source":{"file":"pkg/cli/session.go","start_line":148,"end_line":150},"element_type":null,"symbol":null,"summary":"Проверяет, инициализировано ли приложение в сессии перед попыткой закрытия.","coverage_ids":["if:pkg/cli/session.go:14576677"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/session.go:14576697","kind":"output","label":"Возврат nil при отсутствии приложения","layer":"data","source":{"file":"pkg/cli/session.go","start_line":149,"end_line":149},"element_type":null,"symbol":null,"summary":"Возвращает nil если приложение не инициализировано, считая закрытие успешным.","coverage_ids":["return:pkg/cli/session.go:14576697"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/session.go:14576712","kind":"output","label":"Возврат результата закрытия приложения","layer":"data","source":{"file":"pkg/cli/session.go","start_line":151,"end_line":151},"element_type":null,"symbol":null,"summary":"Передаёт ошибку или результат закрытия из метода приложения сессии.","coverage_ids":["return:pkg/cli/session.go:14576712"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.cmdCloseSession","file":"pkg/cli/commands.go","label":"← cmdCloseSession in pkg/cli/commands.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.cmdExit","file":"pkg/cli/commands.go","label":"← cmdExit in pkg/cli/commands.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"edges":[]};
+const palette = [{"type":"service","label":"Сервис","color":"#3b82f6","icon":"Settings2","description":"Самостоятельный сервис или приложение"},{"type":"database","label":"База данных","color":"#10b981","icon":"Database","description":"Хранилище данных, слой доступа к БД"},{"type":"module","label":"Модуль","color":"#a78bfa","icon":"Box","description":"Внутренний модуль или пакет"},{"type":"library","label":"Библиотека","color":"#f59e0b","icon":"Library","description":"Переиспользуемая библиотека"},{"type":"entrypoint","label":"Точка входа","color":"#ef4444","icon":"Rocket","description":"main / CLI / server entrypoint"}];
+const sources = {"pkg/cli/session.go":"// Package cli provides the interactive REPL for cue-tty.\npackage cli\n\nimport (\n\t\"fmt\"\n\t\"net\"\n\t\"strconv\"\n\t\"sync\"\n\n\t\"github.com/starframe-dev/cue-tty/pkg/cue\"\n)\n\n// Session represents a named TUI session.\ntype Session struct {\n\tName     string\n\tApp      *cue.App\n\tPage     *cue.Page\n\tHTTPAddr string // HTTP address of the app's element tree API\n\tWorkDir  string // working directory of the client (for save/artifacts)\n}\n\n// SessionManager manages named sessions.\ntype SessionManager struct {\n\tmu       sync.Mutex\n\tsessions map[string]*Session\n}\n\n// NewSessionManager creates a new session manager.\nfunc NewSessionManager() *SessionManager {\n\treturn &SessionManager{\n\t\tsessions: make(map[string]*Session),\n\t}\n}\n\n// GetOrCreate returns an existing session or creates a new one.\nfunc (sm *SessionManager) GetOrCreate(name string) *Session {\n\tsm.mu.Lock()\n\tdefer sm.mu.Unlock()\n\n\tif s, ok := sm.sessions[name]; ok {\n\t\treturn s\n\t}\n\n\ts := &Session{Name: name}\n\tsm.sessions[name] = s\n\treturn s\n}\n\n// Get returns a session by name.\nfunc (sm *SessionManager) Get(name string) (*Session, bool) {\n\tsm.mu.Lock()\n\tdefer sm.mu.Unlock()\n\ts, ok := sm.sessions[name]\n\treturn s, ok\n}\n\n// List returns all session names.\nfunc (sm *SessionManager) List() []string {\n\tsm.mu.Lock()\n\tdefer sm.mu.Unlock()\n\tnames := make([]string, 0, len(sm.sessions))\n\tfor name := range sm.sessions {\n\t\tnames = append(names, name)\n\t}\n\treturn names\n}\n\n// Close closes a session by name.\nfunc (sm *SessionManager) Close(name string) error {\n\tsm.mu.Lock()\n\ts, ok := sm.sessions[name]\n\tif !ok {\n\t\tsm.mu.Unlock()\n\t\treturn fmt.Errorf(\"session %q not found\", name)\n\t}\n\tdelete(sm.sessions, name)\n\tsm.mu.Unlock()\n\n\tif s.App != nil {\n\t\treturn s.App.Close()\n\t}\n\treturn nil\n}\n\n// CloseAll closes all sessions.\nfunc (sm *SessionManager) CloseAll() []error {\n\tsm.mu.Lock()\n\tnames := make([]string, 0, len(sm.sessions))\n\tfor name := range sm.sessions {\n\t\tnames = append(names, name)\n\t}\n\tsm.mu.Unlock()\n\n\tvar errs []error\n\tfor _, name := range names {\n\t\tif err := sm.Close(name); err != nil {\n\t\t\terrs = append(errs, err)\n\t\t}\n\t}\n\treturn errs\n}\n\n// Launch starts a TUI application in the session.\n// If the app supports HTTP element tree (warp-based), cuetty-cli allocates\n// a free port and passes it via WARP_HTTP_PORT env variable.\nfunc (s *Session) Launch(command string, args ...string) error {\n\tif s.App != nil {\n\t\treturn fmt.Errorf(\"app already running in session %q, use close first\", s.Name)\n\t}\n\n\t// Allocate a free port for the app's HTTP element tree\n\tport := findFreePort()\n\tif port > 0 {\n\t\ts.HTTPAddr = \"http://localhost:\" + strconv.Itoa(port)\n\t}\n\n\topts := []cue.Option{\n\t\tcue.WithArgs(args...),\n\t\tcue.WithSize(80, 24),\n\t}\n\tif port > 0 {\n\t\topts = append(opts, cue.WithEnv(\"WARP_HTTP_PORT=\"+strconv.Itoa(port)))\n\t}\n\n\tapp, err := cue.Launch(command, opts...)\n\tif err != nil {\n\t\treturn fmt.Errorf(\"launch: %w\", err)\n\t}\n\n\ts.App = app\n\ts.Page = app.Page()\n\treturn nil\n}\n\n// findFreePort finds a free TCP port by listening on :0.\nfunc findFreePort() int {\n\tln, err := net.Listen(\"tcp\", \":0\")\n\tif err != nil {\n\t\treturn 0\n\t}\n\tport := ln.Addr().(*net.TCPAddr).Port\n\tln.Close()\n\treturn port\n}\n\n// Close stops the application in this session.\nfunc (s *Session) Close() error {\n\tif s.App == nil {\n\t\treturn nil\n\t}\n\treturn s.App.Close()\n}\n"};
+
+const KIND_STYLE = {
+  action:   { color: "#3b82f6", icon: "Play" },
+  decision: { color: "#f59e0b", icon: "GitBranch" },
+  call:     { color: "#8b5cf6", icon: "Code2" },
+  input:    { color: "#06b6d4", icon: "ArrowDownToLine" },
+  output:   { color: "#10b981", icon: "ArrowUpFromLine" },
+  state:    { color: "#eab308", icon: "CircleDot" },
+  storage:  { color: "#14b8a6", icon: "Database" },
+  external: { color: "#f97316", icon: "Globe" },
+  loop:     { color: "#84cc16", icon: "RefreshCw" },
+  error:    { color: "#ef4444", icon: "CircleAlert" },
+  async:    { color: "#ec4899", icon: "Zap" },
+  group:    { color: "#71717a", icon: "Layers3" }
+};
+const ICON_PATHS = {
+  Settings2: '<path d="M20 7h-9M14 17H4M17 3v8M7 13v8M20 17h-3M7 7H4"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+  Database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/>',
+  Box: '<path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/>',
+  Library: '<path d="m16 6 4 2v12l-4-2V6ZM4 4l4-1v13l-4 1V4ZM12 3l4 3v12l-4-3V3Z"/>',
+  Rocket: '<path d="M4.5 16.5c-1.5 1.3-2 3.5-2 3.5s2.2-.5 3.5-2c.7-.7.9-1.7.3-2.3s-1.1-.5-1.8.2Z"/><path d="m9 15-3-3 8-8c2-2 5-2 6-1-1 1-1 4-3 6l-8 8Z"/><path d="M14 6 8 4 4 8l6 2M18 10l2 6-4 4-2-6"/>',
+  Play: '<path d="m6 3 14 9-14 9V3Z"/>',
+  GitBranch: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v3a6 6 0 0 0 6 6h3M6 9a6 6 0 0 1 6-6h3"/>',
+  Code2: '<path d="m18 16 4-4-4-4M6 8l-4 4 4 4M14.5 4l-5 16"/>',
+  ArrowDownToLine: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  ArrowUpFromLine: '<path d="M12 17V5M7 10l5-5 5 5M5 21h14"/>',
+  CircleDot: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>',
+  Globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>',
+  RefreshCw: '<path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>',
+  CircleAlert: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  Zap: '<path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/>',
+  Layers3: '<path d="m12 2 8 4-8 4-8-4 8-4Z"/><path d="m4 12 8 4 8-4M4 18l8 4 8-4"/>'
+};
+const paletteStyle = {};
+palette.forEach(p => { paletteStyle[p.type] = p; });
+const styleOf = n => (n.element_type && paletteStyle[n.element_type])
+  ? { color: paletteStyle[n.element_type].color, icon: paletteStyle[n.element_type].icon }
+  : KIND_STYLE[n.kind] || KIND_STYLE.action;
+
+const LAYERS = ["flow", "calls", "data", "state", "effects"];
+const activeLayers = new Set(LAYERS);
+const layersBox = document.getElementById("layers");
+LAYERS.forEach(l => {
+  const label = document.createElement("label");
+  label.className = "lchk";
+  const cb = document.createElement("input");
+  cb.type = "checkbox"; cb.checked = true;
+  cb.addEventListener("change", () => {
+    cb.checked ? activeLayers.add(l) : activeLayers.delete(l);
+    render();
+  });
+  label.appendChild(cb);
+  label.appendChild(document.createTextNode(l));
+  layersBox.appendChild(label);
+});
+
+let views = [{ title: viz.title, nodes: viz.nodes, edges: viz.edges }];
+let cursor = 0;
+const current = () => views[cursor];
+
+document.getElementById("back").addEventListener("click", () => { if (cursor > 0) { cursor--; render(); } });
+document.getElementById("fwd").addEventListener("click", () => { if (cursor < views.length - 1) { cursor++; render(); } });
+
+function openView(title, nodes, edges) {
+  views = views.slice(0, cursor + 1);
+  views.push({ title, nodes, edges });
+  cursor++;
+  render();
+}
+
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d");
+function textWidth(text, font) {
+  ctx.font = font;
+  return ctx.measureText(text).width;
+}
+
+function wrapText(text, maxW, font) {
+  const words = (text || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  words.forEach(w => {
+    const test = line ? line + " " + w : w;
+    if (textWidth(test, font) <= maxW) {
+      line = test;
+    } else {
+      if (line) lines.push(line);
+      line = w;
+    }
+  });
+  if (line) lines.push(line);
+  return lines.length ? lines : [text || ""];
+}
+
+function nodeMetrics(n) {
+  const s = styleOf(n);
+  const labelFont = "500 11px system-ui, sans-serif";
+  const summaryFont = "9px system-ui, sans-serif";
+  const maxTextW = n.kind === "decision" ? 200 : 220;
+  const labelLines = wrapText(n.label, maxTextW, labelFont);
+  const summaryLines = n.summary ? wrapText(n.summary, maxTextW, summaryFont) : [];
+  const labelW = Math.max(...labelLines.map(l => textWidth(l, labelFont)), 0);
+  const summaryW = Math.max(...summaryLines.map(l => textWidth(l, summaryFont)), 0);
+  const hasIcon = true;
+  const innerW = Math.max(labelW, summaryW) + (hasIcon ? 32 : 0);
+  const minW = n.kind === "decision" ? 168 : 140;
+  const maxW = n.kind === "decision" ? 280 : 300;
+  const width = Math.max(minW, Math.min(maxW, innerW + 24));
+  const lineH = 13;
+  const labelH = 11 + (labelLines.length - 1) * lineH;
+  const summaryH = summaryLines.length ? 4 + summaryLines.length * lineH : 0;
+  const height = 22 + labelH + summaryH;
+  return { width, height, labelLines, summaryLines, labelH, summaryH, hasIcon, color: s.color, icon: s.icon };
+}
+
+function sequentialize(arcs, visible, level) {
+  if (level !== "file" && level !== "function") return arcs;
+  const lineOf = id => {
+    const n = visible.find(x => x.id === id);
+    return n && n.source ? n.source.start_line : 0;
+  };
+  const out = {};
+  arcs.forEach(a => { (out[a.from] = out[a.from] || []).push(a); });
+  const keep = new Set();
+  const add = [];
+  Object.keys(out).forEach(src => {
+    const srcNode = visible.find(x => x.id === src);
+    if (!srcNode || srcNode.kind === "decision") return;
+    const outs = out[src]
+      .filter(a => visible.find(x => x.id === a.to))
+      .slice()
+      .sort((a, b) => lineOf(a.to) - lineOf(b.to));
+    if (outs.length < 2) return;
+    keep.add(`${outs[0].from}→${outs[0].to}`);
+    for (let i = 1; i < outs.length; i++) {
+      add.push({ from: outs[i - 1].to, to: outs[i].to, label: outs[i].label });
+    }
+  });
+  return arcs.filter(a => {
+    const srcNode = visible.find(x => x.id === a.from);
+    if (srcNode && srcNode.kind === "decision") return true;
+    if (!out[a.from] || out[a.from].length < 2) return true;
+    return keep.has(`${a.from}→${a.to}`);
+  }).concat(add);
+}
+
+function layeredLayout(nodes, edges) {
+  const visible = nodes.filter(n => activeLayers.has(n.layer));
+  const ids = new Set(visible.map(n => n.id));
+  let arcs = edges.filter(e => ids.has(e.from) && ids.has(e.to)).map(e => ({ ...e }));
+  visible.forEach(n => {
+    if (n.kind === "decision" && n.branches) {
+      n.branches.forEach(b => {
+        if (ids.has(b.target)) arcs.push({ from: n.id, to: b.target, label: b.condition });
+      });
+    }
+  });
+  arcs = sequentialize(arcs, visible, viz.level);
+
+  const layer = {};
+  visible.forEach(n => layer[n.id] = 0);
+  for (let i = 0; i < visible.length; i++) {
+    arcs.forEach(a => { if (layer[a.to] <= layer[a.from]) layer[a.to] = layer[a.from] + 1; });
+  }
+
+  const metrics = {};
+  visible.forEach(n => metrics[n.id] = nodeMetrics(n));
+
+  const groups = new Map();
+  visible.forEach(n => {
+    const l = layer[n.id];
+    if (!groups.has(l)) groups.set(l, []);
+    groups.get(l).push(n);
+  });
+
+  const preds = {};
+  arcs.forEach(a => { (preds[a.to] = preds[a.to] || []).push(a.from); });
+
+  const sortedLayers = [...groups.keys()].sort((a, b) => a - b);
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    group.forEach(n => {
+      const ps = (preds[n.id] || []).filter(p => metrics[p]._pos);
+      n._bary = ps.length ? ps.reduce((s, p) => s + metrics[p]._pos.x + metrics[p].width / 2, 0) / ps.length : Infinity;
+    });
+    group.sort((a, b) => (a._bary - b._bary) || a.id.localeCompare(b.id));
+    let x = 40;
+    group.forEach(n => {
+      metrics[n.id]._pos = { x, y: 0 };
+      x += metrics[n.id].width + 40;
+    });
+  });
+
+  let maxLayerWidth = 0;
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    const last = group[group.length - 1];
+    const w = metrics[last.id]._pos.x + metrics[last.id].width;
+    if (w > maxLayerWidth) maxLayerWidth = w;
+  });
+
+  let y = 40;
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    const maxH = Math.max(...group.map(n => metrics[n.id].height));
+    group.forEach(n => { metrics[n.id]._pos.y = y + (maxH - metrics[n.id].height) / 2; });
+    const layerW = Math.max(...group.map(n => metrics[n.id]._pos.x + metrics[n.id].width));
+    const offset = (maxLayerWidth - layerW) / 2;
+    group.forEach(n => { metrics[n.id]._pos.x += Math.max(0, offset); });
+    y += maxH + 70;
+  });
+
+  return { visible, arcs, metrics };
+}
+
+function treeLayout(nodes, sourceEdges) {
+  const root = nodes[0];
+  if (!root) return { visible: [], arcs: [], metrics: {}, regions: [], header: null };
+
+  const parentById = {};
+  function index(node, parentId = null) {
+    if (parentId) parentById[node.id] = parentId;
+    (node.children || []).forEach(child => index(child, node.id));
+  }
+  index(root);
+
+  const isFileRoot = root.kind === "group" && !root.symbol && root.id.startsWith("file:");
+  const header = isFileRoot
+    ? {
+        label: (root.label || root.source?.file || root.id).trim(),
+        summary: (root.summary || "").trim()
+      }
+    : null;
+
+  function filter(node) {
+    const children = collapsedNodes.has(node.id)
+      ? []
+      : (node.children || [])
+        .filter(c => activeLayers.has(c.layer))
+        .map(filter);
+    return { node, children };
+  }
+  const tree = isFileRoot
+    ? { node: null, depth: 0, children: (root.children || []).filter(c => activeLayers.has(c.layer)).map(filter) }
+    : filter(root);
+  const flat = [];
+
+  function collect(t, depth) {
+    t.depth = depth;
+    if (t.node) flat.push(t.node);
+    t.children.forEach(child => collect(child, depth + 1));
+  }
+  collect(tree, 0);
+  const visibleIds = new Set(flat.map(node => node.id));
+
+  const metrics = {};
+  let y = 40;
+  flat.forEach(node => {
+    const metric = nodeMetrics(node);
+    const depth = findTreeDepth(tree, node.id);
+    metric._pos = { x: 40 + depth * TREE_INDENT, y };
+    node._metrics = metric;
+    metrics[node.id] = metric;
+    y += metric.height + TREE_GAP_Y;
+  });
+
+  const regions = [];
+  function bounds(t) {
+    if (!t.node) {
+      let aggregate = null;
+      t.children.forEach(child => {
+        const childBounds = bounds(child);
+        if (!aggregate) aggregate = childBounds;
+        else {
+          aggregate.left = Math.min(aggregate.left, childBounds.left);
+          aggregate.top = Math.min(aggregate.top, childBounds.top);
+          aggregate.right = Math.max(aggregate.right, childBounds.right);
+          aggregate.bottom = Math.max(aggregate.bottom, childBounds.bottom);
+          aggregate.nodeIds = aggregate.nodeIds.concat(childBounds.nodeIds);
+        }
+      });
+      return aggregate || { left: 0, top: 0, right: 0, bottom: 0, nodeIds: [] };
+    }
+
+    const metric = metrics[t.node.id];
+    const pos = metric._pos;
+    let left = pos.x - TREE_REGION_PADDING;
+    let top = pos.y - TREE_REGION_PADDING;
+    let right = pos.x + metric.width + TREE_REGION_PADDING;
+    let bottom = pos.y + metric.height + TREE_REGION_PADDING;
+    let nodeIds = [t.node.id];
+
+    t.children.forEach(child => {
+      const childBounds = bounds(child);
+      left = Math.min(left, childBounds.left - TREE_REGION_NESTING_GAP);
+      top = Math.min(top, childBounds.top - TREE_REGION_NESTING_GAP);
+      right = Math.max(right, childBounds.right + TREE_REGION_NESTING_GAP);
+      bottom = Math.max(bottom, childBounds.bottom + TREE_REGION_NESTING_GAP);
+      nodeIds = nodeIds.concat(childBounds.nodeIds);
+    });
+
+    if (t.children.length) {
+      regions.push({
+        id: t.node.id,
+        depth: t.depth,
+        x: left,
+        y: top,
+        width: right - left,
+        height: bottom - top,
+        color: metric.color,
+        nodeIds
+      });
+    }
+    return { left, top, right, bottom, nodeIds };
+  }
+  bounds(tree);
+  regions.sort((a, b) => a.depth - b.depth);
+
+  const edges = [];
+  function addStructuralEdges(t) {
+    t.children.forEach(child => {
+      if (t.node) edges.push({ from: t.node.id, to: child.node.id, label: null, status: null });
+      addStructuralEdges(child);
+    });
+  }
+  addStructuralEdges(tree);
+
+  function visibleAncestor(id) {
+    let currentId = id;
+    while (currentId && !visibleIds.has(currentId)) {
+      const parentId = parentById[currentId];
+      if (!parentId) return null;
+      currentId = parentId;
+    }
+    return currentId || null;
+  }
+  const seen = new Set(edges.map(edge => `${edge.from}→${edge.to}`));
+  (sourceEdges || []).forEach(edge => {
+    const from = visibleAncestor(edge.from);
+    const to = visibleAncestor(edge.to);
+    if (!from || !to || from === to) return;
+    const key = `${from}→${to}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    edges.push({ from, to, label: edge.label, status: edge.status });
+  });
+
+  return { visible: flat, arcs: edges, metrics, regions, header };
+}
+
+function findTreeDepth(tree, nodeId) {
+  if (tree.node && tree.node.id === nodeId) return tree.depth;
+  for (const child of tree.children) {
+    const depth = findTreeDepth(child, nodeId);
+    if (depth >= 0) return depth;
+  }
+  return -1;
+}
+
+function isTreeView(view) {
+  return view.nodes.length === 1 && view.nodes[0].children && view.nodes[0].children.length > 0;
+}
+
+const NS = "http://www.w3.org/2000/svg";
+const TREE_INDENT = 44;
+const TREE_REGION_PADDING = 18;
+const TREE_REGION_NESTING_GAP = 10;
+const TREE_GAP_Y = 28;
+const collapsedNodes = new Set();
+let query = "";
+
+function render() {
+  const view = current();
+  document.getElementById("crumb").textContent = view.title;
+  document.getElementById("back").disabled = cursor === 0;
+  document.getElementById("fwd").disabled = cursor === views.length - 1;
+
+  const isTree = isTreeView(view);
+  const layout = isTree
+    ? treeLayout(view.nodes, view.edges)
+    : layeredLayout(view.nodes, view.edges);
+  const { visible, arcs, metrics, regions = [], header = null } = layout;
+  const fileDescription = document.getElementById("file-description");
+  const fileLabel = document.getElementById("file-label");
+  const fileSummary = document.getElementById("file-summary");
+  fileLabel.textContent = header ? header.label : "";
+  fileSummary.textContent = header ? header.summary : "";
+  fileSummary.style.display = header && header.summary ? "inline" : "none";
+  fileDescription.style.display = header ? "block" : "none";
+  const barHeight = document.getElementById("bar").getBoundingClientRect().height;
+  document.getElementById("stage").style.top = `${barHeight}px`;
+  document.getElementById("sidebar").style.top = `${barHeight}px`;
+
+  const svg = document.getElementById("svg");
+  svg.innerHTML = "";
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  visible.forEach(n => {
+    const m = metrics[n.id];
+    minX = Math.min(minX, m._pos.x);
+    minY = Math.min(minY, m._pos.y);
+    maxX = Math.max(maxX, m._pos.x + m.width);
+    maxY = Math.max(maxY, m._pos.y + m.height);
+  });
+  regions.forEach(region => {
+    minX = Math.min(minX, region.x);
+    minY = Math.min(minY, region.y);
+    maxX = Math.max(maxX, region.x + region.width);
+    maxY = Math.max(maxY, region.y + region.height);
+  });
+  const stageWidth = visible.length ? Math.max(maxX + 40, 1) : 1;
+  const stageHeight = visible.length ? Math.max(maxY + 40, 1) : 1;
+  svg.setAttribute("width", stageWidth);
+  svg.setAttribute("height", stageHeight);
+  svg.setAttribute("viewBox", `0 0 ${stageWidth} ${stageHeight}`);
+
+  const defs = document.createElementNS(NS, "defs");
+  defs.innerHTML = '<marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563"/></marker>';
+  svg.appendChild(defs);
+  const scene = document.createElementNS(NS, "g");
+  scene.setAttribute("id", "scene");
+  svg.appendChild(scene);
+
+  const matches = q => n => q && (n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q));
+  const isHit = matches(query);
+
+  const regionLayer = document.createElementNS(NS, "g");
+  regionLayer.setAttribute("id", "scope-regions");
+  regions.forEach(region => {
+    const group = document.createElementNS(NS, "g");
+    group.setAttribute("class", "scope-region");
+    if (query && !region.nodeIds.some(id => isHit(visible.find(n => n.id === id)))) group.classList.add("dim");
+    const rect = document.createElementNS(NS, "rect");
+    rect.setAttribute("x", region.x);
+    rect.setAttribute("y", region.y);
+    rect.setAttribute("width", region.width);
+    rect.setAttribute("height", region.height);
+    rect.setAttribute("rx", 16);
+    rect.setAttribute("fill", region.color);
+    rect.setAttribute("fill-opacity", "0.055");
+    rect.setAttribute("stroke", region.color);
+    rect.setAttribute("stroke-opacity", "0.42");
+    group.appendChild(rect);
+    regionLayer.appendChild(group);
+  });
+  scene.appendChild(regionLayer);
+
+  arcs.forEach(a => {
+    const m1 = metrics[a.from], m2 = metrics[a.to];
+    const p1 = m1._pos, p2 = m2._pos;
+    const sx = p1.x + m1.width / 2;
+    const sy = p1.y + m1.height;
+    const tx = p2.x + m2.width / 2;
+    const ty = p2.y;
+    const dy = Math.max(ty - sy, 30);
+    const c1y = sy + dy * 0.45;
+    const c2y = ty - dy * 0.45;
+    const d = `M ${sx} ${sy} C ${sx} ${c1y}, ${tx} ${c2y}, ${tx} ${ty}`;
+
+    const line = document.createElementNS(NS, "path");
+    line.setAttribute("d", d);
+    const status = a.status || view.edges.find(e => e.from === a.from && e.to === a.to);
+    const inferred = status === "inferred" || (status && status.status === "inferred");
+    line.setAttribute("class", "edge" + (inferred ? " inferred" : ""));
+    line.setAttribute("marker-end", "url(#arr)");
+    if (query && !(isHit(visible.find(n => n.id === a.from)) && isHit(visible.find(n => n.id === a.to)))) line.classList.add("dim");
+    scene.appendChild(line);
+
+    if (a.label) {
+      const len = line.getTotalLength();
+      const pt = line.getPointAtLength(len / 2);
+      const lw = textWidth(a.label, "10px system-ui, sans-serif") + 12;
+      const bg = document.createElementNS(NS, "rect");
+      bg.setAttribute("class", "elabel-bg");
+      bg.setAttribute("x", pt.x - lw / 2);
+      bg.setAttribute("y", pt.y - 10);
+      bg.setAttribute("width", lw);
+      bg.setAttribute("height", 20);
+      bg.setAttribute("rx", 6);
+      scene.appendChild(bg);
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", "elabel");
+      t.setAttribute("x", pt.x);
+      t.setAttribute("y", pt.y + 3);
+      t.setAttribute("text-anchor", "middle");
+      t.textContent = a.label;
+      scene.appendChild(t);
+    }
+  });
+
+  visible.forEach(n => {
+    const p = metrics[n.id]._pos;
+    const m = metrics[n.id];
+    const s = styleOf(n);
+    const g = document.createElementNS(NS, "g");
+    const classes = ["node", n.kind];
+    if (n.id === view.nodes[0]?.id) classes.push("root");
+    if (query && !isHit(n)) classes.push("dim");
+    g.setAttribute("class", classes.join(" "));
+    const shape = document.createElementNS(NS, "rect");
+    shape.setAttribute("x", p.x); shape.setAttribute("y", p.y);
+    shape.setAttribute("width", m.width); shape.setAttribute("height", m.height);
+    shape.setAttribute("rx", 12);
+    const fill = n.kind === "group"
+      ? "#181b2b"
+      : n.kind === "decision"
+        ? "#241d0c"
+        : n.kind === "loop"
+          ? "#1c1f2e"
+          : "#14171f";
+    shape.setAttribute("fill", fill);
+    shape.setAttribute("stroke", s.color);
+    shape.setAttribute("stroke-opacity", n.kind === "group" ? "0.95" : "0.78");
+    shape.setAttribute("stroke-width", n.id === view.nodes[0]?.id ? 2.5 : 1.8);
+    if (query && isHit(n)) shape.setAttribute("class", "hit");
+    g.appendChild(shape);
+
+    if ((n.kind === "group" || n.kind === "function") && n.children && n.children.length) {
+      const toggle = document.createElementNS(NS, "g");
+      toggle.setAttribute("class", "collapse-toggle");
+      toggle.setAttribute("role", "button");
+      toggle.setAttribute("aria-label", collapsedNodes.has(n.id) ? "Развернуть" : "Свернуть");
+      toggle.addEventListener("click", event => {
+        event.stopPropagation();
+        collapsedNodes.has(n.id) ? collapsedNodes.delete(n.id) : collapsedNodes.add(n.id);
+        render();
+      });
+      const toggleShape = document.createElementNS(NS, "rect");
+      toggleShape.setAttribute("x", p.x + m.width - 24);
+      toggleShape.setAttribute("y", p.y + 6);
+      toggleShape.setAttribute("width", 16);
+      toggleShape.setAttribute("height", 16);
+      toggleShape.setAttribute("rx", 5);
+      toggleShape.setAttribute("fill", "#252a3d");
+      toggleShape.setAttribute("stroke", s.color);
+      toggleShape.setAttribute("stroke-opacity", "0.55");
+      toggle.appendChild(toggleShape);
+      const toggleLabel = document.createElementNS(NS, "text");
+      toggleLabel.setAttribute("x", p.x + m.width - 16);
+      toggleLabel.setAttribute("y", p.y + 18);
+      toggleLabel.setAttribute("text-anchor", "middle");
+      toggleLabel.setAttribute("fill", "#cbd0ff");
+      toggleLabel.setAttribute("font-size", "13");
+      toggleLabel.textContent = collapsedNodes.has(n.id) ? "+" : "−";
+      toggle.appendChild(toggleLabel);
+      g.appendChild(toggle);
+    }
+
+    if (m.hasIcon) {
+      const icon = document.createElementNS(NS, "g");
+      icon.setAttribute("transform", `translate(${p.x + 18} ${p.y + m.height/2 - 7}) scale(.55)`);
+      icon.setAttribute("fill", "none");
+      icon.setAttribute("stroke", s.color);
+      icon.setAttribute("stroke-width", "2");
+      icon.setAttribute("stroke-linecap", "round");
+      icon.setAttribute("stroke-linejoin", "round");
+      icon.innerHTML = ICON_PATHS[s.icon] || ICON_PATHS.Box;
+      g.appendChild(icon);
+    }
+
+    const textX = m.hasIcon ? p.x + 38 : p.x + 12;
+    const labelMaxW = m.width - (m.hasIcon ? 48 : 22);
+    const labelLines = wrapText(n.label, labelMaxW, "500 11px system-ui, sans-serif");
+    labelLines.forEach((ln, i) => {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", "nlabel");
+      t.setAttribute("x", textX);
+      t.setAttribute("y", p.y + 17 + i * 13);
+      t.textContent = ln;
+      g.appendChild(t);
+    });
+
+    if (n.summary) {
+      const summaryLines = wrapText(n.summary, labelMaxW, "9px system-ui, sans-serif");
+      summaryLines.forEach((ln, i) => {
+        const t = document.createElementNS(NS, "text");
+        t.setAttribute("class", "nsummary");
+        t.setAttribute("x", textX);
+        t.setAttribute("y", p.y + 19 + labelLines.length * 13 + 4 + i * 13);
+        t.textContent = ln;
+        g.appendChild(t);
+      });
+    }
+
+    if (n.tests) {
+      ["unit", "integration", "e2e"].forEach((k, i) => {
+        const dot = document.createElementNS(NS, "circle");
+        dot.setAttribute("cx", p.x + m.width - 12 - i * 10); dot.setAttribute("cy", p.y + 11);
+        dot.setAttribute("r", 3.5);
+        dot.setAttribute("fill", n.tests[k] ? ["#34d399", "#60a5fa", "#f472b6"][i] : "#3f3f46");
+        g.appendChild(dot);
+      });
+    }
+
+    g.addEventListener("click", event => {
+      if (event.metaKey) {
+        if (n.children && n.children.length) {
+          document.getElementById("sidebar").style.display = "none";
+          openView(n.label, n.children, []);
+        } else if (n.symbol) {
+          document.getElementById("sidebar").style.display = "none";
+          window.parent.postMessage({ type: "graphloom:navigate", symbolId: n.symbol }, "*");
+        }
+        return;
+      }
+      showSidebar(n);
+    });
+    scene.appendChild(g);
+  });
+}
+
+function showSidebar(n) {
+  const s = styleOf(n);
+  document.getElementById("s-title").textContent = n.label;
+  document.getElementById("s-meta").textContent =
+    s.icon + " " + n.kind + (n.element_type ? " · " + n.element_type : "") +
+    (n.confidence != null ? " · confidence " + n.confidence.toFixed(2) : "");
+  document.getElementById("s-tests").innerHTML = n.tests
+    ? ["unit", "integration", "e2e"].map(k =>
+        '<span class="chip ' + (n.tests[k] ? "on" : "off") + '">' + k + "</span>").join("")
+    : "";
+  document.getElementById("s-summary").textContent = n.summary || "";
+
+  const extra = document.getElementById("s-extra");
+  extra.innerHTML = "";
+
+  const refs = document.getElementById("s-refs");
+  refs.innerHTML = "";
+  if (n.cross_refs && n.cross_refs.length) {
+    const title = document.createElement("div");
+    title.className = "meta";
+    title.textContent = "Связи:";
+    refs.appendChild(title);
+    const list = document.createElement("div");
+    for (const ref of n.cross_refs) {
+      const a = document.createElement("a");
+      a.href = "#";
+      a.textContent = ref.label;
+      a.style.display = "block";
+      a.style.color = "#60a5fa";
+      a.style.marginTop = "4px";
+      a.style.textDecoration = "none";
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.parent.postMessage({ type: "graphloom:navigate", symbolId: ref.id, file: ref.file }, "*");
+      });
+      list.appendChild(a);
+    }
+    refs.appendChild(list);
+  }
+
+  if (n.kind === "call" && n.children && n.children.length) {
+    const btn = document.createElement("button");
+    btn.className = "expand";
+    btn.textContent = "Раскрыть flow";
+    btn.addEventListener("click", () => {
+      document.getElementById("sidebar").style.display = "none";
+      openView(n.label, n.children, []);
+    });
+    extra.appendChild(btn);
+  }
+
+  const code = document.getElementById("s-code");
+  if (n.source && sources[n.source.file]) {
+    const lines = sources[n.source.file].split("\n");
+    const from = Math.max(1, n.source.start_line - 2);
+    const to = Math.min(lines.length, n.source.end_line + 2);
+    let html = "";
+    for (let i = from; i <= to; i++) {
+      const esc = lines[i - 1].replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      const body = '<span class="ln">' + i + "</span>" + esc;
+      html += i >= n.source.start_line && i <= n.source.end_line
+        ? '<span class="hl">' + body + "</span>" : body + "\n";
+    }
+    code.innerHTML = html;
+    code.style.display = "block";
+  } else {
+    code.style.display = "none";
+  }
+  document.getElementById("sidebar").style.display = "block";
+}
+
+document.getElementById("close").addEventListener("click", () => {
+  document.getElementById("sidebar").style.display = "none";
+});
+document.getElementById("search").addEventListener("input", ev => {
+  query = ev.target.value.trim().toLowerCase();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

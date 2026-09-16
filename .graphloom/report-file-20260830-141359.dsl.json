@@ -1,0 +1,940 @@
+{
+  "title": "pkg/cue/expect.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cue/expect.go",
+      "kind": "group",
+      "label": "файл пакета cue с тестовыми ожиданиями",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cue/expect.go",
+        "start_line": 1,
+        "end_line": 81
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит пакет cue с набором функций для создания и проверки ожиданий на странице",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "func:pkg/cue/expect.go:Expect:12369561",
+          "kind": "group",
+          "label": "функция создания объекта ожидания",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/expect.go",
+            "start_line": 10,
+            "end_line": 12
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Expect",
+          "summary": "Создает новый экземпляр Expectation для указанной страницы и возвращает его",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/expect.go:12369598",
+              "kind": "output",
+              "label": "возврат нового экземпляра Expectation",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 11,
+                "end_line": 11
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает созданный объект Expectation с привязанным к нему объектом Page",
+              "coverage_ids": [
+                "return:pkg/cue/expect.go:12369598"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "type:pkg/cue/expect.go:Expectation:12369678",
+          "kind": "group",
+          "label": "структура Expectation",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/expect.go",
+            "start_line": 15,
+            "end_line": 17
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation",
+          "summary": "Определяет структуру для хранения ссылки на страницу и предоставляет методы для различных проверок",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/expect.go:ToContain:12369768",
+          "kind": "group",
+          "label": "проверка наличия подстроки в экране",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/expect.go",
+            "start_line": 20,
+            "end_line": 29
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToContain",
+          "summary": "Проверяет, содержит ли текст экрана указанную подстроку, возвращает ошибку если её нет",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/expect.go:12369824",
+              "kind": "action",
+              "label": "получение текста страницы",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 21,
+                "end_line": 21
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает полученный текст страницы в переменную text и ошибку в переменную err",
+              "coverage_ids": [
+                "statement:pkg/cue/expect.go:12369824",
+                "if:pkg/cue/expect.go:12369852"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/expect.go:Text:12369837",
+                  "kind": "call",
+                  "label": "вызов метода получения текста",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 21,
+                    "end_line": 21
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                  "summary": "Вызывает метод Text для получения полного текста страницы в переменную",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Text in pkg/cue/page.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "return:pkg/cue/expect.go:12369870",
+                  "kind": "output",
+                  "label": "возврат ошибки получения текста",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 23,
+                    "end_line": 23
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку полученную при вызове метода Text страницы",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12369870"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/expect.go:12369885",
+              "kind": "decision",
+              "label": "проверка отсутствия подстроки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 25,
+                "end_line": 28
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, не содержит ли текст экрана указанную подстроку и готовит ошибку при её отсутствии",
+              "coverage_ids": [
+                "if:pkg/cue/expect.go:12369885",
+                "return:pkg/cue/expect.go:12370003"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/expect.go:12369924",
+                  "kind": "output",
+                  "label": "возврат ошибки отсутствия подстроки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 26,
+                    "end_line": 26
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку с сообщением что экран не содержит ожидаемую подстроку",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12369924"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/expect.go:ToMatch:12370077",
+          "kind": "group",
+          "label": "проверка соответствия регулярному выражению",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/expect.go",
+            "start_line": 32,
+            "end_line": 45
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToMatch",
+          "summary": "Проверяет, соответствует ли текст экрана указанному регулярному выражению, возвращает ошибку при несоответствии",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/expect.go:12370132",
+              "kind": "action",
+              "label": "компиляция регулярного выражения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 33,
+                "end_line": 33
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Компилирует переданный паттерн в объект регулярного выражения regexp",
+              "coverage_ids": [
+                "statement:pkg/cue/expect.go:12370132",
+                "if:pkg/cue/expect.go:12370168"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/expect.go:12370186",
+                  "kind": "output",
+                  "label": "возврат ошибки компиляции",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 35,
+                    "end_line": 35
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку компиляции регулярного выражения с сообщением об ошибке",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12370186"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/expect.go:12370246",
+              "kind": "action",
+              "label": "получение текста страницы",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 37,
+                "end_line": 37
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает полученный текст страницы в переменную text и ошибку в переменную err",
+              "coverage_ids": [
+                "statement:pkg/cue/expect.go:12370246",
+                "if:pkg/cue/expect.go:12370274"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/expect.go:Text:12370259",
+                  "kind": "call",
+                  "label": "вызов метода получения текста",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 37,
+                    "end_line": 37
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                  "summary": "Вызывает метод Text для получения полного текста страницы в переменную",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Text in pkg/cue/page.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "return:pkg/cue/expect.go:12370292",
+                  "kind": "output",
+                  "label": "возврат ошибки получения текста",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 39,
+                    "end_line": 39
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку полученную при вызове метода Text страницы",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12370292"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/expect.go:12370307",
+              "kind": "decision",
+              "label": "проверка несоответствия паттерну",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 41,
+                "end_line": 44
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, не соответствует ли текст экрана скомпилированному регулярному выражению и готовит ошибку",
+              "coverage_ids": [
+                "if:pkg/cue/expect.go:12370307",
+                "return:pkg/cue/expect.go:12370414"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/expect.go:12370336",
+                  "kind": "output",
+                  "label": "возврат ошибки несоответствия",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 42,
+                    "end_line": 42
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку с сообщением что текст экрана не соответствует ожидаемому регулярному выражению",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12370336"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/expect.go:ToHaveLine:12370488",
+          "kind": "group",
+          "label": "проверка конкретной строки экрана",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/expect.go",
+            "start_line": 48,
+            "end_line": 57
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToHaveLine",
+          "summary": "Проверяет, равна ли строка на указанной позиции ожидаемому значению, возвращает ошибку при несоответствии",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/expect.go:12370556",
+              "kind": "action",
+              "label": "получение строки страницы",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 49,
+                "end_line": 49
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает полученную строку страницы в переменную line и ошибку в переменную err",
+              "coverage_ids": [
+                "statement:pkg/cue/expect.go:12370556",
+                "if:pkg/cue/expect.go:12370587"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/expect.go:Line:12370569",
+                  "kind": "call",
+                  "label": "вызов метода получения строки",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 49,
+                    "end_line": 49
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Line",
+                  "summary": "Вызывает метод Line для получения текста строки на указанной позиции в переменную",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Line",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Line in pkg/cue/page.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "return:pkg/cue/expect.go:12370605",
+                  "kind": "output",
+                  "label": "возврат ошибки получения строки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 51,
+                    "end_line": 51
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку полученную при вызове метода Line страницы",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12370605"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/expect.go:12370620",
+              "kind": "decision",
+              "label": "проверка несоответствия строки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 53,
+                "end_line": 56
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, не равна ли строка после удаления правых пробелов ожидаемому значению и готовит ошибку",
+              "coverage_ids": [
+                "if:pkg/cue/expect.go:12370620",
+                "return:pkg/cue/expect.go:12370748"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/expect.go:12370668",
+                  "kind": "output",
+                  "label": "возврат ошибки несоответствия строки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 54,
+                    "end_line": 54
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку с сообщением что строка на указанной позиции не равна ожидаемому значению",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12370668"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/expect.go:ToHaveCursorAt:12370817",
+          "kind": "group",
+          "label": "проверка позиции курсора",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/expect.go",
+            "start_line": 60,
+            "end_line": 69
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToHaveCursorAt",
+          "summary": "Проверяет, находится ли курсор в указанной позиции, возвращает ошибку при несоответствии координат",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/expect.go:12370877",
+              "kind": "action",
+              "label": "получение позиции курсора",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 61,
+                "end_line": 61
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает полученные координаты курсора в переменные r и c и ошибку в переменную err",
+              "coverage_ids": [
+                "statement:pkg/cue/expect.go:12370877",
+                "if:pkg/cue/expect.go:12370907"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/expect.go:Cursor:12370890",
+                  "kind": "call",
+                  "label": "вызов метода получения позиции курсора",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 61,
+                    "end_line": 61
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor",
+                  "summary": "Вызывает метод Cursor для получения текущих координат курсора в переменные",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Cursor in pkg/cue/page.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "return:pkg/cue/expect.go:12370925",
+                  "kind": "output",
+                  "label": "возврат ошибки получения курсора",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 63,
+                    "end_line": 63
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку полученную при вызове метода Cursor страницы",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12370925"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/expect.go:12370940",
+              "kind": "decision",
+              "label": "проверка несоответствия координат",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 65,
+                "end_line": 68
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, не равны ли координаты курсора ожидаемым значениям и готовит ошибку при несоответствии",
+              "coverage_ids": [
+                "if:pkg/cue/expect.go:12370940",
+                "return:pkg/cue/expect.go:12371049"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/expect.go:12370968",
+                  "kind": "output",
+                  "label": "возврат ошибки несоответствия координат",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 66,
+                    "end_line": 66
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку с сообщением что курсор находится не в ожидаемой позиции",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12370968"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/expect.go:ToNotContain:12371128",
+          "kind": "group",
+          "label": "проверка отсутствия подстроки в экране",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/expect.go",
+            "start_line": 72,
+            "end_line": 81
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToNotContain",
+          "summary": "Проверяет, не содержит ли текст экрана указанную подстроку, возвращает ошибку если она найдена",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/expect.go:12371187",
+              "kind": "action",
+              "label": "получение текста страницы",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 73,
+                "end_line": 73
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает полученный текст страницы в переменную text и ошибку в переменную err",
+              "coverage_ids": [
+                "statement:pkg/cue/expect.go:12371187",
+                "if:pkg/cue/expect.go:12371215"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/expect.go:Text:12371200",
+                  "kind": "call",
+                  "label": "вызов метода получения текста",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 73,
+                    "end_line": 73
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                  "summary": "Вызывает метод Text для получения полного текста страницы в переменную",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Text in pkg/cue/page.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "return:pkg/cue/expect.go:12371233",
+                  "kind": "output",
+                  "label": "возврат ошибки получения текста",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 75,
+                    "end_line": 75
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку полученную при вызове метода Text страницы",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12371233"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/expect.go:12371248",
+              "kind": "decision",
+              "label": "проверка наличия подстроки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/expect.go",
+                "start_line": 77,
+                "end_line": 80
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, содержит ли текст экрана указанную подстроку и готовит ошибку при её наличии",
+              "coverage_ids": [
+                "if:pkg/cue/expect.go:12371248",
+                "return:pkg/cue/expect.go:12371353"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/expect.go:12371286",
+                  "kind": "output",
+                  "label": "возврат ошибки наличия подстроки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/expect.go",
+                    "start_line": 78,
+                    "end_line": 78
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку с сообщением что экран содержит подстроку которая должна отсутствовать",
+                  "coverage_ids": [
+                    "return:pkg/cue/expect.go:12371286"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

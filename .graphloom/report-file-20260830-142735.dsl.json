@@ -1,0 +1,722 @@
+{
+  "title": "pkg/pty/pty.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/pty/pty.go",
+      "kind": "group",
+      "label": "Файл пакета pty",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/pty/pty.go",
+        "start_line": 1,
+        "end_line": 73
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит реализацию псевдотерминала для Go, включая структуру Backend и методы для управления процессом в PTY.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/pty/pty.go:Backend:9423527",
+          "kind": "group",
+          "label": "Структура Backend",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 11,
+            "end_line": 14
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend",
+          "summary": "Структура хранит файловый дескриптор мастера PTY и состояние запущенного процесса для управления псевдотерминалом.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/pty/pty.go:Start:9423701",
+          "kind": "group",
+          "label": "Функция Start",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 18,
+            "end_line": 34
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Start",
+          "summary": "Запускает команду внутри псевдотерминала с заданными размером окна, окружением и рабочей директорией, возвращая объект Backend.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/pty/pty.go:9423809",
+              "kind": "action",
+              "label": "Создание команды",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 19,
+                "end_line": 19
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализирует новый exec.Cmd с указанными аргументами для запуска процесса.",
+              "coverage_ids": [
+                "statement:pkg/pty/pty.go:9423809"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/pty/pty.go:9423851",
+              "kind": "action",
+              "label": "Установка окружения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 19,
+                "end_line": 19
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает переменные окружения запущенной команде из переданного массива.",
+              "coverage_ids": [
+                "statement:pkg/pty/pty.go:9423851"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/pty/pty.go:9423869",
+              "kind": "decision",
+              "label": "Проверка директории",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 21,
+                "end_line": 23
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Если передана непустая директория, устанавливает её как рабочую директорию для команды.",
+              "coverage_ids": [
+                "if:pkg/pty/pty.go:9423869"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/pty/pty.go:9423892",
+                  "kind": "action",
+                  "label": "Установка рабочей директории",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/pty/pty.go",
+                    "start_line": 19,
+                    "end_line": 19
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Присваивает команду рабочую директорию из параметра dir.",
+                  "coverage_ids": [
+                    "statement:pkg/pty/pty.go:9423892"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/pty/pty.go:9423917",
+              "kind": "action",
+              "label": "Запуск PTY с размером",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 26,
+                "end_line": 26
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Запускает команду через pty.StartWithSize, передавая размер окна в виде строк и колонок.",
+              "coverage_ids": [
+                "statement:pkg/pty/pty.go:9423917"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/pty/pty.go:9424036",
+              "kind": "decision",
+              "label": "Проверка ошибки запуска",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 29,
+                "end_line": 31
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Если возникла ошибка при создании PTY, возвращает ошибку и nil вместо объекта Backend.",
+              "coverage_ids": [
+                "if:pkg/pty/pty.go:9424036"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/pty/pty.go:9424060",
+                  "kind": "output",
+                  "label": "Возврат ошибки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/pty/pty.go",
+                    "start_line": 30,
+                    "end_line": 30
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку из функции Start при неудачном запуске псевдотерминала.",
+                  "coverage_ids": [
+                    "return:pkg/pty/pty.go:9424060"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/pty/pty.go:9424087",
+              "kind": "output",
+              "label": "Возврат успешного результата",
+              "layer": "data",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 33,
+                "end_line": 33
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает новый объект Backend с мастер-файлом PTY и командой при успешном запуске.",
+              "coverage_ids": [
+                "return:pkg/pty/pty.go:9424087"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Launch",
+              "file": "pkg/cue/app.go",
+              "label": "← Launch in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/pty/pty.go:Read:9424182",
+          "kind": "group",
+          "label": "Метод Read",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 37,
+            "end_line": 39
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.Read",
+          "summary": "Читает сырые байты из мастера PTY, возвращая количество прочитанных байт и возможную ошибку.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/pty/pty.go:9424234",
+              "kind": "output",
+              "label": "Возврат данных из Read",
+              "layer": "data",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 38,
+                "end_line": 38
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Делегирует чтение на файловый дескриптор мастера PTY и возвращает результат.",
+              "coverage_ids": [
+                "return:pkg/pty/pty.go:9424234"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.readLoop",
+              "file": "pkg/cue/app.go",
+              "label": "← readLoop in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/pty/pty.go:Write:9424306",
+          "kind": "group",
+          "label": "Метод Write",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 42,
+            "end_line": 44
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.Write",
+          "summary": "Записывает сырые байты в мастер PTY, возвращая количество записанных байт и возможную ошибку.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/pty/pty.go:9424359",
+              "kind": "output",
+              "label": "Возврат данных из Write",
+              "layer": "data",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 43,
+                "end_line": 43
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Делегирует запись на файловый дескриптор мастера PTY и возвращает результат.",
+              "coverage_ids": [
+                "return:pkg/pty/pty.go:9424359"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.readLoop",
+              "file": "pkg/cue/app.go",
+              "label": "← readLoop in pkg/cue/app.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.readLoop",
+              "file": "pkg/cue/app.go",
+              "label": "← readLoop in pkg/cue/app.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.write",
+              "file": "pkg/cue/app.go",
+              "label": "← write in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/pty/pty.go:Resize:9424424",
+          "kind": "group",
+          "label": "Метод Resize",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 47,
+            "end_line": 52
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.Resize",
+          "summary": "Изменяет размер терминала, передавая новые значения строк и колонов через pty.Setsize.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/pty/pty.go:9424477",
+              "kind": "output",
+              "label": "Возврат из Resize",
+              "layer": "data",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 48,
+                "end_line": 51
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает результат изменения размера окна терминала через pty.Setsize.",
+              "coverage_ids": [
+                "return:pkg/pty/pty.go:9424477"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.Resize",
+              "file": "pkg/cue/app.go",
+              "label": "← Resize in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/pty/pty.go:Close:9424633",
+          "kind": "group",
+          "label": "Метод Close",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 55,
+            "end_line": 63
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.Close",
+          "summary": "Завершает работу: убивает процесс и закрывает файловый дескриптор мастера PTY.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/pty/pty.go:9424671",
+              "kind": "decision",
+              "label": "Проверка процесса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 56,
+                "end_line": 58
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Если процесс и его ProcessState существуют, уничтожает процесс через Kill.",
+              "coverage_ids": [
+                "if:pkg/pty/pty.go:9424671"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/pty/pty.go:9424721",
+                  "kind": "action",
+                  "label": "Убийство процесса",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/pty/pty.go",
+                    "start_line": 57,
+                    "end_line": 57
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вызывает Kill на процессе для принудительного завершения работы.",
+                  "coverage_ids": [
+                    "statement:pkg/pty/pty.go:9424721"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/pty/pty.go:9424756",
+              "kind": "decision",
+              "label": "Проверка мастера PTY",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 59,
+                "end_line": 61
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Если мастер PTY существует, закрывает его файловый дескриптор.",
+              "coverage_ids": [
+                "if:pkg/pty/pty.go:9424756"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/pty/pty.go:9424785",
+                  "kind": "output",
+                  "label": "Возврат закрытия мастера",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/pty/pty.go",
+                    "start_line": 60,
+                    "end_line": 60
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает результат закрытия файлового дескриптора мастера PTY.",
+                  "coverage_ids": [
+                    "return:pkg/pty/pty.go:9424785"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/pty/pty.go:9424819",
+              "kind": "output",
+              "label": "Возврат nil",
+              "layer": "data",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 62,
+                "end_line": 62
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает nil при успешном завершении, если ни один из условий не выполнен.",
+              "coverage_ids": [
+                "return:pkg/pty/pty.go:9424819"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.Close",
+              "file": "pkg/cue/app.go",
+              "label": "← Close in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/pty/pty.go:Wait:9424884",
+          "kind": "group",
+          "label": "Метод Wait",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 66,
+            "end_line": 68
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.Wait",
+          "summary": "Блокируется до завершения процесса и возвращает ошибку завершения.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/pty/pty.go:9424921",
+              "kind": "output",
+              "label": "Возврат из Wait",
+              "layer": "data",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 67,
+                "end_line": 67
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Делегирует ожидание завершения процесса через cmd.Wait().",
+              "coverage_ids": [
+                "return:pkg/pty/pty.go:9424921"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.Wait",
+              "file": "pkg/cue/app.go",
+              "label": "← Wait in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/pty/pty.go:ProcessState:9424998",
+          "kind": "group",
+          "label": "Метод ProcessState",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/pty/pty.go",
+            "start_line": 71,
+            "end_line": 73
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.ProcessState",
+          "summary": "Возвращает состояние процесса после его завершения для получения кода выхода и других метаданных.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/pty/pty.go:9425054",
+              "kind": "output",
+              "label": "Возврат состояния процесса",
+              "layer": "data",
+              "source": {
+                "file": "pkg/pty/pty.go",
+                "start_line": 72,
+                "end_line": 72
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает указатель на ProcessState из команды для доступа к информации о завершении.",
+              "coverage_ids": [
+                "return:pkg/pty/pty.go:9425054"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

@@ -1,0 +1,445 @@
+{
+  "title": "pkg/ansi/style.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/ansi/style.go",
+      "kind": "group",
+      "label": "Файл пакета ANSI",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/ansi/style.go",
+        "start_line": 1,
+        "end_line": 66
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит определения структур данных и функций для работы с цветами и стилями терминала в пакете ansi.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/ansi/style.go:Color:12363928",
+          "kind": "group",
+          "label": "Структура Color",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/style.go",
+            "start_line": 4,
+            "end_line": 8
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Color",
+          "summary": "Определяет структуру для представления цвета терминала с полями для компонентов RGB, флагом 256-цветной палитры и индексом цвета.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "variable:pkg/ansi/style.go:DefaultPalette:12364030",
+          "kind": "state",
+          "label": "Палитра DefaultPalette",
+          "layer": "state",
+          "source": {
+            "file": "pkg/ansi/style.go",
+            "start_line": 11,
+            "end_line": 28
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.DefaultPalette",
+          "summary": "Массив из 256 цветов, содержащий базовые цвета, палитру 6x6x6 и градации серого для терминала.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/ansi/style.go:init:12364724",
+          "kind": "group",
+          "label": "Функция инициализации палитры",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/style.go",
+            "start_line": 30,
+            "end_line": 50
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.init",
+          "summary": "Заполняет массив DefaultPalette цветами для индексов 16-231 (куб 6x6x6) и 232-255 (градиент серого).",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "loop:pkg/ansi/style.go:12364776",
+              "kind": "loop",
+              "label": "Вложенный цикл RGB",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/style.go",
+                "start_line": 32,
+                "end_line": 49
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Тройной вложенный цикл формирует все комбинации цветов для 6x6x6 куба в палитре.",
+              "coverage_ids": [
+                "loop:pkg/ansi/style.go:12364776",
+                "loop:pkg/ansi/style.go:12365092"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/style.go:12364780",
+                  "kind": "action",
+                  "label": "Цикл по компонентам красного",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/style.go",
+                    "start_line": 32,
+                    "end_line": 32
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вложенный цикл перебирает значения от 0 до 5 для компонента красного цвета при генерации палитры.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/style.go:12364780",
+                    "statement:pkg/ansi/style.go:12364795"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "loop:pkg/ansi/style.go:12364803",
+                  "kind": "loop",
+                  "label": "Вложенный цикл зеленого",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/style.go",
+                    "start_line": 33,
+                    "end_line": 43
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вложенный цикл перебирает значения от 0 до 5 для компонента зеленого цвета внутри цикла красного.",
+                  "coverage_ids": [
+                    "loop:pkg/ansi/style.go:12364803"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/ansi/style.go:12364807",
+                      "kind": "action",
+                      "label": "Цикл по компонентам зеленого",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/style.go",
+                        "start_line": 38,
+                        "end_line": 38
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Цикл перебирает значения от 0 до 5 для компонента зеленого цвета внутри цикла красного.",
+                      "coverage_ids": [
+                        "statement:pkg/ansi/style.go:12364807",
+                        "statement:pkg/ansi/style.go:12364822"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "loop:pkg/ansi/style.go:12364831",
+                      "kind": "loop",
+                      "label": "Вложенный цикл синего",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/style.go",
+                        "start_line": 34,
+                        "end_line": 42
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Вложенный цикл перебирает значения от 0 до 5 для компонента синего цвета внутри цикла зеленого.",
+                      "coverage_ids": [
+                        "loop:pkg/ansi/style.go:12364831"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:pkg/ansi/style.go:12364835",
+                          "kind": "action",
+                          "label": "Цикл по компонентам синего",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/style.go",
+                            "start_line": 38,
+                            "end_line": 38
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Цикл перебирает значения от 0 до 5 для компонента синего цвета внутри цикла зеленого.",
+                          "coverage_ids": [
+                            "statement:pkg/ansi/style.go:12364835",
+                            "statement:pkg/ansi/style.go:12364850"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        },
+                        {
+                          "id": "statement:pkg/ansi/style.go:12364860",
+                          "kind": "action",
+                          "label": "Расчёт индекса цвета",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/style.go",
+                            "start_line": 38,
+                            "end_line": 38
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Вычисляет индекс цвета в палитре по формуле 16 + r*36 + g*6 + b для размещения в массиве.",
+                          "coverage_ids": [
+                            "statement:pkg/ansi/style.go:12364860",
+                            "if:pkg/ansi/style.go:12364889"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [
+                            {
+                              "id": "statement:pkg/ansi/style.go:12364907",
+                              "kind": "action",
+                              "label": "Запись цвета в палитру",
+                              "layer": "flow",
+                              "source": {
+                                "file": "pkg/ansi/style.go",
+                                "start_line": 38,
+                                "end_line": 38
+                              },
+                              "element_type": null,
+                              "symbol": null,
+                              "summary": "Записывает рассчитанный цвет в массив DefaultPalette по вычисленному индексу.",
+                              "coverage_ids": [
+                                "statement:pkg/ansi/style.go:12364907"
+                              ],
+                              "tests": null,
+                              "confidence": null,
+                              "children": [],
+                              "branches": [],
+                              "data_in": [],
+                              "data_out": [],
+                              "effects": [],
+                              "cross_refs": []
+                            }
+                          ],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/style.go:12365096",
+                  "kind": "action",
+                  "label": "Начало цикла для серого",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/style.go",
+                    "start_line": 47,
+                    "end_line": 47
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Начинает цикл для заполнения индексов 232-255 градациями серого цвета.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/style.go:12365096",
+                    "statement:pkg/ansi/style.go:12365112"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/style.go:12365120",
+                  "kind": "action",
+                  "label": "Расчёт значения серого",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/style.go",
+                    "start_line": 47,
+                    "end_line": 47
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вычисляет значение яркости серого цвета по формуле 8 + i*10 для каждого шага цикла.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/style.go:12365120",
+                    "statement:pkg/ansi/style.go:12365143"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "type:pkg/ansi/style.go:Style:12365290",
+          "kind": "group",
+          "label": "Структура Style",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/style.go",
+            "start_line": 53,
+            "end_line": 61
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Style",
+          "summary": "Определяет структуру для описания визуального стиля ячейки с полями для цвета фона, цвета текста и форматирования.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/ansi/style.go:Reset:12365453",
+          "kind": "group",
+          "label": "Функция Reset",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/style.go",
+            "start_line": 64,
+            "end_line": 66
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Reset",
+          "summary": "Возвращает нулевой стиль с белым цветом текста и чёрным фоном для сброса форматирования.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/style.go:12365475",
+              "kind": "output",
+              "label": "Возврат стиля Reset",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/style.go",
+                "start_line": 65,
+                "end_line": 65
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает структуру Style с предустановленными значениями белого текста и чёрного фона.",
+              "coverage_ids": [
+                "return:pkg/ansi/style.go:12365475"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.NewScreen",
+              "file": "pkg/ansi/screen.go",
+              "label": "← NewScreen in pkg/ansi/screen.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.applySGR",
+              "file": "pkg/ansi/parser.go",
+              "label": "← applySGR in pkg/ansi/parser.go"
+            }
+          ]
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Graphloom</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #09090b; color: #e4e4e7; font: 14px/1.5 system-ui, sans-serif; overflow: hidden; }
+  #bar { position: fixed; top: 0; left: 0; right: 0; min-height: 36px; padding: 4px 10px; background: rgba(9,9,11,.94);
+         border-bottom: 1px solid #27272a; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; align-content: center; z-index: 5; }
+  #file-description { display: none; flex: 0 0 100%; min-width: 0; padding: 2px 4px 3px; color: #a1a1aa; font-size: 11px; line-height: 1.35; }
+  #file-description strong { color: #f4f4f5; font-weight: 600; }
+  #file-description span { margin-left: 8px; color: #71717a; }
+  #bar h1 { font-size: 14px; font-weight: 600; white-space: nowrap; }
+  #bar .crumb { min-width: 0; flex: 1; font-size: 12px; color: #a1a1aa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #layers { display: flex; flex: 0 0 auto; gap: 7px; align-items: center; }
+  .lchk { font-size: 11px; color: #a1a1aa; display: flex; gap: 3px; align-items: center; cursor: pointer; white-space: nowrap; }
+  #search { flex: 0 0 150px; background: #18181b; border: 1px solid #3f3f46; border-radius: 6px; color: #e4e4e7;
+            padding: 4px 8px; font-size: 12px; width: 150px; }
+  .nav, .tool { background: #27272a; border: 1px solid #3f3f46; color: #e4e4e7; border-radius: 6px;
+         cursor: pointer; font-size: 12px; }
+  .nav { padding: 4px 9px; }
+  .nav:disabled, .tool:disabled { opacity: .4; cursor: default; }
+  .tool { width: 28px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+  .tool:hover:not(:disabled), .nav:hover:not(:disabled) { background: #3f3f46; }
+  .tool svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8;
+              stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  #stage { position: fixed; inset: 0; top: 36px; overflow: auto; padding: 0; background: #0b0d12; }
+  #stage::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22;
+                  background-image: linear-gradient(#202533 1px, transparent 1px), linear-gradient(90deg, #202533 1px, transparent 1px);
+                  background-size: 32px 32px; }
+  svg { display: block; position: relative; z-index: 1; overflow: visible; }
+  .scope-region { pointer-events: none; }
+  .scope-region rect { stroke-width: 1.2; }
+  .scope-region.dim { opacity: .14; }
+  .node { cursor: pointer; }
+  .collapse-toggle { cursor: pointer; }
+  .collapse-toggle text { pointer-events: none; }
+  .collapse-toggle:hover rect { filter: brightness(1.25); }
+  .node rect { transition: filter .15s, stroke-width .15s; }
+  .node:hover rect { filter: brightness(1.18); }
+  .node.root rect { stroke-width: 2.5; }
+  .node.dim, .edge.dim { opacity: .14; }
+  .edge { stroke: #4b5563; stroke-width: 1.25; fill: none; opacity: .9; }
+  .edge.inferred { stroke-dasharray: 5 4; }
+  .elabel-bg { fill: #09090b; stroke: #27272a; stroke-width: 1; }
+  .elabel { font-size: 10px; fill: #a1a1aa; }
+  .nlabel { font-size: 11px; fill: #f4f4f5; font-weight: 500; }
+  .nsummary { font-size: 9px; fill: #71717a; }
+  .nkind { font-size: 11px; }
+  .hit { stroke: #facc15; stroke-width: 2.5; }
+  #sidebar { position: fixed; top: 36px; right: 0; bottom: 0; width: 380px; background: #18181b;
+             border-left: 1px solid #27272a; padding: 16px; overflow: auto; display: none; z-index: 6; }
+  #sidebar h2 { font-size: 16px; margin-bottom: 2px; padding-right: 20px; }
+  #sidebar .meta { font-size: 12px; color: #a1a1aa; margin-bottom: 10px; }
+  #close { position: absolute; top: 10px; right: 12px; cursor: pointer; color: #71717a;
+           background: none; border: none; font-size: 16px; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; margin-right: 4px; }
+  .chip.on { background: #064e3b; color: #6ee7b7; }
+  .chip.off { background: #27272a; color: #71717a; }
+  pre.code { margin-top: 12px; background: #09090b; border: 1px solid #27272a; border-radius: 8px;
+             padding: 10px; font: 11px/1.6 ui-monospace, monospace; overflow: auto; }
+  pre.code .ln { color: #52525b; display: inline-block; width: 34px; user-select: none; }
+  pre.code .hl { background: #27272a; display: block; }
+  .expand { margin-top: 10px; background: #1d4ed8; color: #fff; border: none; border-radius: 6px;
+            padding: 5px 12px; cursor: pointer; font-size: 12px; }
+  .expand { margin-top: 10px; background: #1d4ed8; color: #fff; border: none; border-radius: 6px;
+            padding: 5px 12px; cursor: pointer; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="bar">
+  <h1>Graphloom</h1>
+  <button class="nav" id="back">←</button>
+  <button class="nav" id="fwd">→</button>
+  <span class="crumb" id="crumb"></span>
+  <span id="layers"></span>
+  <input id="search" placeholder="Поиск…" />
+  <div id="file-description"><strong id="file-label"></strong><span id="file-summary"></span></div>
+</div>
+<div id="stage"><svg id="svg"></svg></div>
+<div id="sidebar">
+  <button id="close" aria-label="Закрыть">×</button>
+  <h2 id="s-title"></h2>
+  <div class="meta" id="s-meta"></div>
+  <div id="s-tests"></div>
+  <p id="s-summary" style="margin-top:8px;font-size:13px"></p>
+  <div id="s-refs" style="margin-top:10px;font-size:12px"></div>
+  <div id="s-extra"></div>
+  <pre class="code" id="s-code" style="display:none"></pre>
+</div>
+<script>
+const viz = {"title":"pkg/cue/app.go","level":"file","nodes":[{"id":"file:pkg/cue/app.go","kind":"group","label":"Файл приложения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":1,"end_line":163},"element_type":null,"symbol":null,"summary":"Содержит определение структуры приложения и основные функции для запуска и управления TUI.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"type:pkg/cue/app.go:App:12374673","kind":"group","label":"Структура приложения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":14,"end_line":24},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App","summary":"Определяет основные поля для хранения состояния, бэкенда, экрана и опций запуска.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cue/app.go:Launch:12374961","kind":"group","label":"Функция запуска","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":27,"end_line":59},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.Launch","summary":"Инициализирует и запускает новое приложение, настраивая окружение и создавая бэкенд.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12375022","kind":"action","label":"Инициализация опций","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":28,"end_line":28},"element_type":null,"symbol":null,"summary":"Создает переменную с начальными настройками приложения.","coverage_ids":["statement:pkg/cue/app.go:12375022","loop:pkg/cue/app.go:12375045"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cue/app.go:DefaultOptions:12375027","kind":"call","label":"Вызов получения опций","layer":"calls","source":{"file":"pkg/cue/app.go","start_line":28,"end_line":28},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.DefaultOptions","summary":"Создает структуру с параметрами по умолчанию для конфигурации запуска.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.DefaultOptions","file":"pkg/cue/options.go","label":"→ DefaultOptions in pkg/cue/options.go"}]},{"id":"statement:pkg/cue/app.go:12375073","kind":"action","label":"Вызов функции настройки","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":30,"end_line":30},"element_type":null,"symbol":null,"summary":"Обновляет текущие настройки с учетом переданной опции.","coverage_ids":["statement:pkg/cue/app.go:12375073"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cue/app.go:fn:12375073","kind":"call","label":"Применение опции","layer":"calls","source":{"file":"pkg/cue/app.go","start_line":30,"end_line":30},"element_type":null,"symbol":null,"summary":"Вызывает функцию настройки для обновления параметров конфигурации.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cue/app.go:12375236","kind":"decision","label":"Проверка замены окружения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":35,"end_line":39},"element_type":null,"symbol":null,"summary":"Определяет, нужно ли объединять переменные окружения с текущими процессом.","coverage_ids":["if:pkg/cue/app.go:12375236","statement:pkg/cue/app.go:12375302"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12375258","kind":"action","label":"Объединение переменных окружения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":36,"end_line":36},"element_type":null,"symbol":null,"summary":"Добавляет переменные окружения приложения к переменным текущего процесса.","coverage_ids":["statement:pkg/cue/app.go:12375258"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cue/app.go:Start:12375318","kind":"call","label":"Запуск бэкенда","layer":"calls","source":{"file":"pkg/cue/app.go","start_line":39,"end_line":39},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/pty.Start","summary":"Создает и запускает псевдо-терминальный бэкенд для выполнения команды.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/pty.Start","file":"pkg/pty/pty.go","label":"→ Start in pkg/pty/pty.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cue/app.go:12375379","kind":"decision","label":"Проверка ошибки бэкенда","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":40,"end_line":44},"element_type":null,"symbol":null,"summary":"Проверяет наличие ошибки при создании бэкенда и возвращает её.","coverage_ids":["if:pkg/cue/app.go:12375379","statement:pkg/cue/app.go:12375418"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cue/app.go:12375397","kind":"output","label":"Возврат ошибки","layer":"data","source":{"file":"pkg/cue/app.go","start_line":41,"end_line":41},"element_type":null,"symbol":null,"summary":"Возвращает ошибку при неудачном создании бэкенда псевдо-терминала.","coverage_ids":["return:pkg/cue/app.go:12375397"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cue/app.go:NewScreen:12375428","kind":"call","label":"Создание экрана","layer":"calls","source":{"file":"pkg/cue/app.go","start_line":44,"end_line":44},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/ansi.NewScreen","summary":"Инициализирует новый экран с заданными размерами терминала.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/ansi.NewScreen","file":"pkg/ansi/screen.go","label":"→ NewScreen in pkg/ansi/screen.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cue/app.go:12375463","kind":"action","label":"Инициализация парсера","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":52,"end_line":52},"element_type":null,"symbol":null,"summary":"Создает переменную для хранения объекта парсера ANSI.","coverage_ids":["statement:pkg/cue/app.go:12375463","statement:pkg/cue/app.go:12375498"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cue/app.go:NewParser:12375473","kind":"call","label":"Создание парсера","layer":"calls","source":{"file":"pkg/cue/app.go","start_line":45,"end_line":45},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/ansi.NewParser","summary":"Инициализирует парсер для обработки вывода псевдо-терминала.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/ansi.NewParser","file":"pkg/ansi/parser.go","label":"→ NewParser in pkg/ansi/parser.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cue/app.go:12375670","kind":"action","label":"Запуск цикла чтения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":56,"end_line":56},"element_type":null,"symbol":null,"summary":"Запускает фоновый горутины для чтения данных из бэкенда.","coverage_ids":["statement:pkg/cue/app.go:12375670","return:pkg/cue/app.go:12375690"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch","file":"pkg/cli/session.go","label":"← Launch in pkg/cli/session.go"}]},{"id":"func:pkg/cue/app.go:Page:12375759","kind":"group","label":"Функция получения страницы","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":62,"end_line":64},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.Page","summary":"Возвращает текущую страницу для взаимодействия с пользователем.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cue/app.go:12375789","kind":"output","label":"Возврат страницы","layer":"data","source":{"file":"pkg/cue/app.go","start_line":63,"end_line":63},"element_type":null,"symbol":null,"summary":"Создает и возвращает новый объект страницы, привязанный к приложению.","coverage_ids":["return:pkg/cue/app.go:12375789"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch","file":"pkg/cli/session.go","label":"← Launch in pkg/cli/session.go"}]},{"id":"func:pkg/cue/app.go:Resize:12375852","kind":"group","label":"Функция изменения размера","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":67,"end_line":72},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.Resize","summary":"Изменяет размеры терминала и обновляет состояние экрана и бэкенда.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12375898","kind":"action","label":"Блокировка мутекса","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":68,"end_line":68},"element_type":null,"symbol":null,"summary":"Запирает мутекс для безопасного изменения размера экрана.","coverage_ids":["statement:pkg/cue/app.go:12375898","statement:pkg/cue/app.go:12375911"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cue/app.go:12375932","kind":"action","label":"Вызов изменения размера бэкенда","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":70,"end_line":70},"element_type":null,"symbol":null,"summary":"Вызывает метод изменения размера на объекте бэкенда псевдо-терминала.","coverage_ids":["statement:pkg/cue/app.go:12375932","return:pkg/cue/app.go:12375961"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cue/app.go:Resize:12375932","kind":"call","label":"Вызов изменения размера экрана","layer":"calls","source":{"file":"pkg/cue/app.go","start_line":70,"end_line":70},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Resize","summary":"Вызывает метод изменения размера на объекте экрана.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Resize","file":"pkg/ansi/screen.go","label":"→ Resize in pkg/ansi/screen.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.cmdResize","file":"pkg/cli/commands.go","label":"← cmdResize in pkg/cli/commands.go"}]},{"id":"func:pkg/cue/app.go:Close:12376032","kind":"group","label":"Функция закрытия приложения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":75,"end_line":80},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.Close","summary":"Завершает работу приложения, закрывая бэкенд и останавливая чтение.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12376063","kind":"action","label":"Закрытие канала остановки","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":77,"end_line":77},"element_type":null,"symbol":null,"summary":"Закрывает канал stopReader для остановки цикла чтения данных.","coverage_ids":["statement:pkg/cue/app.go:12376063","return:pkg/cue/app.go:12376114"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Session.Close","file":"pkg/cli/session.go","label":"← Close in pkg/cli/session.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close","file":"pkg/cli/session.go","label":"← Close in pkg/cli/session.go"}]},{"id":"func:pkg/cue/app.go:Wait:12376182","kind":"group","label":"Функция ожидания завершения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":83,"end_line":85},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.Wait","summary":"Блокирует выполнение до завершения процесса в бэкенде.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cue/app.go:12376212","kind":"output","label":"Возврат ошибки ожидания","layer":"data","source":{"file":"pkg/cue/app.go","start_line":84,"end_line":84},"element_type":null,"symbol":null,"summary":"Возвращает ошибку от бэкенда при ожидании завершения процесса.","coverage_ids":["return:pkg/cue/app.go:12376212"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cue/app.go:readLoop:12376239","kind":"group","label":"Функция цикла чтения","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":87,"end_line":129},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.readLoop","summary":"Обрабатывает входящие данные из бэкенда и обновляет состояние приложения.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12376267","kind":"action","label":"Создание канала данных","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":94,"end_line":94},"element_type":null,"symbol":null,"summary":"Инициализирует канал для передачи буферов данных из бэкенда.","coverage_ids":["statement:pkg/cue/app.go:12376267","statement:pkg/cue/app.go:12376296"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"loop:pkg/cue/app.go:12376525","kind":"loop","label":"Цикл обработки данных","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":105,"end_line":128},"element_type":null,"symbol":null,"summary":"Обрабатывает входящие данные из бэкенда и реагирует на специальные последовательности.","coverage_ids":["loop:pkg/cue/app.go:12376525"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12376533","kind":"action","label":"Выбор случая в select","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":116,"end_line":116},"element_type":null,"symbol":null,"summary":"Обрабатывает события остановки или поступления данных из бэкенда.","coverage_ids":["statement:pkg/cue/app.go:12376533"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Launch","file":"pkg/cue/app.go","label":"← Launch in pkg/cue/app.go"}]},{"id":"func:pkg/cue/app.go:write:12377081","kind":"group","label":"Метод записи данных в backend","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":131,"end_line":134},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.write","summary":"Метод принимает байтовый массив и передаёт его на запись в backend, возвращая ошибку при необходимости.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12377123","kind":"action","label":"Присваивание ошибки от записи","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":132,"end_line":132},"element_type":null,"symbol":null,"summary":"Сохраняет ошибку от метода записи backend в переменную err для последующего возврата.","coverage_ids":["statement:pkg/cue/app.go:12377123","return:pkg/cue/app.go:12377156"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cue/app.go:Write:12377133","kind":"call","label":"Вызов метода записи backend","layer":"calls","source":{"file":"pkg/cue/app.go","start_line":132,"end_line":132},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/pty.Backend.Write","summary":"Выполняет вызов метода записи на backend, игнорируя возвращаемое значение.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/pty.Backend.Write","file":"pkg/pty/pty.go","label":"→ Write in pkg/pty/pty.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.DisableMouse","file":"pkg/cue/page.go","label":"← DisableMouse in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.EnableMouse","file":"pkg/cue/page.go","label":"← EnableMouse in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseClick","file":"pkg/cue/page.go","label":"← MouseClick in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseClick","file":"pkg/cue/page.go","label":"← MouseClick in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseDown","file":"pkg/cue/page.go","label":"← MouseDown in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseMove","file":"pkg/cue/page.go","label":"← MouseMove in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseMove","file":"pkg/cue/page.go","label":"← MouseMove in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollDown","file":"pkg/cue/page.go","label":"← MouseScrollDown in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollUp","file":"pkg/cue/page.go","label":"← MouseScrollUp in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseUp","file":"pkg/cue/page.go","label":"← MouseUp in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.Press","file":"pkg/cue/page.go","label":"← Press in pkg/cue/page.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.Type","file":"pkg/cue/page.go","label":"← Type in pkg/cue/page.go"}]},{"id":"func:pkg/cue/app.go:screenState:12377223","kind":"group","label":"Метод получения состояния экрана","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":137,"end_line":141},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.screenState","summary":"Возвращает текущее состояние экрана с блокировкой мьютекса для обеспечения thread-safe доступа.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12377267","kind":"action","label":"Блокировка мьютекса экрана","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":138,"end_line":138},"element_type":null,"symbol":null,"summary":"Блокирует мьютекс для предотвращения конкурентного доступа к состоянию экрана.","coverage_ids":["statement:pkg/cue/app.go:12377267","statement:pkg/cue/app.go:12377280"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cue/app.go:12377301","kind":"output","label":"Возврат состояния экрана","layer":"data","source":{"file":"pkg/cue/app.go","start_line":140,"end_line":140},"element_type":null,"symbol":null,"summary":"Возвращает указатель на текущее состояние экрана после разблокировки мьютекса.","coverage_ids":["return:pkg/cue/app.go:12377301"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor","file":"pkg/cue/page.go","label":"← Cursor in pkg/cue/page.go"}]},{"id":"func:pkg/cue/app.go:RenderText:12377376","kind":"group","label":"Метод рендеринга текста экрана","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":144,"end_line":148},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.RenderText","summary":"Возвращает содержимое экрана в виде обычного текста с блокировкой мьютекса для thread-safe доступа.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12377413","kind":"action","label":"Блокировка мьютекса для рендеринга","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":145,"end_line":145},"element_type":null,"symbol":null,"summary":"Блокирует мьютекс перед доступом к состоянию экрана для рендеринга текста.","coverage_ids":["statement:pkg/cue/app.go:12377413","statement:pkg/cue/app.go:12377426"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cue/app.go:12377447","kind":"output","label":"Возврат отрендеренного текста","layer":"data","source":{"file":"pkg/cue/app.go","start_line":147,"end_line":147},"element_type":null,"symbol":null,"summary":"Возвращает строку с текстовым представлением экрана после разблокировки мьютекса.","coverage_ids":["return:pkg/cue/app.go:12377447"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cue.Page.Text","file":"pkg/cue/page.go","label":"← Text in pkg/cue/page.go"}]},{"id":"func:pkg/cue/app.go:RawLog:12377550","kind":"group","label":"Метод получения сырых логов PTY","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":151,"end_line":155},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.RawLog","summary":"Возвращает сырые байты, захваченные от PTY терминала, с блокировкой мьютекса для thread-safe доступа.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12377583","kind":"action","label":"Блокировка мьютекса для логов","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":152,"end_line":152},"element_type":null,"symbol":null,"summary":"Блокирует мьютекс перед доступом к сырым логам PTY для thread-safe чтения.","coverage_ids":["statement:pkg/cue/app.go:12377583","statement:pkg/cue/app.go:12377596"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cue/app.go:12377617","kind":"output","label":"Возврат копий сырых логов","layer":"data","source":{"file":"pkg/cue/app.go","start_line":154,"end_line":154},"element_type":null,"symbol":null,"summary":"Возвращает копию сырых логов PTY в виде байтового массива для thread-safe возврата.","coverage_ids":["return:pkg/cue/app.go:12377617"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cue/app.go:waitStable:12377732","kind":"group","label":"Метод ожидания стабильного состояния","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":158,"end_line":163},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cue.App.waitStable","summary":"Ожидает отсутствие новых данных в течение заданной длительности, используя sleep для паузы.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cue/app.go:12377777","kind":"decision","label":"Проверка длительности ожидания","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":159,"end_line":162},"element_type":null,"symbol":null,"summary":"Проверяет, равна ли переданная длительность нулю, и устанавливает значение по умолчанию если это так.","coverage_ids":["if:pkg/cue/app.go:12377777","statement:pkg/cue/app.go:12377821"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cue/app.go:12377791","kind":"action","label":"Установка длительности по умолчанию","layer":"flow","source":{"file":"pkg/cue/app.go","start_line":162,"end_line":162},"element_type":null,"symbol":null,"summary":"Устанавливает длительность ожидания на 50 миллисекунд если переданное значение равно нулю.","coverage_ids":["statement:pkg/cue/app.go:12377791"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"edges":[]};
+const palette = [{"type":"service","label":"Сервис","color":"#3b82f6","icon":"Settings2","description":"Самостоятельный сервис или приложение"},{"type":"database","label":"База данных","color":"#10b981","icon":"Database","description":"Хранилище данных, слой доступа к БД"},{"type":"module","label":"Модуль","color":"#a78bfa","icon":"Box","description":"Внутренний модуль или пакет"},{"type":"library","label":"Библиотека","color":"#f59e0b","icon":"Library","description":"Переиспользуемая библиотека"},{"type":"entrypoint","label":"Точка входа","color":"#ef4444","icon":"Rocket","description":"main / CLI / server entrypoint"}];
+const sources = {"pkg/cue/app.go":"package cue\n\nimport (\n\t\"bytes\"\n\t\"os\"\n\t\"sync\"\n\t\"time\"\n\n\t\"github.com/starframe-dev/cue-tty/pkg/ansi\"\n\t\"github.com/starframe-dev/cue-tty/pkg/pty\"\n)\n\n// App represents a running TUI application.\ntype App struct {\n\tbackend    *pty.Backend\n\tparser     *ansi.Parser\n\tscreen     *ansi.Screen\n\topts       Options\n\tmu         sync.Mutex\n\tcloseOnce  sync.Once\n\tdone       chan struct{}\n\tstopReader chan struct{}\n\trawLog     []byte // debug: raw PTY output\n}\n\n// Launch starts a TUI application.\nfunc Launch(command string, opts ...Option) (*App, error) {\n\to := DefaultOptions()\n\tfor _, fn := range opts {\n\t\tfn(&o)\n\t}\n\n\t// Merge with the current process environment by default so that env vars\n\t// set by the application under test (e.g. WARP_HTTP_PORT) remain visible.\n\tif !o.EnvReplaced {\n\t\to.Env = append(os.Environ(), o.Env...)\n\t}\n\n\tbackend, err := pty.Start(command, o.Args, o.Env, o.Dir, o.Width, o.Height)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\n\tscreen := ansi.NewScreen(o.Width, o.Height)\n\tparser := ansi.NewParser(screen)\n\n\tapp := &App{\n\t\tbackend:    backend,\n\t\tparser:     parser,\n\t\tscreen:     screen,\n\t\topts:       o,\n\t\tdone:       make(chan struct{}),\n\t\tstopReader: make(chan struct{}),\n\t}\n\n\tgo app.readLoop()\n\n\treturn app, nil\n}\n\n// Page returns the current page for interaction.\nfunc (a *App) Page() *Page {\n\treturn &Page{app: a}\n}\n\n// Resize changes terminal dimensions.\nfunc (a *App) Resize(cols, rows int) error {\n\ta.mu.Lock()\n\tdefer a.mu.Unlock()\n\ta.screen.Resize(cols, rows)\n\treturn a.backend.Resize(cols, rows)\n}\n\n// Close kills the application.\nfunc (a *App) Close() error {\n\ta.closeOnce.Do(func() {\n\t\tclose(a.stopReader)\n\t})\n\treturn a.backend.Close()\n}\n\n// Wait blocks until the process exits.\nfunc (a *App) Wait() error {\n\treturn a.backend.Wait()\n}\n\nfunc (a *App) readLoop() {\n\tdataCh := make(chan []byte)\n\tgo func() {\n\t\tbuf := make([]byte, 4096)\n\t\tfor {\n\t\t\tn, err := a.backend.Read(buf)\n\t\t\tif err != nil {\n\t\t\t\tclose(dataCh)\n\t\t\t\treturn\n\t\t\t}\n\t\t\tif n > 0 {\n\t\t\t\tcp := make([]byte, n)\n\t\t\t\tcopy(cp, buf[:n])\n\t\t\t\tdataCh <- cp\n\t\t\t}\n\t\t}\n\t}()\n\n\tfor {\n\t\tselect {\n\t\tcase <-a.stopReader:\n\t\t\treturn\n\t\tcase data, ok := <-dataCh:\n\t\t\tif !ok {\n\t\t\t\treturn\n\t\t\t}\n\t\t\ta.mu.Lock()\n\t\t\ta.rawLog = append(a.rawLog, data...)\n\t\t\ta.parser.Feed(data)\n\t\t\ta.mu.Unlock()\n\n\t\t\t// Auto-respond to common terminal queries so apps don't hang\n\t\t\tif bytes.Contains(data, []byte(\"\\x1b[6n\")) {\n\t\t\t\t// Cursor position report: ESC[row;colR\n\t\t\t\t_, _ = a.backend.Write([]byte(\"\\x1b[1;1R\"))\n\t\t\t}\n\t\t\tif bytes.Contains(data, []byte(\"\\x1b[5n\")) {\n\t\t\t\t// Status report: ESC[0n (OK)\n\t\t\t\t_, _ = a.backend.Write([]byte(\"\\x1b[0n\"))\n\t\t\t}\n\t\t}\n\t}\n}\n\nfunc (a *App) write(data []byte) error {\n\t_, err := a.backend.Write(data)\n\treturn err\n}\n\n// Screen returns the current screen state (locked).\nfunc (a *App) screenState() *ansi.Screen {\n\ta.mu.Lock()\n\tdefer a.mu.Unlock()\n\treturn a.screen\n}\n\n// RenderText returns the screen as plain text, locked.\nfunc (a *App) RenderText() string {\n\ta.mu.Lock()\n\tdefer a.mu.Unlock()\n\treturn a.screen.RenderText()\n}\n\n// RawLog returns the raw bytes captured from the PTY (for debugging).\nfunc (a *App) RawLog() []byte {\n\ta.mu.Lock()\n\tdefer a.mu.Unlock()\n\treturn append([]byte(nil), a.rawLog...)\n}\n\n// waitStable waits until no new output arrives for the given duration.\nfunc (a *App) waitStable(d time.Duration) {\n\tif d == 0 {\n\t\td = 50 * time.Millisecond\n\t}\n\ttime.Sleep(d)\n}\n"};
+
+const KIND_STYLE = {
+  action:   { color: "#3b82f6", icon: "Play" },
+  decision: { color: "#f59e0b", icon: "GitBranch" },
+  call:     { color: "#8b5cf6", icon: "Code2" },
+  input:    { color: "#06b6d4", icon: "ArrowDownToLine" },
+  output:   { color: "#10b981", icon: "ArrowUpFromLine" },
+  state:    { color: "#eab308", icon: "CircleDot" },
+  storage:  { color: "#14b8a6", icon: "Database" },
+  external: { color: "#f97316", icon: "Globe" },
+  loop:     { color: "#84cc16", icon: "RefreshCw" },
+  error:    { color: "#ef4444", icon: "CircleAlert" },
+  async:    { color: "#ec4899", icon: "Zap" },
+  group:    { color: "#71717a", icon: "Layers3" }
+};
+const ICON_PATHS = {
+  Settings2: '<path d="M20 7h-9M14 17H4M17 3v8M7 13v8M20 17h-3M7 7H4"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+  Database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/>',
+  Box: '<path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/>',
+  Library: '<path d="m16 6 4 2v12l-4-2V6ZM4 4l4-1v13l-4 1V4ZM12 3l4 3v12l-4-3V3Z"/>',
+  Rocket: '<path d="M4.5 16.5c-1.5 1.3-2 3.5-2 3.5s2.2-.5 3.5-2c.7-.7.9-1.7.3-2.3s-1.1-.5-1.8.2Z"/><path d="m9 15-3-3 8-8c2-2 5-2 6-1-1 1-1 4-3 6l-8 8Z"/><path d="M14 6 8 4 4 8l6 2M18 10l2 6-4 4-2-6"/>',
+  Play: '<path d="m6 3 14 9-14 9V3Z"/>',
+  GitBranch: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v3a6 6 0 0 0 6 6h3M6 9a6 6 0 0 1 6-6h3"/>',
+  Code2: '<path d="m18 16 4-4-4-4M6 8l-4 4 4 4M14.5 4l-5 16"/>',
+  ArrowDownToLine: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  ArrowUpFromLine: '<path d="M12 17V5M7 10l5-5 5 5M5 21h14"/>',
+  CircleDot: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>',
+  Globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>',
+  RefreshCw: '<path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>',
+  CircleAlert: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  Zap: '<path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/>',
+  Layers3: '<path d="m12 2 8 4-8 4-8-4 8-4Z"/><path d="m4 12 8 4 8-4M4 18l8 4 8-4"/>'
+};
+const paletteStyle = {};
+palette.forEach(p => { paletteStyle[p.type] = p; });
+const styleOf = n => (n.element_type && paletteStyle[n.element_type])
+  ? { color: paletteStyle[n.element_type].color, icon: paletteStyle[n.element_type].icon }
+  : KIND_STYLE[n.kind] || KIND_STYLE.action;
+
+const LAYERS = ["flow", "calls", "data", "state", "effects"];
+const activeLayers = new Set(LAYERS);
+const layersBox = document.getElementById("layers");
+LAYERS.forEach(l => {
+  const label = document.createElement("label");
+  label.className = "lchk";
+  const cb = document.createElement("input");
+  cb.type = "checkbox"; cb.checked = true;
+  cb.addEventListener("change", () => {
+    cb.checked ? activeLayers.add(l) : activeLayers.delete(l);
+    render();
+  });
+  label.appendChild(cb);
+  label.appendChild(document.createTextNode(l));
+  layersBox.appendChild(label);
+});
+
+let views = [{ title: viz.title, nodes: viz.nodes, edges: viz.edges }];
+let cursor = 0;
+const current = () => views[cursor];
+
+document.getElementById("back").addEventListener("click", () => { if (cursor > 0) { cursor--; render(); } });
+document.getElementById("fwd").addEventListener("click", () => { if (cursor < views.length - 1) { cursor++; render(); } });
+
+function openView(title, nodes, edges) {
+  views = views.slice(0, cursor + 1);
+  views.push({ title, nodes, edges });
+  cursor++;
+  render();
+}
+
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d");
+function textWidth(text, font) {
+  ctx.font = font;
+  return ctx.measureText(text).width;
+}
+
+function wrapText(text, maxW, font) {
+  const words = (text || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  words.forEach(w => {
+    const test = line ? line + " " + w : w;
+    if (textWidth(test, font) <= maxW) {
+      line = test;
+    } else {
+      if (line) lines.push(line);
+      line = w;
+    }
+  });
+  if (line) lines.push(line);
+  return lines.length ? lines : [text || ""];
+}
+
+function nodeMetrics(n) {
+  const s = styleOf(n);
+  const labelFont = "500 11px system-ui, sans-serif";
+  const summaryFont = "9px system-ui, sans-serif";
+  const maxTextW = n.kind === "decision" ? 200 : 220;
+  const labelLines = wrapText(n.label, maxTextW, labelFont);
+  const summaryLines = n.summary ? wrapText(n.summary, maxTextW, summaryFont) : [];
+  const labelW = Math.max(...labelLines.map(l => textWidth(l, labelFont)), 0);
+  const summaryW = Math.max(...summaryLines.map(l => textWidth(l, summaryFont)), 0);
+  const hasIcon = true;
+  const innerW = Math.max(labelW, summaryW) + (hasIcon ? 32 : 0);
+  const minW = n.kind === "decision" ? 168 : 140;
+  const maxW = n.kind === "decision" ? 280 : 300;
+  const width = Math.max(minW, Math.min(maxW, innerW + 24));
+  const lineH = 13;
+  const labelH = 11 + (labelLines.length - 1) * lineH;
+  const summaryH = summaryLines.length ? 4 + summaryLines.length * lineH : 0;
+  const height = 22 + labelH + summaryH;
+  return { width, height, labelLines, summaryLines, labelH, summaryH, hasIcon, color: s.color, icon: s.icon };
+}
+
+function sequentialize(arcs, visible, level) {
+  if (level !== "file" && level !== "function") return arcs;
+  const lineOf = id => {
+    const n = visible.find(x => x.id === id);
+    return n && n.source ? n.source.start_line : 0;
+  };
+  const out = {};
+  arcs.forEach(a => { (out[a.from] = out[a.from] || []).push(a); });
+  const keep = new Set();
+  const add = [];
+  Object.keys(out).forEach(src => {
+    const srcNode = visible.find(x => x.id === src);
+    if (!srcNode || srcNode.kind === "decision") return;
+    const outs = out[src]
+      .filter(a => visible.find(x => x.id === a.to))
+      .slice()
+      .sort((a, b) => lineOf(a.to) - lineOf(b.to));
+    if (outs.length < 2) return;
+    keep.add(`${outs[0].from}→${outs[0].to}`);
+    for (let i = 1; i < outs.length; i++) {
+      add.push({ from: outs[i - 1].to, to: outs[i].to, label: outs[i].label });
+    }
+  });
+  return arcs.filter(a => {
+    const srcNode = visible.find(x => x.id === a.from);
+    if (srcNode && srcNode.kind === "decision") return true;
+    if (!out[a.from] || out[a.from].length < 2) return true;
+    return keep.has(`${a.from}→${a.to}`);
+  }).concat(add);
+}
+
+function layeredLayout(nodes, edges) {
+  const visible = nodes.filter(n => activeLayers.has(n.layer));
+  const ids = new Set(visible.map(n => n.id));
+  let arcs = edges.filter(e => ids.has(e.from) && ids.has(e.to)).map(e => ({ ...e }));
+  visible.forEach(n => {
+    if (n.kind === "decision" && n.branches) {
+      n.branches.forEach(b => {
+        if (ids.has(b.target)) arcs.push({ from: n.id, to: b.target, label: b.condition });
+      });
+    }
+  });
+  arcs = sequentialize(arcs, visible, viz.level);
+
+  const layer = {};
+  visible.forEach(n => layer[n.id] = 0);
+  for (let i = 0; i < visible.length; i++) {
+    arcs.forEach(a => { if (layer[a.to] <= layer[a.from]) layer[a.to] = layer[a.from] + 1; });
+  }
+
+  const metrics = {};
+  visible.forEach(n => metrics[n.id] = nodeMetrics(n));
+
+  const groups = new Map();
+  visible.forEach(n => {
+    const l = layer[n.id];
+    if (!groups.has(l)) groups.set(l, []);
+    groups.get(l).push(n);
+  });
+
+  const preds = {};
+  arcs.forEach(a => { (preds[a.to] = preds[a.to] || []).push(a.from); });
+
+  const sortedLayers = [...groups.keys()].sort((a, b) => a - b);
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    group.forEach(n => {
+      const ps = (preds[n.id] || []).filter(p => metrics[p]._pos);
+      n._bary = ps.length ? ps.reduce((s, p) => s + metrics[p]._pos.x + metrics[p].width / 2, 0) / ps.length : Infinity;
+    });
+    group.sort((a, b) => (a._bary - b._bary) || a.id.localeCompare(b.id));
+    let x = 40;
+    group.forEach(n => {
+      metrics[n.id]._pos = { x, y: 0 };
+      x += metrics[n.id].width + 40;
+    });
+  });
+
+  let maxLayerWidth = 0;
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    const last = group[group.length - 1];
+    const w = metrics[last.id]._pos.x + metrics[last.id].width;
+    if (w > maxLayerWidth) maxLayerWidth = w;
+  });
+
+  let y = 40;
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    const maxH = Math.max(...group.map(n => metrics[n.id].height));
+    group.forEach(n => { metrics[n.id]._pos.y = y + (maxH - metrics[n.id].height) / 2; });
+    const layerW = Math.max(...group.map(n => metrics[n.id]._pos.x + metrics[n.id].width));
+    const offset = (maxLayerWidth - layerW) / 2;
+    group.forEach(n => { metrics[n.id]._pos.x += Math.max(0, offset); });
+    y += maxH + 70;
+  });
+
+  return { visible, arcs, metrics };
+}
+
+function treeLayout(nodes, sourceEdges) {
+  const root = nodes[0];
+  if (!root) return { visible: [], arcs: [], metrics: {}, regions: [], header: null };
+
+  const parentById = {};
+  function index(node, parentId = null) {
+    if (parentId) parentById[node.id] = parentId;
+    (node.children || []).forEach(child => index(child, node.id));
+  }
+  index(root);
+
+  const isFileRoot = root.kind === "group" && !root.symbol && root.id.startsWith("file:");
+  const header = isFileRoot
+    ? {
+        label: (root.label || root.source?.file || root.id).trim(),
+        summary: (root.summary || "").trim()
+      }
+    : null;
+
+  function filter(node) {
+    const children = collapsedNodes.has(node.id)
+      ? []
+      : (node.children || [])
+        .filter(c => activeLayers.has(c.layer))
+        .map(filter);
+    return { node, children };
+  }
+  const tree = isFileRoot
+    ? { node: null, depth: 0, children: (root.children || []).filter(c => activeLayers.has(c.layer)).map(filter) }
+    : filter(root);
+  const flat = [];
+
+  function collect(t, depth) {
+    t.depth = depth;
+    if (t.node) flat.push(t.node);
+    t.children.forEach(child => collect(child, depth + 1));
+  }
+  collect(tree, 0);
+  const visibleIds = new Set(flat.map(node => node.id));
+
+  const metrics = {};
+  let y = 40;
+  flat.forEach(node => {
+    const metric = nodeMetrics(node);
+    const depth = findTreeDepth(tree, node.id);
+    metric._pos = { x: 40 + depth * TREE_INDENT, y };
+    node._metrics = metric;
+    metrics[node.id] = metric;
+    y += metric.height + TREE_GAP_Y;
+  });
+
+  const regions = [];
+  function bounds(t) {
+    if (!t.node) {
+      let aggregate = null;
+      t.children.forEach(child => {
+        const childBounds = bounds(child);
+        if (!aggregate) aggregate = childBounds;
+        else {
+          aggregate.left = Math.min(aggregate.left, childBounds.left);
+          aggregate.top = Math.min(aggregate.top, childBounds.top);
+          aggregate.right = Math.max(aggregate.right, childBounds.right);
+          aggregate.bottom = Math.max(aggregate.bottom, childBounds.bottom);
+          aggregate.nodeIds = aggregate.nodeIds.concat(childBounds.nodeIds);
+        }
+      });
+      return aggregate || { left: 0, top: 0, right: 0, bottom: 0, nodeIds: [] };
+    }
+
+    const metric = metrics[t.node.id];
+    const pos = metric._pos;
+    let left = pos.x - TREE_REGION_PADDING;
+    let top = pos.y - TREE_REGION_PADDING;
+    let right = pos.x + metric.width + TREE_REGION_PADDING;
+    let bottom = pos.y + metric.height + TREE_REGION_PADDING;
+    let nodeIds = [t.node.id];
+
+    t.children.forEach(child => {
+      const childBounds = bounds(child);
+      left = Math.min(left, childBounds.left - TREE_REGION_NESTING_GAP);
+      top = Math.min(top, childBounds.top - TREE_REGION_NESTING_GAP);
+      right = Math.max(right, childBounds.right + TREE_REGION_NESTING_GAP);
+      bottom = Math.max(bottom, childBounds.bottom + TREE_REGION_NESTING_GAP);
+      nodeIds = nodeIds.concat(childBounds.nodeIds);
+    });
+
+    if (t.children.length) {
+      regions.push({
+        id: t.node.id,
+        depth: t.depth,
+        x: left,
+        y: top,
+        width: right - left,
+        height: bottom - top,
+        color: metric.color,
+        nodeIds
+      });
+    }
+    return { left, top, right, bottom, nodeIds };
+  }
+  bounds(tree);
+  regions.sort((a, b) => a.depth - b.depth);
+
+  const edges = [];
+  function addStructuralEdges(t) {
+    t.children.forEach(child => {
+      if (t.node) edges.push({ from: t.node.id, to: child.node.id, label: null, status: null });
+      addStructuralEdges(child);
+    });
+  }
+  addStructuralEdges(tree);
+
+  function visibleAncestor(id) {
+    let currentId = id;
+    while (currentId && !visibleIds.has(currentId)) {
+      const parentId = parentById[currentId];
+      if (!parentId) return null;
+      currentId = parentId;
+    }
+    return currentId || null;
+  }
+  const seen = new Set(edges.map(edge => `${edge.from}→${edge.to}`));
+  (sourceEdges || []).forEach(edge => {
+    const from = visibleAncestor(edge.from);
+    const to = visibleAncestor(edge.to);
+    if (!from || !to || from === to) return;
+    const key = `${from}→${to}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    edges.push({ from, to, label: edge.label, status: edge.status });
+  });
+
+  return { visible: flat, arcs: edges, metrics, regions, header };
+}
+
+function findTreeDepth(tree, nodeId) {
+  if (tree.node && tree.node.id === nodeId) return tree.depth;
+  for (const child of tree.children) {
+    const depth = findTreeDepth(child, nodeId);
+    if (depth >= 0) return depth;
+  }
+  return -1;
+}
+
+function isTreeView(view) {
+  return view.nodes.length === 1 && view.nodes[0].children && view.nodes[0].children.length > 0;
+}
+
+const NS = "http://www.w3.org/2000/svg";
+const TREE_INDENT = 44;
+const TREE_REGION_PADDING = 18;
+const TREE_REGION_NESTING_GAP = 10;
+const TREE_GAP_Y = 28;
+const collapsedNodes = new Set();
+let query = "";
+
+function render() {
+  const view = current();
+  document.getElementById("crumb").textContent = view.title;
+  document.getElementById("back").disabled = cursor === 0;
+  document.getElementById("fwd").disabled = cursor === views.length - 1;
+
+  const isTree = isTreeView(view);
+  const layout = isTree
+    ? treeLayout(view.nodes, view.edges)
+    : layeredLayout(view.nodes, view.edges);
+  const { visible, arcs, metrics, regions = [], header = null } = layout;
+  const fileDescription = document.getElementById("file-description");
+  const fileLabel = document.getElementById("file-label");
+  const fileSummary = document.getElementById("file-summary");
+  fileLabel.textContent = header ? header.label : "";
+  fileSummary.textContent = header ? header.summary : "";
+  fileSummary.style.display = header && header.summary ? "inline" : "none";
+  fileDescription.style.display = header ? "block" : "none";
+  const barHeight = document.getElementById("bar").getBoundingClientRect().height;
+  document.getElementById("stage").style.top = `${barHeight}px`;
+  document.getElementById("sidebar").style.top = `${barHeight}px`;
+
+  const svg = document.getElementById("svg");
+  svg.innerHTML = "";
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  visible.forEach(n => {
+    const m = metrics[n.id];
+    minX = Math.min(minX, m._pos.x);
+    minY = Math.min(minY, m._pos.y);
+    maxX = Math.max(maxX, m._pos.x + m.width);
+    maxY = Math.max(maxY, m._pos.y + m.height);
+  });
+  regions.forEach(region => {
+    minX = Math.min(minX, region.x);
+    minY = Math.min(minY, region.y);
+    maxX = Math.max(maxX, region.x + region.width);
+    maxY = Math.max(maxY, region.y + region.height);
+  });
+  const stageWidth = visible.length ? Math.max(maxX + 40, 1) : 1;
+  const stageHeight = visible.length ? Math.max(maxY + 40, 1) : 1;
+  svg.setAttribute("width", stageWidth);
+  svg.setAttribute("height", stageHeight);
+  svg.setAttribute("viewBox", `0 0 ${stageWidth} ${stageHeight}`);
+
+  const defs = document.createElementNS(NS, "defs");
+  defs.innerHTML = '<marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563"/></marker>';
+  svg.appendChild(defs);
+  const scene = document.createElementNS(NS, "g");
+  scene.setAttribute("id", "scene");
+  svg.appendChild(scene);
+
+  const matches = q => n => q && (n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q));
+  const isHit = matches(query);
+
+  const regionLayer = document.createElementNS(NS, "g");
+  regionLayer.setAttribute("id", "scope-regions");
+  regions.forEach(region => {
+    const group = document.createElementNS(NS, "g");
+    group.setAttribute("class", "scope-region");
+    if (query && !region.nodeIds.some(id => isHit(visible.find(n => n.id === id)))) group.classList.add("dim");
+    const rect = document.createElementNS(NS, "rect");
+    rect.setAttribute("x", region.x);
+    rect.setAttribute("y", region.y);
+    rect.setAttribute("width", region.width);
+    rect.setAttribute("height", region.height);
+    rect.setAttribute("rx", 16);
+    rect.setAttribute("fill", region.color);
+    rect.setAttribute("fill-opacity", "0.055");
+    rect.setAttribute("stroke", region.color);
+    rect.setAttribute("stroke-opacity", "0.42");
+    group.appendChild(rect);
+    regionLayer.appendChild(group);
+  });
+  scene.appendChild(regionLayer);
+
+  arcs.forEach(a => {
+    const m1 = metrics[a.from], m2 = metrics[a.to];
+    const p1 = m1._pos, p2 = m2._pos;
+    const sx = p1.x + m1.width / 2;
+    const sy = p1.y + m1.height;
+    const tx = p2.x + m2.width / 2;
+    const ty = p2.y;
+    const dy = Math.max(ty - sy, 30);
+    const c1y = sy + dy * 0.45;
+    const c2y = ty - dy * 0.45;
+    const d = `M ${sx} ${sy} C ${sx} ${c1y}, ${tx} ${c2y}, ${tx} ${ty}`;
+
+    const line = document.createElementNS(NS, "path");
+    line.setAttribute("d", d);
+    const status = a.status || view.edges.find(e => e.from === a.from && e.to === a.to);
+    const inferred = status === "inferred" || (status && status.status === "inferred");
+    line.setAttribute("class", "edge" + (inferred ? " inferred" : ""));
+    line.setAttribute("marker-end", "url(#arr)");
+    if (query && !(isHit(visible.find(n => n.id === a.from)) && isHit(visible.find(n => n.id === a.to)))) line.classList.add("dim");
+    scene.appendChild(line);
+
+    if (a.label) {
+      const len = line.getTotalLength();
+      const pt = line.getPointAtLength(len / 2);
+      const lw = textWidth(a.label, "10px system-ui, sans-serif") + 12;
+      const bg = document.createElementNS(NS, "rect");
+      bg.setAttribute("class", "elabel-bg");
+      bg.setAttribute("x", pt.x - lw / 2);
+      bg.setAttribute("y", pt.y - 10);
+      bg.setAttribute("width", lw);
+      bg.setAttribute("height", 20);
+      bg.setAttribute("rx", 6);
+      scene.appendChild(bg);
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", "elabel");
+      t.setAttribute("x", pt.x);
+      t.setAttribute("y", pt.y + 3);
+      t.setAttribute("text-anchor", "middle");
+      t.textContent = a.label;
+      scene.appendChild(t);
+    }
+  });
+
+  visible.forEach(n => {
+    const p = metrics[n.id]._pos;
+    const m = metrics[n.id];
+    const s = styleOf(n);
+    const g = document.createElementNS(NS, "g");
+    const classes = ["node", n.kind];
+    if (n.id === view.nodes[0]?.id) classes.push("root");
+    if (query && !isHit(n)) classes.push("dim");
+    g.setAttribute("class", classes.join(" "));
+    const shape = document.createElementNS(NS, "rect");
+    shape.setAttribute("x", p.x); shape.setAttribute("y", p.y);
+    shape.setAttribute("width", m.width); shape.setAttribute("height", m.height);
+    shape.setAttribute("rx", 12);
+    const fill = n.kind === "group"
+      ? "#181b2b"
+      : n.kind === "decision"
+        ? "#241d0c"
+        : n.kind === "loop"
+          ? "#1c1f2e"
+          : "#14171f";
+    shape.setAttribute("fill", fill);
+    shape.setAttribute("stroke", s.color);
+    shape.setAttribute("stroke-opacity", n.kind === "group" ? "0.95" : "0.78");
+    shape.setAttribute("stroke-width", n.id === view.nodes[0]?.id ? 2.5 : 1.8);
+    if (query && isHit(n)) shape.setAttribute("class", "hit");
+    g.appendChild(shape);
+
+    if ((n.kind === "group" || n.kind === "function") && n.children && n.children.length) {
+      const toggle = document.createElementNS(NS, "g");
+      toggle.setAttribute("class", "collapse-toggle");
+      toggle.setAttribute("role", "button");
+      toggle.setAttribute("aria-label", collapsedNodes.has(n.id) ? "Развернуть" : "Свернуть");
+      toggle.addEventListener("click", event => {
+        event.stopPropagation();
+        collapsedNodes.has(n.id) ? collapsedNodes.delete(n.id) : collapsedNodes.add(n.id);
+        render();
+      });
+      const toggleShape = document.createElementNS(NS, "rect");
+      toggleShape.setAttribute("x", p.x + m.width - 24);
+      toggleShape.setAttribute("y", p.y + 6);
+      toggleShape.setAttribute("width", 16);
+      toggleShape.setAttribute("height", 16);
+      toggleShape.setAttribute("rx", 5);
+      toggleShape.setAttribute("fill", "#252a3d");
+      toggleShape.setAttribute("stroke", s.color);
+      toggleShape.setAttribute("stroke-opacity", "0.55");
+      toggle.appendChild(toggleShape);
+      const toggleLabel = document.createElementNS(NS, "text");
+      toggleLabel.setAttribute("x", p.x + m.width - 16);
+      toggleLabel.setAttribute("y", p.y + 18);
+      toggleLabel.setAttribute("text-anchor", "middle");
+      toggleLabel.setAttribute("fill", "#cbd0ff");
+      toggleLabel.setAttribute("font-size", "13");
+      toggleLabel.textContent = collapsedNodes.has(n.id) ? "+" : "−";
+      toggle.appendChild(toggleLabel);
+      g.appendChild(toggle);
+    }
+
+    if (m.hasIcon) {
+      const icon = document.createElementNS(NS, "g");
+      icon.setAttribute("transform", `translate(${p.x + 18} ${p.y + m.height/2 - 7}) scale(.55)`);
+      icon.setAttribute("fill", "none");
+      icon.setAttribute("stroke", s.color);
+      icon.setAttribute("stroke-width", "2");
+      icon.setAttribute("stroke-linecap", "round");
+      icon.setAttribute("stroke-linejoin", "round");
+      icon.innerHTML = ICON_PATHS[s.icon] || ICON_PATHS.Box;
+      g.appendChild(icon);
+    }
+
+    const textX = m.hasIcon ? p.x + 38 : p.x + 12;
+    const labelMaxW = m.width - (m.hasIcon ? 48 : 22);
+    const labelLines = wrapText(n.label, labelMaxW, "500 11px system-ui, sans-serif");
+    labelLines.forEach((ln, i) => {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", "nlabel");
+      t.setAttribute("x", textX);
+      t.setAttribute("y", p.y + 17 + i * 13);
+      t.textContent = ln;
+      g.appendChild(t);
+    });
+
+    if (n.summary) {
+      const summaryLines = wrapText(n.summary, labelMaxW, "9px system-ui, sans-serif");
+      summaryLines.forEach((ln, i) => {
+        const t = document.createElementNS(NS, "text");
+        t.setAttribute("class", "nsummary");
+        t.setAttribute("x", textX);
+        t.setAttribute("y", p.y + 19 + labelLines.length * 13 + 4 + i * 13);
+        t.textContent = ln;
+        g.appendChild(t);
+      });
+    }
+
+    if (n.tests) {
+      ["unit", "integration", "e2e"].forEach((k, i) => {
+        const dot = document.createElementNS(NS, "circle");
+        dot.setAttribute("cx", p.x + m.width - 12 - i * 10); dot.setAttribute("cy", p.y + 11);
+        dot.setAttribute("r", 3.5);
+        dot.setAttribute("fill", n.tests[k] ? ["#34d399", "#60a5fa", "#f472b6"][i] : "#3f3f46");
+        g.appendChild(dot);
+      });
+    }
+
+    g.addEventListener("click", event => {
+      if (event.metaKey) {
+        if (n.children && n.children.length) {
+          document.getElementById("sidebar").style.display = "none";
+          openView(n.label, n.children, []);
+        } else if (n.symbol) {
+          document.getElementById("sidebar").style.display = "none";
+          window.parent.postMessage({ type: "graphloom:navigate", symbolId: n.symbol }, "*");
+        }
+        return;
+      }
+      showSidebar(n);
+    });
+    scene.appendChild(g);
+  });
+}
+
+function showSidebar(n) {
+  const s = styleOf(n);
+  document.getElementById("s-title").textContent = n.label;
+  document.getElementById("s-meta").textContent =
+    s.icon + " " + n.kind + (n.element_type ? " · " + n.element_type : "") +
+    (n.confidence != null ? " · confidence " + n.confidence.toFixed(2) : "");
+  document.getElementById("s-tests").innerHTML = n.tests
+    ? ["unit", "integration", "e2e"].map(k =>
+        '<span class="chip ' + (n.tests[k] ? "on" : "off") + '">' + k + "</span>").join("")
+    : "";
+  document.getElementById("s-summary").textContent = n.summary || "";
+
+  const extra = document.getElementById("s-extra");
+  extra.innerHTML = "";
+
+  const refs = document.getElementById("s-refs");
+  refs.innerHTML = "";
+  if (n.cross_refs && n.cross_refs.length) {
+    const title = document.createElement("div");
+    title.className = "meta";
+    title.textContent = "Связи:";
+    refs.appendChild(title);
+    const list = document.createElement("div");
+    for (const ref of n.cross_refs) {
+      const a = document.createElement("a");
+      a.href = "#";
+      a.textContent = ref.label;
+      a.style.display = "block";
+      a.style.color = "#60a5fa";
+      a.style.marginTop = "4px";
+      a.style.textDecoration = "none";
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.parent.postMessage({ type: "graphloom:navigate", symbolId: ref.id, file: ref.file }, "*");
+      });
+      list.appendChild(a);
+    }
+    refs.appendChild(list);
+  }
+
+  if (n.kind === "call" && n.children && n.children.length) {
+    const btn = document.createElement("button");
+    btn.className = "expand";
+    btn.textContent = "Раскрыть flow";
+    btn.addEventListener("click", () => {
+      document.getElementById("sidebar").style.display = "none";
+      openView(n.label, n.children, []);
+    });
+    extra.appendChild(btn);
+  }
+
+  const code = document.getElementById("s-code");
+  if (n.source && sources[n.source.file]) {
+    const lines = sources[n.source.file].split("\n");
+    const from = Math.max(1, n.source.start_line - 2);
+    const to = Math.min(lines.length, n.source.end_line + 2);
+    let html = "";
+    for (let i = from; i <= to; i++) {
+      const esc = lines[i - 1].replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      const body = '<span class="ln">' + i + "</span>" + esc;
+      html += i >= n.source.start_line && i <= n.source.end_line
+        ? '<span class="hl">' + body + "</span>" : body + "\n";
+    }
+    code.innerHTML = html;
+    code.style.display = "block";
+  } else {
+    code.style.display = "none";
+  }
+  document.getElementById("sidebar").style.display = "block";
+}
+
+document.getElementById("close").addEventListener("click", () => {
+  document.getElementById("sidebar").style.display = "none";
+});
+document.getElementById("search").addEventListener("input", ev => {
+  query = ev.target.value.trim().toLowerCase();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

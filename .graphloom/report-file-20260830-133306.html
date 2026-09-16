@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Graphloom</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #09090b; color: #e4e4e7; font: 14px/1.5 system-ui, sans-serif; overflow: hidden; }
+  #bar { position: fixed; top: 0; left: 0; right: 0; min-height: 36px; padding: 4px 10px; background: rgba(9,9,11,.94);
+         border-bottom: 1px solid #27272a; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; align-content: center; z-index: 5; }
+  #file-description { display: none; flex: 0 0 100%; min-width: 0; padding: 2px 4px 3px; color: #a1a1aa; font-size: 11px; line-height: 1.35; }
+  #file-description strong { color: #f4f4f5; font-weight: 600; }
+  #file-description span { margin-left: 8px; color: #71717a; }
+  #bar h1 { font-size: 14px; font-weight: 600; white-space: nowrap; }
+  #bar .crumb { min-width: 0; flex: 1; font-size: 12px; color: #a1a1aa; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #layers { display: flex; flex: 0 0 auto; gap: 7px; align-items: center; }
+  .lchk { font-size: 11px; color: #a1a1aa; display: flex; gap: 3px; align-items: center; cursor: pointer; white-space: nowrap; }
+  #search { flex: 0 0 150px; background: #18181b; border: 1px solid #3f3f46; border-radius: 6px; color: #e4e4e7;
+            padding: 4px 8px; font-size: 12px; width: 150px; }
+  .nav, .tool { background: #27272a; border: 1px solid #3f3f46; color: #e4e4e7; border-radius: 6px;
+         cursor: pointer; font-size: 12px; }
+  .nav { padding: 4px 9px; }
+  .nav:disabled, .tool:disabled { opacity: .4; cursor: default; }
+  .tool { width: 28px; height: 26px; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+  .tool:hover:not(:disabled), .nav:hover:not(:disabled) { background: #3f3f46; }
+  .tool svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8;
+              stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+  #stage { position: fixed; inset: 0; top: 36px; overflow: auto; padding: 0; background: #0b0d12; }
+  #stage::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .22;
+                  background-image: linear-gradient(#202533 1px, transparent 1px), linear-gradient(90deg, #202533 1px, transparent 1px);
+                  background-size: 32px 32px; }
+  svg { display: block; position: relative; z-index: 1; overflow: visible; }
+  .scope-region { pointer-events: none; }
+  .scope-region rect { stroke-width: 1.2; }
+  .scope-region.dim { opacity: .14; }
+  .node { cursor: pointer; }
+  .collapse-toggle { cursor: pointer; }
+  .collapse-toggle text { pointer-events: none; }
+  .collapse-toggle:hover rect { filter: brightness(1.25); }
+  .node rect { transition: filter .15s, stroke-width .15s; }
+  .node:hover rect { filter: brightness(1.18); }
+  .node.root rect { stroke-width: 2.5; }
+  .node.dim, .edge.dim { opacity: .14; }
+  .edge { stroke: #4b5563; stroke-width: 1.25; fill: none; opacity: .9; }
+  .edge.inferred { stroke-dasharray: 5 4; }
+  .elabel-bg { fill: #09090b; stroke: #27272a; stroke-width: 1; }
+  .elabel { font-size: 10px; fill: #a1a1aa; }
+  .nlabel { font-size: 11px; fill: #f4f4f5; font-weight: 500; }
+  .nsummary { font-size: 9px; fill: #71717a; }
+  .nkind { font-size: 11px; }
+  .hit { stroke: #facc15; stroke-width: 2.5; }
+  #sidebar { position: fixed; top: 36px; right: 0; bottom: 0; width: 380px; background: #18181b;
+             border-left: 1px solid #27272a; padding: 16px; overflow: auto; display: none; z-index: 6; }
+  #sidebar h2 { font-size: 16px; margin-bottom: 2px; padding-right: 20px; }
+  #sidebar .meta { font-size: 12px; color: #a1a1aa; margin-bottom: 10px; }
+  #close { position: absolute; top: 10px; right: 12px; cursor: pointer; color: #71717a;
+           background: none; border: none; font-size: 16px; }
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; margin-right: 4px; }
+  .chip.on { background: #064e3b; color: #6ee7b7; }
+  .chip.off { background: #27272a; color: #71717a; }
+  pre.code { margin-top: 12px; background: #09090b; border: 1px solid #27272a; border-radius: 8px;
+             padding: 10px; font: 11px/1.6 ui-monospace, monospace; overflow: auto; }
+  pre.code .ln { color: #52525b; display: inline-block; width: 34px; user-select: none; }
+  pre.code .hl { background: #27272a; display: block; }
+  .expand { margin-top: 10px; background: #1d4ed8; color: #fff; border: none; border-radius: 6px;
+            padding: 5px 12px; cursor: pointer; font-size: 12px; }
+  .expand { margin-top: 10px; background: #1d4ed8; color: #fff; border: none; border-radius: 6px;
+            padding: 5px 12px; cursor: pointer; font-size: 12px; }
+</style>
+</head>
+<body>
+<div id="bar">
+  <h1>Graphloom</h1>
+  <button class="nav" id="back">←</button>
+  <button class="nav" id="fwd">→</button>
+  <span class="crumb" id="crumb"></span>
+  <span id="layers"></span>
+  <input id="search" placeholder="Поиск…" />
+  <div id="file-description"><strong id="file-label"></strong><span id="file-summary"></span></div>
+</div>
+<div id="stage"><svg id="svg"></svg></div>
+<div id="sidebar">
+  <button id="close" aria-label="Закрыть">×</button>
+  <h2 id="s-title"></h2>
+  <div class="meta" id="s-meta"></div>
+  <div id="s-tests"></div>
+  <p id="s-summary" style="margin-top:8px;font-size:13px"></p>
+  <div id="s-refs" style="margin-top:10px;font-size:12px"></div>
+  <div id="s-extra"></div>
+  <pre class="code" id="s-code" style="display:none"></pre>
+</div>
+<script>
+const viz = {"title":"pkg/cli/daemon.go","level":"file","nodes":[{"id":"file:pkg/cli/daemon.go","kind":"group","label":"Файл пакета CLI","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":1,"end_line":301},"element_type":null,"symbol":null,"summary":"Этот файл содержит реализацию демона для управления сессиями через HTTP API по Unix-сокету.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"type:pkg/cli/daemon.go:Daemon:14591383","kind":"group","label":"Структура Daemon","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":18,"end_line":23},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon","summary":"Структура представляет собой основной демон с полями для мьютекса, менеджера сессий, HTTP-сервера и пути к сокету.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"type:pkg/cli/daemon.go:DaemonRequest:14591548","kind":"group","label":"Структура DaemonRequest","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":26,"end_line":31},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.DaemonRequest","summary":"Структура содержит данные команды, отправляемой демону, включая сессию, команду, аргументы и рабочий каталог.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"type:pkg/cli/daemon.go:DaemonResponse:14591767","kind":"group","label":"Структура DaemonResponse","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":34,"end_line":37},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.DaemonResponse","summary":"Структура представляет ответ демона с выводом или ошибкой в JSON-формате.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cli/daemon.go:socketDir:14591923","kind":"group","label":"Функция socketDir","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":40,"end_line":45},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.socketDir","summary":"Функция возвращает директорию для размещения Unix-сокета демона, используя переменную окружения или временную директорию.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14591950","kind":"decision","label":"Условие проверки переменной окружения","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":41,"end_line":43},"element_type":null,"symbol":null,"summary":"Проверка, установлена ли переменная окружения XDG_RUNTIME_DIR, для выбора директории сокетов.","coverage_ids":["if:pkg/cli/daemon.go:14591950"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14591953","kind":"action","label":"Получение переменной окружения","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":41,"end_line":41},"element_type":null,"symbol":null,"summary":"Получение значения переменной XDG_RUNTIME_DIR из окружения для определения директории сокетов.","coverage_ids":["statement:pkg/cli/daemon.go:14591953"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14592018","kind":"output","label":"Возврат директории сокетов","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":42,"end_line":42},"element_type":null,"symbol":null,"summary":"Возвращает путь к директории сокетов, если переменная окружения установлена.","coverage_ids":["return:pkg/cli/daemon.go:14592018"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14592040","kind":"output","label":"Возврат временной директории","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":44,"end_line":44},"element_type":null,"symbol":null,"summary":"Возвращает временную директорию, если переменная окружения не установлена.","coverage_ids":["return:pkg/cli/daemon.go:14592040"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SocketPath","file":"pkg/cli/daemon.go","label":"← SocketPath in pkg/cli/daemon.go"}]},{"id":"func:pkg/cli/daemon.go:SocketPath:14592130","kind":"group","label":"Функция SocketPath","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":48,"end_line":50},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SocketPath","summary":"Функция возвращает полный путь к Unix-сокету демона с именем пользователя.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14592158","kind":"output","label":"Возврат пути к сокету","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":49,"end_line":49},"element_type":null,"symbol":null,"summary":"Возвращает путь к сокету, объединяя директорию сокетов и имя файла сокета.","coverage_ids":["return:pkg/cli/daemon.go:14592158"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.IsDaemonRunning","file":"pkg/cli/daemon.go","label":"← IsDaemonRunning in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.NewDaemon","file":"pkg/cli/daemon.go","label":"← NewDaemon in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SendCommand","file":"pkg/cli/daemon.go","label":"← SendCommand in pkg/cli/daemon.go"}]},{"id":"func:pkg/cli/daemon.go:NewDaemon:14592289","kind":"group","label":"Функция NewDaemon","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":53,"end_line":58},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.NewDaemon","summary":"Функция создаёт новый экземпляр демона с инициализацией менеджера сессий и пути к сокету.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14592317","kind":"output","label":"Возврат нового демона","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":54,"end_line":57},"element_type":null,"symbol":null,"summary":"Возвращает указатель на новый созданный экземпляр демона.","coverage_ids":["return:pkg/cli/daemon.go:14592317"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/cmd/cuetty-cli.main","file":"cmd/cuetty-cli/main.go","label":"← main in cmd/cuetty-cli/main.go"}]},{"id":"func:pkg/cli/daemon.go:IsDaemonRunning:14592470","kind":"group","label":"Функция IsDaemonRunning","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":61,"end_line":82},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.IsDaemonRunning","summary":"Функция проверяет, запущен ли демон, пытаясь подключиться к сокету и получить ответ от эндпоинта здоровья.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14592501","kind":"action","label":"Присваивание пути к сокету","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":62,"end_line":62},"element_type":null,"symbol":null,"summary":"Присваивание полученного пути к сокету в локальную переменную.","coverage_ids":["statement:pkg/cli/daemon.go:14592501"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:SocketPath:14592509","kind":"call","label":"Вызов SocketPath","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":48,"end_line":50},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SocketPath","summary":"Вызов функции SocketPath для получения пути к сокету демона.","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SocketPath","file":"pkg/cli/daemon.go","label":"→ SocketPath in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14592523","kind":"decision","label":"Условие ошибки при проверке сокета","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":63,"end_line":65},"element_type":null,"symbol":null,"summary":"Условие проверки на ошибку при проверке существования сокета.","coverage_ids":["if:pkg/cli/daemon.go:14592523"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14592526","kind":"action","label":"Проверка существования сокета","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":63,"end_line":63},"element_type":null,"symbol":null,"summary":"Проверка существования файла сокета через os.Stat для определения, запущен ли демон.","coverage_ids":["statement:pkg/cli/daemon.go:14592526"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14592566","kind":"output","label":"Возврат false при ошибке","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":64,"end_line":64},"element_type":null,"symbol":null,"summary":"Возвращает false, если возникла ошибка при проверке существования сокета.","coverage_ids":["return:pkg/cli/daemon.go:14592566"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14592584","kind":"action","label":"Создание HTTP клиента","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":71,"end_line":71},"element_type":null,"symbol":null,"summary":"Создание HTTP клиента для отправки запроса к эндпоинту здоровья демона.","coverage_ids":["statement:pkg/cli/daemon.go:14592584"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14592795","kind":"action","label":"Отправка запроса к эндпоинту здоровья","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":76,"end_line":76},"element_type":null,"symbol":null,"summary":"Отправка GET-запроса к эндпоинту здоровья демона для проверки его работоспособности.","coverage_ids":["statement:pkg/cli/daemon.go:14592795"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14592845","kind":"decision","label":"Условие ошибки при запросе","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":77,"end_line":79},"element_type":null,"symbol":null,"summary":"Проверка на наличие ошибки при отправке запроса к эндпоинту здоровья.","coverage_ids":["if:pkg/cli/daemon.go:14592845"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14592863","kind":"output","label":"Возврат false при ошибке запроса","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":78,"end_line":78},"element_type":null,"symbol":null,"summary":"Возвращает false, если возникла ошибка при отправке запроса к эндпоинту здоровья.","coverage_ids":["return:pkg/cli/daemon.go:14592863"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14592880","kind":"action","label":"Закрытие тела ответа","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":80,"end_line":80},"element_type":null,"symbol":null,"summary":"Закрытие тела ответа HTTP-запроса после получения результата.","coverage_ids":["statement:pkg/cli/daemon.go:14592880"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14592905","kind":"output","label":"Возврат статуса ответа","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":81,"end_line":81},"element_type":null,"symbol":null,"summary":"Возвращает true, если статус ответа соответствует успешному состоянию.","coverage_ids":["return:pkg/cli/daemon.go:14592905"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SendCommand","file":"pkg/cli/daemon.go","label":"← SendCommand in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.StartDaemon","file":"pkg/cli/daemon.go","label":"← StartDaemon in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.StartDaemon","file":"pkg/cli/daemon.go","label":"← StartDaemon in pkg/cli/daemon.go"}]},{"id":"func:pkg/cli/daemon.go:StartDaemon:14593008","kind":"group","label":"Функция StartDaemon","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":85,"end_line":109},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.StartDaemon","summary":"Функция запускает демон в фоновом режиме, проверяя его работоспособность после запуска.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14593036","kind":"decision","label":"Условие проверки запуска демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":86,"end_line":88},"element_type":null,"symbol":null,"summary":"Проверка, запущен ли демон, перед попыткой запуска.","coverage_ids":["if:pkg/cli/daemon.go:14593036"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14593061","kind":"output","label":"Возврат nil при успешном запуске","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":87,"end_line":87},"element_type":null,"symbol":null,"summary":"Возвращает nil, если демон уже запущен.","coverage_ids":["return:pkg/cli/daemon.go:14593061"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593077","kind":"action","label":"Создание команды запуска демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":90,"end_line":90},"element_type":null,"symbol":null,"summary":"Создание команды для запуска демона с аргументом daemon.","coverage_ids":["statement:pkg/cli/daemon.go:14593077"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593120","kind":"action","label":"Перенаправление stdout","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":90,"end_line":90},"element_type":null,"symbol":null,"summary":"Отключение вывода в stdout для процесса демона.","coverage_ids":["statement:pkg/cli/daemon.go:14593120"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593138","kind":"action","label":"Перенаправление stderr","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":90,"end_line":90},"element_type":null,"symbol":null,"summary":"Отключение вывода в stderr для процесса демона.","coverage_ids":["statement:pkg/cli/daemon.go:14593138"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593156","kind":"action","label":"Перенаправление stdin","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":95,"end_line":95},"element_type":null,"symbol":null,"summary":"Отключение ввода в stdin для процесса демона.","coverage_ids":["statement:pkg/cli/daemon.go:14593156"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14593174","kind":"decision","label":"Условие ошибки запуска","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":95,"end_line":97},"element_type":null,"symbol":null,"summary":"Проверка на наличие ошибки при запуске процесса демона.","coverage_ids":["if:pkg/cli/daemon.go:14593174"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14593177","kind":"action","label":"Запуск процесса демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":95,"end_line":95},"element_type":null,"symbol":null,"summary":"Запуск процесса демона и проверка на наличие ошибки.","coverage_ids":["statement:pkg/cli/daemon.go:14593177"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14593212","kind":"output","label":"Возврат ошибки запуска","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":96,"end_line":96},"element_type":null,"symbol":null,"summary":"Возвращает ошибку, если не удалось запустить демон.","coverage_ids":["return:pkg/cli/daemon.go:14593212"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593292","kind":"action","label":"Установка дедлайна ожидания","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":100,"end_line":100},"element_type":null,"symbol":null,"summary":"Установка временного лимита для ожидания готовности демона.","coverage_ids":["statement:pkg/cli/daemon.go:14593292"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"loop:pkg/cli/daemon.go:14593337","kind":"loop","label":"Цикл ожидания готовности демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":101,"end_line":106},"element_type":null,"symbol":null,"summary":"Циклическая проверка готовности демона до истечения временного лимита.","coverage_ids":["loop:pkg/cli/daemon.go:14593337"],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14593373","kind":"decision","label":"Условие проверки готовности демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":102,"end_line":104},"element_type":null,"symbol":null,"summary":"Проверка, запущен ли демон внутри цикла ожидания.","coverage_ids":["if:pkg/cli/daemon.go:14593373"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14593399","kind":"output","label":"Возврат nil при готовности","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":103,"end_line":103},"element_type":null,"symbol":null,"summary":"Возвращает nil, если демон успешно запустился.","coverage_ids":["return:pkg/cli/daemon.go:14593399"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593416","kind":"action","label":"Задержка в цикле ожидания","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":105,"end_line":105},"element_type":null,"symbol":null,"summary":"Задержка перед следующей проверкой готовности демона.","coverage_ids":["statement:pkg/cli/daemon.go:14593416"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14593455","kind":"output","label":"Возврат ошибки при запуске","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":108,"end_line":108},"element_type":null,"symbol":null,"summary":"Возвращает ошибку, если демон не запустился в течение дедлайна.","coverage_ids":["return:pkg/cli/daemon.go:14593455"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SendCommand","file":"pkg/cli/daemon.go","label":"← SendCommand in pkg/cli/daemon.go"}]},{"id":"func:pkg/cli/daemon.go:Run:14593559","kind":"group","label":"Функция Run","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":112,"end_line":136},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.Run","summary":"Функция запускает демон и блокирует выполнение до его остановки.","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14593615","kind":"action","label":"Удаление устаревшего сокета","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":114,"end_line":114},"element_type":null,"symbol":null,"summary":"Удаление существующего файла сокета перед запуском HTTP-сервера.","coverage_ids":["statement:pkg/cli/daemon.go:14593615"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593645","kind":"action","label":"Создание HTTP-мультиплексора","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":116,"end_line":116},"element_type":null,"symbol":null,"summary":"Создание нового HTTP-мультиплексора для обработки различных эндпоинтов.","coverage_ids":["statement:pkg/cli/daemon.go:14593645"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593672","kind":"action","label":"Регистрация эндпоинта здоровья","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":117,"end_line":117},"element_type":null,"symbol":null,"summary":"Регистрация обработчика эндпоинта /healthz для проверки работоспособности.","coverage_ids":["statement:pkg/cli/daemon.go:14593672"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593717","kind":"action","label":"Регистрация эндпоинта команд","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":118,"end_line":118},"element_type":null,"symbol":null,"summary":"Регистрация обработчика эндпоинта /cmd для обработки команд.","coverage_ids":["statement:pkg/cli/daemon.go:14593717"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593758","kind":"action","label":"Регистрация эндпоинта show","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":119,"end_line":119},"element_type":null,"symbol":null,"summary":"Регистрация обработчика эндпоинта /show для отображения информации.","coverage_ids":["statement:pkg/cli/daemon.go:14593758"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593797","kind":"action","label":"Регистрация эндпоинта list","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":120,"end_line":120},"element_type":null,"symbol":null,"summary":"Регистрация обработчика эндпоинта /list для отображения списка сессий.","coverage_ids":["statement:pkg/cli/daemon.go:14593797"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593836","kind":"action","label":"Регистрация эндпоинта stop","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":121,"end_line":121},"element_type":null,"symbol":null,"summary":"Регистрация обработчика эндпоинта /stop для остановки демона.","coverage_ids":["statement:pkg/cli/daemon.go:14593836"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14593876","kind":"action","label":"Слушатель Unix-сокета","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":123,"end_line":123},"element_type":null,"symbol":null,"summary":"Создание слушателя для Unix-сокета с указанным путём.","coverage_ids":["statement:pkg/cli/daemon.go:14593876"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14593927","kind":"decision","label":"Условие ошибки слушателя","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":124,"end_line":126},"element_type":null,"symbol":null,"summary":"Проверка на наличие ошибки при создании слушателя Unix-сокета.","coverage_ids":["if:pkg/cli/daemon.go:14593927"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14593945","kind":"output","label":"Возврат ошибки слушателя","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":125,"end_line":125},"element_type":null,"symbol":null,"summary":"Возвращает ошибку, если не удалось создать слушателя Unix-сокета.","coverage_ids":["return:pkg/cli/daemon.go:14593945"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14594006","kind":"action","label":"Закрытие слушателя","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":127,"end_line":127},"element_type":null,"symbol":null,"summary":"Закрытие слушателя Unix-сокета при завершении работы демона.","coverage_ids":["statement:pkg/cli/daemon.go:14594006"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14594073","kind":"decision","label":"Проверка ошибки установки прав","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":130,"end_line":132},"element_type":null,"symbol":null,"summary":"Проверяет, была ли ошибка при установке прав доступа на сокет","coverage_ids":["if:pkg/cli/daemon.go:14594073"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14594076","kind":"action","label":"Установка прав доступа на сокет","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":130,"end_line":130},"element_type":null,"symbol":null,"summary":"Устанавливает права доступа на сокет файла на 0700 для безопасности","coverage_ids":["statement:pkg/cli/daemon.go:14594076","return:pkg/cli/daemon.go:14594128"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14594176","kind":"action","label":"Инициализация HTTP сервера","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":135,"end_line":135},"element_type":null,"symbol":null,"summary":"Создает новый HTTP сервер с установленным обработчиком маршрутизации","coverage_ids":["statement:pkg/cli/daemon.go:14594176","return:pkg/cli/daemon.go:14594215"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/cmd/cuetty-cli.main","file":"cmd/cuetty-cli/main.go","label":"← main in cmd/cuetty-cli/main.go"}]},{"id":"func:pkg/cli/daemon.go:Stop:14594276","kind":"group","label":"Функция остановки демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":139,"end_line":144},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.Stop","summary":"Останавливает работающий демон, закрывая HTTP сервер","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14594309","kind":"decision","label":"Проверка наличия сервера","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":140,"end_line":143},"element_type":null,"symbol":null,"summary":"Проверяет, был ли сервер создан и запущен ранее","coverage_ids":["if:pkg/cli/daemon.go:14594309","return:pkg/cli/daemon.go:14594347"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14594332","kind":"output","label":"Возврат при отсутствии сервера","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":141,"end_line":141},"element_type":null,"symbol":null,"summary":"Возвращает nil, если сервер не был создан и останавливать нечего","coverage_ids":["return:pkg/cli/daemon.go:14594332"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleCommand","file":"pkg/cli/daemon.go","label":"← handleCommand in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleStop","file":"pkg/cli/daemon.go","label":"← handleStop in pkg/cli/daemon.go"}]},{"id":"func:pkg/cli/daemon.go:handleHealthz:14594374","kind":"group","label":"Обработчик проверки здоровья","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":146,"end_line":149},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleHealthz","summary":"Обработчик HTTP-запроса для проверки работоспособности демона","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14594448","kind":"action","label":"Установка статуса ответа","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":147,"end_line":147},"element_type":null,"symbol":null,"summary":"Устанавливает HTTP-статус код 200 OK для успешного ответа","coverage_ids":["statement:pkg/cli/daemon.go:14594448","statement:pkg/cli/daemon.go:14594478"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cli/daemon.go:handleCommand:14594510","kind":"group","label":"Обработчик команд демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":151,"end_line":191},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleCommand","summary":"Обработчик HTTP-запросов для выполнения команд через сокет","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14594584","kind":"decision","label":"Проверка метода запроса","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":152,"end_line":157},"element_type":null,"symbol":null,"summary":"Проверяет, является ли метод запроса POST для команд","coverage_ids":["if:pkg/cli/daemon.go:14594584","statement:pkg/cli/daemon.go:14594698"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14594619","kind":"action","label":"Ошибка недопустимого метода","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":153,"end_line":153},"element_type":null,"symbol":null,"summary":"Возвращает ошибку 405 для недопустимых HTTP-методов","coverage_ids":["statement:pkg/cli/daemon.go:14594619","return:pkg/cli/daemon.go:14594686"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14594721","kind":"decision","label":"Проверка ошибки декодирования","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":158,"end_line":163},"element_type":null,"symbol":null,"summary":"Проверяет, была ли ошибка при декодировании JSON запроса","coverage_ids":["if:pkg/cli/daemon.go:14594721","statement:pkg/cli/daemon.go:14594851"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14594724","kind":"action","label":"Декодирование JSON запроса","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":158,"end_line":158},"element_type":null,"symbol":null,"summary":"Декодирует тело HTTP-запроса в структуру DaemonRequest","coverage_ids":["statement:pkg/cli/daemon.go:14594724","statement:pkg/cli/daemon.go:14594784"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:writeError:14594784","kind":"call","label":"Запись ошибки декодирования","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":242,"end_line":246},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","summary":"Вызывает функцию записи ошибки при неудачном декодировании JSON","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","file":"pkg/cli/daemon.go","label":"→ writeError in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14594839","kind":"output","label":"Возврат при ошибке декодирования","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":160,"end_line":160},"element_type":null,"symbol":null,"summary":"Прерывает обработку запроса при ошибке декодирования JSON","coverage_ids":["return:pkg/cli/daemon.go:14594839"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14594865","kind":"action","label":"Получение команд","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":164,"end_line":164},"element_type":null,"symbol":null,"summary":"Извлекает коллекцию команд из состояния машины с замком","coverage_ids":["statement:pkg/cli/daemon.go:14594865","statement:pkg/cli/daemon.go:14594893"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:Commands:14594877","kind":"call","label":"Получение списка команд","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":164,"end_line":164},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Commands","summary":"Получает доступ к коллекции доступных команд из состояния машины","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Commands","file":"pkg/cli/commands.go","label":"→ Commands in pkg/cli/commands.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14594961","kind":"decision","label":"Проверка команды stop","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":168,"end_line":177},"element_type":null,"symbol":null,"summary":"Проверяет, является ли команда special stop для корректной остановки","coverage_ids":["if:pkg/cli/daemon.go:14594961","statement:pkg/cli/daemon.go:14595113"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14594990","kind":"action","label":"Вызов writeResponse","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":171,"end_line":171},"element_type":null,"symbol":null,"summary":"Вызывает функцию для записи успешного ответа в HTTP-тело","coverage_ids":["statement:pkg/cli/daemon.go:14594990","statement:pkg/cli/daemon.go:14595027"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:writeResponse:14594990","kind":"call","label":"Запись ответа остановки","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":236,"end_line":240},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","summary":"Отправляет текстовый ответ о завершении работы демона","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","file":"pkg/cli/daemon.go","label":"→ writeResponse in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14595101","kind":"output","label":"Возврат после остановки","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":174,"end_line":174},"element_type":null,"symbol":null,"summary":"Прерывает обработку запроса после запуска отложенной остановки","coverage_ids":["return:pkg/cli/daemon.go:14595101"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cli/daemon.go:GetOrCreate:14595124","kind":"call","label":"Получение или создание сессии","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":177,"end_line":177},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.GetOrCreate","summary":"Получает существующую или создает новую сессию для запроса","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.GetOrCreate","file":"pkg/cli/session.go","label":"→ GetOrCreate in pkg/cli/session.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14595155","kind":"action","label":"Установка рабочей директории","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":177,"end_line":177},"element_type":null,"symbol":null,"summary":"Устанавливает рабочую директорию из параметров запроса в сессии","coverage_ids":["statement:pkg/cli/daemon.go:14595155","statement:pkg/cli/daemon.go:14595186"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14595207","kind":"decision","label":"Проверка аргументов команды","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":180,"end_line":184},"element_type":null,"symbol":null,"summary":"Проверяет наличие дополнительных аргументов в запросе команды","coverage_ids":["if:pkg/cli/daemon.go:14595207","statement:pkg/cli/daemon.go:14595279"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14595232","kind":"action","label":"Добавление аргументов к команде","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":181,"end_line":181},"element_type":null,"symbol":null,"summary":"Добавляет дополнительные аргументы к основной команде через пробел","coverage_ids":["statement:pkg/cli/daemon.go:14595232"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cli/daemon.go:runCommand:14595294","kind":"call","label":"Выполнение команды","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":184,"end_line":184},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.runCommand","summary":"Выполняет команду в контексте сессии и возвращает результат","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.runCommand","file":"pkg/cli/repl.go","label":"→ runCommand in pkg/cli/repl.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14595331","kind":"decision","label":"Проверка ошибки выполнения","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":185,"end_line":190},"element_type":null,"symbol":null,"summary":"Проверяет, была ли ошибка при выполнении команды","coverage_ids":["if:pkg/cli/daemon.go:14595331","statement:pkg/cli/daemon.go:14595382"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14595349","kind":"action","label":"Вызов writeError","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":186,"end_line":186},"element_type":null,"symbol":null,"summary":"Вызывает функцию для записи ошибки выполнения команды","coverage_ids":["statement:pkg/cli/daemon.go:14595349","return:pkg/cli/daemon.go:14595370"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:writeError:14595349","kind":"call","label":"Запись ошибки выполнения","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":242,"end_line":246},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","summary":"Записывает ошибку выполнения команды в HTTP-ответ","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","file":"pkg/cli/daemon.go","label":"→ writeError in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cli/daemon.go:writeResponse:14595382","kind":"call","label":"Запись результата выполнения","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":236,"end_line":240},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","summary":"Отправляет результат выполнения команды в HTTP-ответе","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","file":"pkg/cli/daemon.go","label":"→ writeResponse in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cli/daemon.go:handleShow:14595410","kind":"group","label":"Обработчик показа списка","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":193,"end_line":206},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleShow","summary":"Обработчик HTTP-запроса для получения списка доступных команд","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14595481","kind":"decision","label":"Проверка метода GET","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":194,"end_line":199},"element_type":null,"symbol":null,"summary":"Проверяет, является ли метод запроса GET для показа списка","coverage_ids":["if:pkg/cli/daemon.go:14595481","statement:pkg/cli/daemon.go:14595594"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14595515","kind":"action","label":"Ошибка метода для show","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":195,"end_line":195},"element_type":null,"symbol":null,"summary":"Возвращает ошибку 405 для недопустимых HTTP-методов в show","coverage_ids":["statement:pkg/cli/daemon.go:14595515","return:pkg/cli/daemon.go:14595582"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cli/daemon.go:Commands:14595609","kind":"call","label":"Получение команд для show","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":199,"end_line":199},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Commands","summary":"Получает коллекцию команд для вызова обработчика show","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Commands","file":"pkg/cli/commands.go","label":"→ Commands in pkg/cli/commands.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14595633","kind":"action","label":"Вызов showHandler","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":202,"end_line":202},"element_type":null,"symbol":null,"summary":"Вызывает обработчик команды show с пустыми параметрами","coverage_ids":["statement:pkg/cli/daemon.go:14595633","if:pkg/cli/daemon.go:14595671"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:showHandler:14595648","kind":"call","label":"Вызов обработчика show","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":200,"end_line":200},"element_type":null,"symbol":null,"summary":"Вызывает обработчик команды show для получения списка","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14595689","kind":"action","label":"Вызов writeError","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":202,"end_line":202},"element_type":null,"symbol":null,"summary":"Вызывает функцию для записи ошибки обработчика show","coverage_ids":["statement:pkg/cli/daemon.go:14595689","return:pkg/cli/daemon.go:14595710"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:writeError:14595689","kind":"call","label":"Запись ошибки show","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":242,"end_line":246},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","summary":"Записывает ошибку выполнения обработчика show в HTTP-ответ","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","file":"pkg/cli/daemon.go","label":"→ writeError in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14595721","kind":"action","label":"Вызов writeResponse","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":205,"end_line":205},"element_type":null,"symbol":null,"summary":"Вызывает функцию для записи результата обработчика show","coverage_ids":["statement:pkg/cli/daemon.go:14595721"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:writeResponse:14595721","kind":"call","label":"Запись результата show","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":236,"end_line":240},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","summary":"Отправляет результат выполнения обработчика show в ответе","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","file":"pkg/cli/daemon.go","label":"→ writeResponse in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cli/daemon.go:handleList:14595749","kind":"group","label":"Обработчик списка","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":208,"end_line":221},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleList","summary":"Обработчик HTTP-запроса для получения списка сессий","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14595820","kind":"decision","label":"Проверка метода GET для list","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":209,"end_line":214},"element_type":null,"symbol":null,"summary":"Проверяет, является ли метод запроса GET для списка","coverage_ids":["if:pkg/cli/daemon.go:14595820","statement:pkg/cli/daemon.go:14595933"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14595854","kind":"action","label":"Ошибка метода для list","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":210,"end_line":210},"element_type":null,"symbol":null,"summary":"Возвращает ошибку 405 для недопустимых HTTP-методов в list","coverage_ids":["statement:pkg/cli/daemon.go:14595854","return:pkg/cli/daemon.go:14595921"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cli/daemon.go:Commands:14595948","kind":"call","label":"Получение команд для list","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":214,"end_line":214},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Commands","summary":"Получает коллекцию команд для вызова обработчика list","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Commands","file":"pkg/cli/commands.go","label":"→ Commands in pkg/cli/commands.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14595972","kind":"action","label":"Вызов listHandler","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":217,"end_line":217},"element_type":null,"symbol":null,"summary":"Вызывает обработчик команды list с пустыми параметрами","coverage_ids":["statement:pkg/cli/daemon.go:14595972","if:pkg/cli/daemon.go:14596010"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:listHandler:14595987","kind":"call","label":"Вызов обработчика list","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":215,"end_line":215},"element_type":null,"symbol":null,"summary":"Вызывает обработчик команды list для получения списка сессий","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14596028","kind":"action","label":"Вызов writeError","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":217,"end_line":217},"element_type":null,"symbol":null,"summary":"Вызывает функцию для записи ошибки обработчика list","coverage_ids":["statement:pkg/cli/daemon.go:14596028","return:pkg/cli/daemon.go:14596049"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:writeError:14596028","kind":"call","label":"Запись ошибки list","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":242,"end_line":246},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","summary":"Записывает ошибку выполнения обработчика list в HTTP-ответ","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeError","file":"pkg/cli/daemon.go","label":"→ writeError in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14596060","kind":"action","label":"Вызов writeResponse","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":220,"end_line":220},"element_type":null,"symbol":null,"summary":"Вызывает функцию для записи результата обработчика list","coverage_ids":["statement:pkg/cli/daemon.go:14596060"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:writeResponse:14596060","kind":"call","label":"Запись результата list","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":236,"end_line":240},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","summary":"Отправляет результат выполнения обработчика list в ответе","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","file":"pkg/cli/daemon.go","label":"→ writeResponse in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cli/daemon.go:handleStop:14596088","kind":"group","label":"Обработчик остановки","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":223,"end_line":234},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleStop","summary":"Обработчик HTTP-запроса для остановки демона","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14596159","kind":"decision","label":"Проверка метода POST для stop","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":224,"end_line":229},"element_type":null,"symbol":null,"summary":"Проверяет, является ли метод запроса POST для остановки","coverage_ids":["if:pkg/cli/daemon.go:14596159","statement:pkg/cli/daemon.go:14596273"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14596194","kind":"action","label":"Ошибка метода для stop","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":225,"end_line":225},"element_type":null,"symbol":null,"summary":"Возвращает ошибку 405 для недопустимых HTTP-методов в stop","coverage_ids":["statement:pkg/cli/daemon.go:14596194","return:pkg/cli/daemon.go:14596261"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"call:pkg/cli/daemon.go:writeResponse:14596273","kind":"call","label":"Запись ответа остановки","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":236,"end_line":240},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","summary":"Отправляет текстовый ответ о завершении работы демона","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","file":"pkg/cli/daemon.go","label":"→ writeResponse in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14596309","kind":"action","label":"Запуск отложенной остановки","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":231,"end_line":231},"element_type":null,"symbol":null,"summary":"Запускает отложенную функцию для остановки демона через 100мс","coverage_ids":["statement:pkg/cli/daemon.go:14596309"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"func:pkg/cli/daemon.go:writeResponse:14596381","kind":"group","label":"Функция записи ответа","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":236,"end_line":240},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.writeResponse","summary":"Функция для записи JSON-ответа с типом application/json","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14596441","kind":"action","label":"Установка заголовка ответа","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":237,"end_line":237},"element_type":null,"symbol":null,"summary":"Устанавливает заголовок Content-Type на application/json","coverage_ids":["statement:pkg/cli/daemon.go:14596441","statement:pkg/cli/daemon.go:14596493"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14596523","kind":"action","label":"Кодировка JSON ответа","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":239,"end_line":239},"element_type":null,"symbol":null,"summary":"Кодирует структуру DaemonResponse в JSON и записывает в тело","coverage_ids":["statement:pkg/cli/daemon.go:14596523"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14596641","kind":"action","label":"Установка заголовка ошибки","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":243,"end_line":243},"element_type":null,"symbol":null,"summary":"Устанавливает заголовок Content-Type на application/json","coverage_ids":["statement:pkg/cli/daemon.go:14596641","statement:pkg/cli/daemon.go:14596693"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14596755","kind":"action","label":"Кодировка JSON ошибки","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":245,"end_line":245},"element_type":null,"symbol":null,"summary":"Кодирует структуру DaemonResponse с полем Error в JSON","coverage_ids":["statement:pkg/cli/daemon.go:14596755"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleCommand","file":"pkg/cli/daemon.go","label":"← handleCommand in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleCommand","file":"pkg/cli/daemon.go","label":"← handleCommand in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleList","file":"pkg/cli/daemon.go","label":"← handleList in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleShow","file":"pkg/cli/daemon.go","label":"← handleShow in pkg/cli/daemon.go"},{"id":"github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleStop","file":"pkg/cli/daemon.go","label":"← handleStop in pkg/cli/daemon.go"}]},{"id":"func:pkg/cli/daemon.go:SendCommand:14596895","kind":"group","label":"Функция отправки команды","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":249,"end_line":293},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.SendCommand","summary":"Отправляет команду на сокет демона и возвращает результат","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14596971","kind":"decision","label":"Проверка работы демона","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":250,"end_line":263},"element_type":null,"symbol":null,"summary":"Проверяет, запущен ли демон перед отправкой команды","coverage_ids":["if:pkg/cli/daemon.go:14596971","statement:pkg/cli/daemon.go:14597100"],"tests":null,"confidence":null,"children":[{"id":"if:pkg/cli/daemon.go:14596997","kind":"decision","label":"Проверка ошибки запуска","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":251,"end_line":253},"element_type":null,"symbol":null,"summary":"Проверяет, была ли ошибка при запуске демона","coverage_ids":["if:pkg/cli/daemon.go:14596997"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14597000","kind":"action","label":"Вызов StartDaemon","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":251,"end_line":251},"element_type":null,"symbol":null,"summary":"Вызывает функцию запуска демона при ошибке","coverage_ids":["statement:pkg/cli/daemon.go:14597000","return:pkg/cli/daemon.go:14597038"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:StartDaemon:14597007","kind":"call","label":"Запуск демона","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":85,"end_line":109},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.StartDaemon","summary":"Вызывает функцию для запуска демона при необходимости","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.StartDaemon","file":"pkg/cli/daemon.go","label":"→ StartDaemon in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14597313","kind":"action","label":"Создание структуры DaemonRequest","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":269,"end_line":269},"element_type":null,"symbol":null,"summary":"Инициализация структуры запроса к демону с заполнением полей сессии, команды, аргументов и рабочей директории","coverage_ids":["statement:pkg/cli/daemon.go:14597313"],"tests":null,"confidence":null,"children":[{"id":"call:pkg/cli/daemon.go:mustGetwd:14597403","kind":"call","label":"Вызов mustGetwd","layer":"calls","source":{"file":"pkg/cli/daemon.go","start_line":295,"end_line":301},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.mustGetwd","summary":"Вызов вспомогательной функции для получения рабочей директории процесса","coverage_ids":[],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.mustGetwd","file":"pkg/cli/daemon.go","label":"→ mustGetwd in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14597421","kind":"action","label":"Сериализация запроса в JSON","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":272,"end_line":272},"element_type":null,"symbol":null,"summary":"Преобразование структуры DaemonRequest в JSON-байты для отправки по сети","coverage_ids":["statement:pkg/cli/daemon.go:14597421","if:pkg/cli/daemon.go:14597453"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14597471","kind":"output","label":"Возврат ошибки сериализации","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":274,"end_line":274},"element_type":null,"symbol":null,"summary":"Возврат пустой строки и ошибки при неудачной сериализации запроса","coverage_ids":["return:pkg/cli/daemon.go:14597471"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14597491","kind":"action","label":"Отправка HTTP-запроса","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":277,"end_line":277},"element_type":null,"symbol":null,"summary":"Отправка POST-запроса на адрес демона с JSON-телом запроса","coverage_ids":["statement:pkg/cli/daemon.go:14597491","if:pkg/cli/daemon.go:14597591"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14597609","kind":"output","label":"Возврат ошибки отправки","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":279,"end_line":279},"element_type":null,"symbol":null,"summary":"Возврат пустой строки и сформированной ошибки при неудачной отправке запроса","coverage_ids":["return:pkg/cli/daemon.go:14597609"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"statement:pkg/cli/daemon.go:14597660","kind":"action","label":"Отложенное закрытие ответа","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":281,"end_line":281},"element_type":null,"symbol":null,"summary":"Регистрация отложенного закрытия тела HTTP-ответа после завершения обработки","coverage_ids":["statement:pkg/cli/daemon.go:14597660","statement:pkg/cli/daemon.go:14597686"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14597713","kind":"decision","label":"Проверка ошибки декодирования","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":284,"end_line":286},"element_type":null,"symbol":null,"summary":"Проверка на наличие ошибки при декодировании JSON-ответа от демона","coverage_ids":["if:pkg/cli/daemon.go:14597713"],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14597716","kind":"action","label":"Декодирование ответа","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":284,"end_line":284},"element_type":null,"symbol":null,"summary":"Чтение и декодирование JSON-тела HTTP-ответа в структуру DaemonResponse","coverage_ids":["statement:pkg/cli/daemon.go:14597716","return:pkg/cli/daemon.go:14597782"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"if:pkg/cli/daemon.go:14597837","kind":"decision","label":"Проверка ошибки в ответе","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":288,"end_line":292},"element_type":null,"symbol":null,"summary":"Проверка поля Error в декодированном ответе на наличие сообщения об ошибке","coverage_ids":["if:pkg/cli/daemon.go:14597837","return:pkg/cli/daemon.go:14597910"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14597863","kind":"output","label":"Возврат ошибки демона","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":289,"end_line":289},"element_type":null,"symbol":null,"summary":"Возврат пустой строки и ошибки из поля Error ответа демона","coverage_ids":["return:pkg/cli/daemon.go:14597863"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/cmd/cuetty-cli.main","file":"cmd/cuetty-cli/main.go","label":"← main in cmd/cuetty-cli/main.go"},{"id":"github.com/starframe-dev/cue-tty/cmd/cuetty-cli.main","file":"cmd/cuetty-cli/main.go","label":"← main in cmd/cuetty-cli/main.go"}]},{"id":"func:pkg/cli/daemon.go:mustGetwd:14597939","kind":"group","label":"Функция mustGetwd","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":295,"end_line":301},"element_type":null,"symbol":"github.com/starframe-dev/cue-tty/pkg/cli.mustGetwd","summary":"Определение вспомогательной функции для получения рабочей директории с гарантированным возвращением значения","coverage_ids":[],"tests":null,"confidence":null,"children":[{"id":"statement:pkg/cli/daemon.go:14597966","kind":"action","label":"Получение рабочей директории","layer":"flow","source":{"file":"pkg/cli/daemon.go","start_line":296,"end_line":296},"element_type":null,"symbol":null,"summary":"Вызов системной функции os.Getwd для получения текущего рабочего каталога процесса","coverage_ids":["statement:pkg/cli/daemon.go:14597966","if:pkg/cli/daemon.go:14597989"],"tests":null,"confidence":null,"children":[{"id":"return:pkg/cli/daemon.go:14598007","kind":"output","label":"Возврат точки при ошибке","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":298,"end_line":298},"element_type":null,"symbol":null,"summary":"Возврат символа точки как значения рабочей директории при ошибке получения","coverage_ids":["return:pkg/cli/daemon.go:14598007"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]},{"id":"return:pkg/cli/daemon.go:14598022","kind":"output","label":"Возврат рабочей директории","layer":"data","source":{"file":"pkg/cli/daemon.go","start_line":300,"end_line":300},"element_type":null,"symbol":null,"summary":"Возврат полученной рабочей директории процесса при успешном получении","coverage_ids":["return:pkg/cli/daemon.go:14598022"],"tests":null,"confidence":null,"children":[],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[{"id":"github.com/starframe-dev/cue-tty/pkg/cli.SendCommand","file":"pkg/cli/daemon.go","label":"← SendCommand in pkg/cli/daemon.go"}]}],"branches":[],"data_in":[],"data_out":[],"effects":[],"cross_refs":[]}],"edges":[]};
+const palette = [{"type":"service","label":"Сервис","color":"#3b82f6","icon":"Settings2","description":"Самостоятельный сервис или приложение"},{"type":"database","label":"База данных","color":"#10b981","icon":"Database","description":"Хранилище данных, слой доступа к БД"},{"type":"module","label":"Модуль","color":"#a78bfa","icon":"Box","description":"Внутренний модуль или пакет"},{"type":"library","label":"Библиотека","color":"#f59e0b","icon":"Library","description":"Переиспользуемая библиотека"},{"type":"entrypoint","label":"Точка входа","color":"#ef4444","icon":"Rocket","description":"main / CLI / server entrypoint"}];
+const sources = {"pkg/cli/daemon.go":"package cli\n\nimport (\n\t\"context\"\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net\"\n\t\"net/http\"\n\t\"os\"\n\t\"os/exec\"\n\t\"path/filepath\"\n\t\"strings\"\n\t\"sync\"\n\t\"time\"\n)\n\n// Daemon provides persistent session management via HTTP API over Unix socket.\ntype Daemon struct {\n\tmu       sync.RWMutex\n\tsm       *SessionManager\n\tserver   *http.Server\n\tsocketPath string\n}\n\n// DaemonRequest is a command sent to the daemon.\ntype DaemonRequest struct {\n\tSession string   `json:\"session\"`\n\tCommand string   `json:\"command\"`\n\tArgs    []string `json:\"args\"`\n\tWorkDir string   `json:\"workdir,omitempty\"`\n}\n\n// DaemonResponse is the daemon's reply.\ntype DaemonResponse struct {\n\tOutput string `json:\"output\"`\n\tError  string `json:\"error,omitempty\"`\n}\n\n// socketDir returns the directory for the daemon socket.\nfunc socketDir() string {\n\tif runtimeDir := os.Getenv(\"XDG_RUNTIME_DIR\"); runtimeDir != \"\" {\n\t\treturn runtimeDir\n\t}\n\treturn os.TempDir()\n}\n\n// SocketPath returns the default Unix socket path for the daemon.\nfunc SocketPath() string {\n\treturn filepath.Join(socketDir(), fmt.Sprintf(\"cuetty-%s.sock\", os.Getenv(\"USER\")))\n}\n\n// NewDaemon creates a new daemon instance.\nfunc NewDaemon() *Daemon {\n\treturn &Daemon{\n\t\tsm:         NewSessionManager(),\n\t\tsocketPath: SocketPath(),\n\t}\n}\n\n// IsDaemonRunning checks if the daemon is listening on its socket.\nfunc IsDaemonRunning() bool {\n\tpath := SocketPath()\n\tif _, err := os.Stat(path); err != nil {\n\t\treturn false\n\t}\n\n\tclient := http.Client{\n\t\tTimeout: 100 * time.Millisecond,\n\t\tTransport: &http.Transport{\n\t\t\tDialContext: func(_ context.Context, _, _ string) (net.Conn, error) {\n\t\t\t\treturn net.Dial(\"unix\", path)\n\t\t\t},\n\t\t},\n\t}\n\n\tresp, err := client.Get(\"http://daemon/healthz\")\n\tif err != nil {\n\t\treturn false\n\t}\n\tdefer resp.Body.Close()\n\treturn resp.StatusCode == http.StatusOK\n}\n\n// StartDaemon starts the daemon process in the background.\nfunc StartDaemon() error {\n\tif IsDaemonRunning() {\n\t\treturn nil\n\t}\n\n\tcmd := exec.Command(os.Args[0], \"daemon\")\n\tcmd.Stdout = nil\n\tcmd.Stderr = nil\n\tcmd.Stdin = nil\n\n\tif err := cmd.Start(); err != nil {\n\t\treturn fmt.Errorf(\"start daemon: %w\", err)\n\t}\n\n\t// Wait for daemon to be ready\n\tdeadline := time.Now().Add(2 * time.Second)\n\tfor time.Now().Before(deadline) {\n\t\tif IsDaemonRunning() {\n\t\t\treturn nil\n\t\t}\n\t\ttime.Sleep(50 * time.Millisecond)\n\t}\n\n\treturn fmt.Errorf(\"daemon failed to start\")\n}\n\n// Run starts the daemon and blocks until it is stopped.\nfunc (d *Daemon) Run() error {\n\t// Remove stale socket\n\t_ = os.Remove(d.socketPath)\n\n\tmux := http.NewServeMux()\n\tmux.HandleFunc(\"/healthz\", d.handleHealthz)\n\tmux.HandleFunc(\"/cmd\", d.handleCommand)\n\tmux.HandleFunc(\"/show\", d.handleShow)\n\tmux.HandleFunc(\"/list\", d.handleList)\n\tmux.HandleFunc(\"/stop\", d.handleStop)\n\n\tlistener, err := net.Listen(\"unix\", d.socketPath)\n\tif err != nil {\n\t\treturn fmt.Errorf(\"listen on %s: %w\", d.socketPath, err)\n\t}\n\tdefer listener.Close()\n\n\t// Ensure socket is writable by the user\n\tif err := os.Chmod(d.socketPath, 0700); err != nil {\n\t\treturn fmt.Errorf(\"chmod socket: %w\", err)\n\t}\n\n\td.server = &http.Server{Handler: mux}\n\treturn d.server.Serve(listener)\n}\n\n// Stop stops the daemon.\nfunc (d *Daemon) Stop() error {\n\tif d.server == nil {\n\t\treturn nil\n\t}\n\treturn d.server.Close()\n}\n\nfunc (d *Daemon) handleHealthz(w http.ResponseWriter, r *http.Request) {\n\tw.WriteHeader(http.StatusOK)\n\t_, _ = w.Write([]byte(\"ok\"))\n}\n\nfunc (d *Daemon) handleCommand(w http.ResponseWriter, r *http.Request) {\n\tif r.Method != http.MethodPost {\n\t\thttp.Error(w, \"method not allowed\", http.StatusMethodNotAllowed)\n\t\treturn\n\t}\n\n\tvar req DaemonRequest\n\tif err := json.NewDecoder(r.Body).Decode(&req); err != nil {\n\t\twriteError(w, fmt.Errorf(\"decode request: %w\", err))\n\t\treturn\n\t}\n\n\td.mu.RLock()\n\tcommands := Commands(d.sm)\n\td.mu.RUnlock()\n\n\t// If the command is \"stop\", handle it specially.\n\tif req.Command == \"stop\" {\n\t\twriteResponse(w, \"Daemon stopped\")\n\t\tgo func() {\n\t\t\ttime.Sleep(100 * time.Millisecond)\n\t\t\t_ = d.Stop()\n\t\t}()\n\t\treturn\n\t}\n\n\tsession := d.sm.GetOrCreate(req.Session)\n\tsession.WorkDir = req.WorkDir\n\tline := req.Command\n\tif len(req.Args) > 0 {\n\t\tline += \" \" + strings.Join(req.Args, \" \")\n\t}\n\n\tresult, err := runCommand(session, commands, line)\n\tif err != nil {\n\t\twriteError(w, err)\n\t\treturn\n\t}\n\n\twriteResponse(w, result)\n}\n\nfunc (d *Daemon) handleShow(w http.ResponseWriter, r *http.Request) {\n\tif r.Method != http.MethodGet {\n\t\thttp.Error(w, \"method not allowed\", http.StatusMethodNotAllowed)\n\t\treturn\n\t}\n\n\tshowHandler := Commands(d.sm)[\"show\"]\n\tresult, err := showHandler(nil, nil)\n\tif err != nil {\n\t\twriteError(w, err)\n\t\treturn\n\t}\n\twriteResponse(w, result)\n}\n\nfunc (d *Daemon) handleList(w http.ResponseWriter, r *http.Request) {\n\tif r.Method != http.MethodGet {\n\t\thttp.Error(w, \"method not allowed\", http.StatusMethodNotAllowed)\n\t\treturn\n\t}\n\n\tlistHandler := Commands(d.sm)[\"list\"]\n\tresult, err := listHandler(nil, nil)\n\tif err != nil {\n\t\twriteError(w, err)\n\t\treturn\n\t}\n\twriteResponse(w, result)\n}\n\nfunc (d *Daemon) handleStop(w http.ResponseWriter, r *http.Request) {\n\tif r.Method != http.MethodPost {\n\t\thttp.Error(w, \"method not allowed\", http.StatusMethodNotAllowed)\n\t\treturn\n\t}\n\n\twriteResponse(w, \"Daemon stopped\")\n\tgo func() {\n\t\ttime.Sleep(100 * time.Millisecond)\n\t\t_ = d.Stop()\n\t}()\n}\n\nfunc writeResponse(w http.ResponseWriter, output string) {\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tw.WriteHeader(http.StatusOK)\n\t_ = json.NewEncoder(w).Encode(DaemonResponse{Output: output})\n}\n\nfunc writeError(w http.ResponseWriter, err error) {\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tw.WriteHeader(http.StatusOK) // keep HTTP 200, error in body\n\t_ = json.NewEncoder(w).Encode(DaemonResponse{Error: err.Error()})\n}\n\n// SendCommand sends a command to the daemon and returns the response.\nfunc SendCommand(session, command string, args []string) (string, error) {\n\tif !IsDaemonRunning() {\n\t\tif err := StartDaemon(); err != nil {\n\t\t\treturn \"\", fmt.Errorf(\"daemon not running: %w\", err)\n\t\t}\n\t}\n\n\tclient := http.Client{\n\t\tTimeout: 30 * time.Second,\n\t\tTransport: &http.Transport{\n\t\t\tDialContext: func(_ context.Context, _, _ string) (net.Conn, error) {\n\t\t\t\treturn net.Dial(\"unix\", SocketPath())\n\t\t\t},\n\t\t},\n\t}\n\n\treq := DaemonRequest{\n\t\tSession: session,\n\t\tCommand: command,\n\t\tArgs:    args,\n\t\tWorkDir: mustGetwd(),\n\t}\n\n\tbody, err := json.Marshal(req)\n\tif err != nil {\n\t\treturn \"\", err\n\t}\n\n\tresp, err := client.Post(\"http://daemon/cmd\", \"application/json\", strings.NewReader(string(body)))\n\tif err != nil {\n\t\treturn \"\", fmt.Errorf(\"send command: %w\", err)\n\t}\n\tdefer resp.Body.Close()\n\n\tvar result DaemonResponse\n\tif err := json.NewDecoder(resp.Body).Decode(&result); err != nil {\n\t\treturn \"\", fmt.Errorf(\"decode response: %w\", err)\n\t}\n\n\tif result.Error != \"\" {\n\t\treturn \"\", fmt.Errorf(\"%s\", result.Error)\n\t}\n\n\treturn result.Output, nil\n}\n\nfunc mustGetwd() string {\n\twd, err := os.Getwd()\n\tif err != nil {\n\t\treturn \".\"\n\t}\n\treturn wd\n}\n"};
+
+const KIND_STYLE = {
+  action:   { color: "#3b82f6", icon: "Play" },
+  decision: { color: "#f59e0b", icon: "GitBranch" },
+  call:     { color: "#8b5cf6", icon: "Code2" },
+  input:    { color: "#06b6d4", icon: "ArrowDownToLine" },
+  output:   { color: "#10b981", icon: "ArrowUpFromLine" },
+  state:    { color: "#eab308", icon: "CircleDot" },
+  storage:  { color: "#14b8a6", icon: "Database" },
+  external: { color: "#f97316", icon: "Globe" },
+  loop:     { color: "#84cc16", icon: "RefreshCw" },
+  error:    { color: "#ef4444", icon: "CircleAlert" },
+  async:    { color: "#ec4899", icon: "Zap" },
+  group:    { color: "#71717a", icon: "Layers3" }
+};
+const ICON_PATHS = {
+  Settings2: '<path d="M20 7h-9M14 17H4M17 3v8M7 13v8M20 17h-3M7 7H4"/><circle cx="14" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>',
+  Database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/>',
+  Box: '<path d="m21 8-9-5-9 5 9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8M12 13v8"/>',
+  Library: '<path d="m16 6 4 2v12l-4-2V6ZM4 4l4-1v13l-4 1V4ZM12 3l4 3v12l-4-3V3Z"/>',
+  Rocket: '<path d="M4.5 16.5c-1.5 1.3-2 3.5-2 3.5s2.2-.5 3.5-2c.7-.7.9-1.7.3-2.3s-1.1-.5-1.8.2Z"/><path d="m9 15-3-3 8-8c2-2 5-2 6-1-1 1-1 4-3 6l-8 8Z"/><path d="M14 6 8 4 4 8l6 2M18 10l2 6-4 4-2-6"/>',
+  Play: '<path d="m6 3 14 9-14 9V3Z"/>',
+  GitBranch: '<circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M6 9v3a6 6 0 0 0 6 6h3M6 9a6 6 0 0 1 6-6h3"/>',
+  Code2: '<path d="m18 16 4-4-4-4M6 8l-4 4 4 4M14.5 4l-5 16"/>',
+  ArrowDownToLine: '<path d="M12 3v12M7 10l5 5 5-5M5 21h14"/>',
+  ArrowUpFromLine: '<path d="M12 17V5M7 10l5-5 5 5M5 21h14"/>',
+  CircleDot: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>',
+  Globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>',
+  RefreshCw: '<path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5"/>',
+  CircleAlert: '<circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>',
+  Zap: '<path d="m13 2-9 12h7l-1 8 9-12h-7l1-8Z"/>',
+  Layers3: '<path d="m12 2 8 4-8 4-8-4 8-4Z"/><path d="m4 12 8 4 8-4M4 18l8 4 8-4"/>'
+};
+const paletteStyle = {};
+palette.forEach(p => { paletteStyle[p.type] = p; });
+const styleOf = n => (n.element_type && paletteStyle[n.element_type])
+  ? { color: paletteStyle[n.element_type].color, icon: paletteStyle[n.element_type].icon }
+  : KIND_STYLE[n.kind] || KIND_STYLE.action;
+
+const LAYERS = ["flow", "calls", "data", "state", "effects"];
+const activeLayers = new Set(LAYERS);
+const layersBox = document.getElementById("layers");
+LAYERS.forEach(l => {
+  const label = document.createElement("label");
+  label.className = "lchk";
+  const cb = document.createElement("input");
+  cb.type = "checkbox"; cb.checked = true;
+  cb.addEventListener("change", () => {
+    cb.checked ? activeLayers.add(l) : activeLayers.delete(l);
+    render();
+  });
+  label.appendChild(cb);
+  label.appendChild(document.createTextNode(l));
+  layersBox.appendChild(label);
+});
+
+let views = [{ title: viz.title, nodes: viz.nodes, edges: viz.edges }];
+let cursor = 0;
+const current = () => views[cursor];
+
+document.getElementById("back").addEventListener("click", () => { if (cursor > 0) { cursor--; render(); } });
+document.getElementById("fwd").addEventListener("click", () => { if (cursor < views.length - 1) { cursor++; render(); } });
+
+function openView(title, nodes, edges) {
+  views = views.slice(0, cursor + 1);
+  views.push({ title, nodes, edges });
+  cursor++;
+  render();
+}
+
+const canvas = document.createElement("canvas");
+const ctx = canvas.getContext("2d");
+function textWidth(text, font) {
+  ctx.font = font;
+  return ctx.measureText(text).width;
+}
+
+function wrapText(text, maxW, font) {
+  const words = (text || "").split(/\s+/).filter(Boolean);
+  const lines = [];
+  let line = "";
+  words.forEach(w => {
+    const test = line ? line + " " + w : w;
+    if (textWidth(test, font) <= maxW) {
+      line = test;
+    } else {
+      if (line) lines.push(line);
+      line = w;
+    }
+  });
+  if (line) lines.push(line);
+  return lines.length ? lines : [text || ""];
+}
+
+function nodeMetrics(n) {
+  const s = styleOf(n);
+  const labelFont = "500 11px system-ui, sans-serif";
+  const summaryFont = "9px system-ui, sans-serif";
+  const maxTextW = n.kind === "decision" ? 200 : 220;
+  const labelLines = wrapText(n.label, maxTextW, labelFont);
+  const summaryLines = n.summary ? wrapText(n.summary, maxTextW, summaryFont) : [];
+  const labelW = Math.max(...labelLines.map(l => textWidth(l, labelFont)), 0);
+  const summaryW = Math.max(...summaryLines.map(l => textWidth(l, summaryFont)), 0);
+  const hasIcon = true;
+  const innerW = Math.max(labelW, summaryW) + (hasIcon ? 32 : 0);
+  const minW = n.kind === "decision" ? 168 : 140;
+  const maxW = n.kind === "decision" ? 280 : 300;
+  const width = Math.max(minW, Math.min(maxW, innerW + 24));
+  const lineH = 13;
+  const labelH = 11 + (labelLines.length - 1) * lineH;
+  const summaryH = summaryLines.length ? 4 + summaryLines.length * lineH : 0;
+  const height = 22 + labelH + summaryH;
+  return { width, height, labelLines, summaryLines, labelH, summaryH, hasIcon, color: s.color, icon: s.icon };
+}
+
+function sequentialize(arcs, visible, level) {
+  if (level !== "file" && level !== "function") return arcs;
+  const lineOf = id => {
+    const n = visible.find(x => x.id === id);
+    return n && n.source ? n.source.start_line : 0;
+  };
+  const out = {};
+  arcs.forEach(a => { (out[a.from] = out[a.from] || []).push(a); });
+  const keep = new Set();
+  const add = [];
+  Object.keys(out).forEach(src => {
+    const srcNode = visible.find(x => x.id === src);
+    if (!srcNode || srcNode.kind === "decision") return;
+    const outs = out[src]
+      .filter(a => visible.find(x => x.id === a.to))
+      .slice()
+      .sort((a, b) => lineOf(a.to) - lineOf(b.to));
+    if (outs.length < 2) return;
+    keep.add(`${outs[0].from}→${outs[0].to}`);
+    for (let i = 1; i < outs.length; i++) {
+      add.push({ from: outs[i - 1].to, to: outs[i].to, label: outs[i].label });
+    }
+  });
+  return arcs.filter(a => {
+    const srcNode = visible.find(x => x.id === a.from);
+    if (srcNode && srcNode.kind === "decision") return true;
+    if (!out[a.from] || out[a.from].length < 2) return true;
+    return keep.has(`${a.from}→${a.to}`);
+  }).concat(add);
+}
+
+function layeredLayout(nodes, edges) {
+  const visible = nodes.filter(n => activeLayers.has(n.layer));
+  const ids = new Set(visible.map(n => n.id));
+  let arcs = edges.filter(e => ids.has(e.from) && ids.has(e.to)).map(e => ({ ...e }));
+  visible.forEach(n => {
+    if (n.kind === "decision" && n.branches) {
+      n.branches.forEach(b => {
+        if (ids.has(b.target)) arcs.push({ from: n.id, to: b.target, label: b.condition });
+      });
+    }
+  });
+  arcs = sequentialize(arcs, visible, viz.level);
+
+  const layer = {};
+  visible.forEach(n => layer[n.id] = 0);
+  for (let i = 0; i < visible.length; i++) {
+    arcs.forEach(a => { if (layer[a.to] <= layer[a.from]) layer[a.to] = layer[a.from] + 1; });
+  }
+
+  const metrics = {};
+  visible.forEach(n => metrics[n.id] = nodeMetrics(n));
+
+  const groups = new Map();
+  visible.forEach(n => {
+    const l = layer[n.id];
+    if (!groups.has(l)) groups.set(l, []);
+    groups.get(l).push(n);
+  });
+
+  const preds = {};
+  arcs.forEach(a => { (preds[a.to] = preds[a.to] || []).push(a.from); });
+
+  const sortedLayers = [...groups.keys()].sort((a, b) => a - b);
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    group.forEach(n => {
+      const ps = (preds[n.id] || []).filter(p => metrics[p]._pos);
+      n._bary = ps.length ? ps.reduce((s, p) => s + metrics[p]._pos.x + metrics[p].width / 2, 0) / ps.length : Infinity;
+    });
+    group.sort((a, b) => (a._bary - b._bary) || a.id.localeCompare(b.id));
+    let x = 40;
+    group.forEach(n => {
+      metrics[n.id]._pos = { x, y: 0 };
+      x += metrics[n.id].width + 40;
+    });
+  });
+
+  let maxLayerWidth = 0;
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    const last = group[group.length - 1];
+    const w = metrics[last.id]._pos.x + metrics[last.id].width;
+    if (w > maxLayerWidth) maxLayerWidth = w;
+  });
+
+  let y = 40;
+  sortedLayers.forEach(l => {
+    const group = groups.get(l);
+    const maxH = Math.max(...group.map(n => metrics[n.id].height));
+    group.forEach(n => { metrics[n.id]._pos.y = y + (maxH - metrics[n.id].height) / 2; });
+    const layerW = Math.max(...group.map(n => metrics[n.id]._pos.x + metrics[n.id].width));
+    const offset = (maxLayerWidth - layerW) / 2;
+    group.forEach(n => { metrics[n.id]._pos.x += Math.max(0, offset); });
+    y += maxH + 70;
+  });
+
+  return { visible, arcs, metrics };
+}
+
+function treeLayout(nodes, sourceEdges) {
+  const root = nodes[0];
+  if (!root) return { visible: [], arcs: [], metrics: {}, regions: [], header: null };
+
+  const parentById = {};
+  function index(node, parentId = null) {
+    if (parentId) parentById[node.id] = parentId;
+    (node.children || []).forEach(child => index(child, node.id));
+  }
+  index(root);
+
+  const isFileRoot = root.kind === "group" && !root.symbol && root.id.startsWith("file:");
+  const header = isFileRoot
+    ? {
+        label: (root.label || root.source?.file || root.id).trim(),
+        summary: (root.summary || "").trim()
+      }
+    : null;
+
+  function filter(node) {
+    const children = collapsedNodes.has(node.id)
+      ? []
+      : (node.children || [])
+        .filter(c => activeLayers.has(c.layer))
+        .map(filter);
+    return { node, children };
+  }
+  const tree = isFileRoot
+    ? { node: null, depth: 0, children: (root.children || []).filter(c => activeLayers.has(c.layer)).map(filter) }
+    : filter(root);
+  const flat = [];
+
+  function collect(t, depth) {
+    t.depth = depth;
+    if (t.node) flat.push(t.node);
+    t.children.forEach(child => collect(child, depth + 1));
+  }
+  collect(tree, 0);
+  const visibleIds = new Set(flat.map(node => node.id));
+
+  const metrics = {};
+  let y = 40;
+  flat.forEach(node => {
+    const metric = nodeMetrics(node);
+    const depth = findTreeDepth(tree, node.id);
+    metric._pos = { x: 40 + depth * TREE_INDENT, y };
+    node._metrics = metric;
+    metrics[node.id] = metric;
+    y += metric.height + TREE_GAP_Y;
+  });
+
+  const regions = [];
+  function bounds(t) {
+    if (!t.node) {
+      let aggregate = null;
+      t.children.forEach(child => {
+        const childBounds = bounds(child);
+        if (!aggregate) aggregate = childBounds;
+        else {
+          aggregate.left = Math.min(aggregate.left, childBounds.left);
+          aggregate.top = Math.min(aggregate.top, childBounds.top);
+          aggregate.right = Math.max(aggregate.right, childBounds.right);
+          aggregate.bottom = Math.max(aggregate.bottom, childBounds.bottom);
+          aggregate.nodeIds = aggregate.nodeIds.concat(childBounds.nodeIds);
+        }
+      });
+      return aggregate || { left: 0, top: 0, right: 0, bottom: 0, nodeIds: [] };
+    }
+
+    const metric = metrics[t.node.id];
+    const pos = metric._pos;
+    let left = pos.x - TREE_REGION_PADDING;
+    let top = pos.y - TREE_REGION_PADDING;
+    let right = pos.x + metric.width + TREE_REGION_PADDING;
+    let bottom = pos.y + metric.height + TREE_REGION_PADDING;
+    let nodeIds = [t.node.id];
+
+    t.children.forEach(child => {
+      const childBounds = bounds(child);
+      left = Math.min(left, childBounds.left - TREE_REGION_NESTING_GAP);
+      top = Math.min(top, childBounds.top - TREE_REGION_NESTING_GAP);
+      right = Math.max(right, childBounds.right + TREE_REGION_NESTING_GAP);
+      bottom = Math.max(bottom, childBounds.bottom + TREE_REGION_NESTING_GAP);
+      nodeIds = nodeIds.concat(childBounds.nodeIds);
+    });
+
+    if (t.children.length) {
+      regions.push({
+        id: t.node.id,
+        depth: t.depth,
+        x: left,
+        y: top,
+        width: right - left,
+        height: bottom - top,
+        color: metric.color,
+        nodeIds
+      });
+    }
+    return { left, top, right, bottom, nodeIds };
+  }
+  bounds(tree);
+  regions.sort((a, b) => a.depth - b.depth);
+
+  const edges = [];
+  function addStructuralEdges(t) {
+    t.children.forEach(child => {
+      if (t.node) edges.push({ from: t.node.id, to: child.node.id, label: null, status: null });
+      addStructuralEdges(child);
+    });
+  }
+  addStructuralEdges(tree);
+
+  function visibleAncestor(id) {
+    let currentId = id;
+    while (currentId && !visibleIds.has(currentId)) {
+      const parentId = parentById[currentId];
+      if (!parentId) return null;
+      currentId = parentId;
+    }
+    return currentId || null;
+  }
+  const seen = new Set(edges.map(edge => `${edge.from}→${edge.to}`));
+  (sourceEdges || []).forEach(edge => {
+    const from = visibleAncestor(edge.from);
+    const to = visibleAncestor(edge.to);
+    if (!from || !to || from === to) return;
+    const key = `${from}→${to}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    edges.push({ from, to, label: edge.label, status: edge.status });
+  });
+
+  return { visible: flat, arcs: edges, metrics, regions, header };
+}
+
+function findTreeDepth(tree, nodeId) {
+  if (tree.node && tree.node.id === nodeId) return tree.depth;
+  for (const child of tree.children) {
+    const depth = findTreeDepth(child, nodeId);
+    if (depth >= 0) return depth;
+  }
+  return -1;
+}
+
+function isTreeView(view) {
+  return view.nodes.length === 1 && view.nodes[0].children && view.nodes[0].children.length > 0;
+}
+
+const NS = "http://www.w3.org/2000/svg";
+const TREE_INDENT = 44;
+const TREE_REGION_PADDING = 18;
+const TREE_REGION_NESTING_GAP = 10;
+const TREE_GAP_Y = 28;
+const collapsedNodes = new Set();
+let query = "";
+
+function render() {
+  const view = current();
+  document.getElementById("crumb").textContent = view.title;
+  document.getElementById("back").disabled = cursor === 0;
+  document.getElementById("fwd").disabled = cursor === views.length - 1;
+
+  const isTree = isTreeView(view);
+  const layout = isTree
+    ? treeLayout(view.nodes, view.edges)
+    : layeredLayout(view.nodes, view.edges);
+  const { visible, arcs, metrics, regions = [], header = null } = layout;
+  const fileDescription = document.getElementById("file-description");
+  const fileLabel = document.getElementById("file-label");
+  const fileSummary = document.getElementById("file-summary");
+  fileLabel.textContent = header ? header.label : "";
+  fileSummary.textContent = header ? header.summary : "";
+  fileSummary.style.display = header && header.summary ? "inline" : "none";
+  fileDescription.style.display = header ? "block" : "none";
+  const barHeight = document.getElementById("bar").getBoundingClientRect().height;
+  document.getElementById("stage").style.top = `${barHeight}px`;
+  document.getElementById("sidebar").style.top = `${barHeight}px`;
+
+  const svg = document.getElementById("svg");
+  svg.innerHTML = "";
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  visible.forEach(n => {
+    const m = metrics[n.id];
+    minX = Math.min(minX, m._pos.x);
+    minY = Math.min(minY, m._pos.y);
+    maxX = Math.max(maxX, m._pos.x + m.width);
+    maxY = Math.max(maxY, m._pos.y + m.height);
+  });
+  regions.forEach(region => {
+    minX = Math.min(minX, region.x);
+    minY = Math.min(minY, region.y);
+    maxX = Math.max(maxX, region.x + region.width);
+    maxY = Math.max(maxY, region.y + region.height);
+  });
+  const stageWidth = visible.length ? Math.max(maxX + 40, 1) : 1;
+  const stageHeight = visible.length ? Math.max(maxY + 40, 1) : 1;
+  svg.setAttribute("width", stageWidth);
+  svg.setAttribute("height", stageHeight);
+  svg.setAttribute("viewBox", `0 0 ${stageWidth} ${stageHeight}`);
+
+  const defs = document.createElementNS(NS, "defs");
+  defs.innerHTML = '<marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563"/></marker>';
+  svg.appendChild(defs);
+  const scene = document.createElementNS(NS, "g");
+  scene.setAttribute("id", "scene");
+  svg.appendChild(scene);
+
+  const matches = q => n => q && (n.label.toLowerCase().includes(q) || n.id.toLowerCase().includes(q));
+  const isHit = matches(query);
+
+  const regionLayer = document.createElementNS(NS, "g");
+  regionLayer.setAttribute("id", "scope-regions");
+  regions.forEach(region => {
+    const group = document.createElementNS(NS, "g");
+    group.setAttribute("class", "scope-region");
+    if (query && !region.nodeIds.some(id => isHit(visible.find(n => n.id === id)))) group.classList.add("dim");
+    const rect = document.createElementNS(NS, "rect");
+    rect.setAttribute("x", region.x);
+    rect.setAttribute("y", region.y);
+    rect.setAttribute("width", region.width);
+    rect.setAttribute("height", region.height);
+    rect.setAttribute("rx", 16);
+    rect.setAttribute("fill", region.color);
+    rect.setAttribute("fill-opacity", "0.055");
+    rect.setAttribute("stroke", region.color);
+    rect.setAttribute("stroke-opacity", "0.42");
+    group.appendChild(rect);
+    regionLayer.appendChild(group);
+  });
+  scene.appendChild(regionLayer);
+
+  arcs.forEach(a => {
+    const m1 = metrics[a.from], m2 = metrics[a.to];
+    const p1 = m1._pos, p2 = m2._pos;
+    const sx = p1.x + m1.width / 2;
+    const sy = p1.y + m1.height;
+    const tx = p2.x + m2.width / 2;
+    const ty = p2.y;
+    const dy = Math.max(ty - sy, 30);
+    const c1y = sy + dy * 0.45;
+    const c2y = ty - dy * 0.45;
+    const d = `M ${sx} ${sy} C ${sx} ${c1y}, ${tx} ${c2y}, ${tx} ${ty}`;
+
+    const line = document.createElementNS(NS, "path");
+    line.setAttribute("d", d);
+    const status = a.status || view.edges.find(e => e.from === a.from && e.to === a.to);
+    const inferred = status === "inferred" || (status && status.status === "inferred");
+    line.setAttribute("class", "edge" + (inferred ? " inferred" : ""));
+    line.setAttribute("marker-end", "url(#arr)");
+    if (query && !(isHit(visible.find(n => n.id === a.from)) && isHit(visible.find(n => n.id === a.to)))) line.classList.add("dim");
+    scene.appendChild(line);
+
+    if (a.label) {
+      const len = line.getTotalLength();
+      const pt = line.getPointAtLength(len / 2);
+      const lw = textWidth(a.label, "10px system-ui, sans-serif") + 12;
+      const bg = document.createElementNS(NS, "rect");
+      bg.setAttribute("class", "elabel-bg");
+      bg.setAttribute("x", pt.x - lw / 2);
+      bg.setAttribute("y", pt.y - 10);
+      bg.setAttribute("width", lw);
+      bg.setAttribute("height", 20);
+      bg.setAttribute("rx", 6);
+      scene.appendChild(bg);
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", "elabel");
+      t.setAttribute("x", pt.x);
+      t.setAttribute("y", pt.y + 3);
+      t.setAttribute("text-anchor", "middle");
+      t.textContent = a.label;
+      scene.appendChild(t);
+    }
+  });
+
+  visible.forEach(n => {
+    const p = metrics[n.id]._pos;
+    const m = metrics[n.id];
+    const s = styleOf(n);
+    const g = document.createElementNS(NS, "g");
+    const classes = ["node", n.kind];
+    if (n.id === view.nodes[0]?.id) classes.push("root");
+    if (query && !isHit(n)) classes.push("dim");
+    g.setAttribute("class", classes.join(" "));
+    const shape = document.createElementNS(NS, "rect");
+    shape.setAttribute("x", p.x); shape.setAttribute("y", p.y);
+    shape.setAttribute("width", m.width); shape.setAttribute("height", m.height);
+    shape.setAttribute("rx", 12);
+    const fill = n.kind === "group"
+      ? "#181b2b"
+      : n.kind === "decision"
+        ? "#241d0c"
+        : n.kind === "loop"
+          ? "#1c1f2e"
+          : "#14171f";
+    shape.setAttribute("fill", fill);
+    shape.setAttribute("stroke", s.color);
+    shape.setAttribute("stroke-opacity", n.kind === "group" ? "0.95" : "0.78");
+    shape.setAttribute("stroke-width", n.id === view.nodes[0]?.id ? 2.5 : 1.8);
+    if (query && isHit(n)) shape.setAttribute("class", "hit");
+    g.appendChild(shape);
+
+    if ((n.kind === "group" || n.kind === "function") && n.children && n.children.length) {
+      const toggle = document.createElementNS(NS, "g");
+      toggle.setAttribute("class", "collapse-toggle");
+      toggle.setAttribute("role", "button");
+      toggle.setAttribute("aria-label", collapsedNodes.has(n.id) ? "Развернуть" : "Свернуть");
+      toggle.addEventListener("click", event => {
+        event.stopPropagation();
+        collapsedNodes.has(n.id) ? collapsedNodes.delete(n.id) : collapsedNodes.add(n.id);
+        render();
+      });
+      const toggleShape = document.createElementNS(NS, "rect");
+      toggleShape.setAttribute("x", p.x + m.width - 24);
+      toggleShape.setAttribute("y", p.y + 6);
+      toggleShape.setAttribute("width", 16);
+      toggleShape.setAttribute("height", 16);
+      toggleShape.setAttribute("rx", 5);
+      toggleShape.setAttribute("fill", "#252a3d");
+      toggleShape.setAttribute("stroke", s.color);
+      toggleShape.setAttribute("stroke-opacity", "0.55");
+      toggle.appendChild(toggleShape);
+      const toggleLabel = document.createElementNS(NS, "text");
+      toggleLabel.setAttribute("x", p.x + m.width - 16);
+      toggleLabel.setAttribute("y", p.y + 18);
+      toggleLabel.setAttribute("text-anchor", "middle");
+      toggleLabel.setAttribute("fill", "#cbd0ff");
+      toggleLabel.setAttribute("font-size", "13");
+      toggleLabel.textContent = collapsedNodes.has(n.id) ? "+" : "−";
+      toggle.appendChild(toggleLabel);
+      g.appendChild(toggle);
+    }
+
+    if (m.hasIcon) {
+      const icon = document.createElementNS(NS, "g");
+      icon.setAttribute("transform", `translate(${p.x + 18} ${p.y + m.height/2 - 7}) scale(.55)`);
+      icon.setAttribute("fill", "none");
+      icon.setAttribute("stroke", s.color);
+      icon.setAttribute("stroke-width", "2");
+      icon.setAttribute("stroke-linecap", "round");
+      icon.setAttribute("stroke-linejoin", "round");
+      icon.innerHTML = ICON_PATHS[s.icon] || ICON_PATHS.Box;
+      g.appendChild(icon);
+    }
+
+    const textX = m.hasIcon ? p.x + 38 : p.x + 12;
+    const labelMaxW = m.width - (m.hasIcon ? 48 : 22);
+    const labelLines = wrapText(n.label, labelMaxW, "500 11px system-ui, sans-serif");
+    labelLines.forEach((ln, i) => {
+      const t = document.createElementNS(NS, "text");
+      t.setAttribute("class", "nlabel");
+      t.setAttribute("x", textX);
+      t.setAttribute("y", p.y + 17 + i * 13);
+      t.textContent = ln;
+      g.appendChild(t);
+    });
+
+    if (n.summary) {
+      const summaryLines = wrapText(n.summary, labelMaxW, "9px system-ui, sans-serif");
+      summaryLines.forEach((ln, i) => {
+        const t = document.createElementNS(NS, "text");
+        t.setAttribute("class", "nsummary");
+        t.setAttribute("x", textX);
+        t.setAttribute("y", p.y + 19 + labelLines.length * 13 + 4 + i * 13);
+        t.textContent = ln;
+        g.appendChild(t);
+      });
+    }
+
+    if (n.tests) {
+      ["unit", "integration", "e2e"].forEach((k, i) => {
+        const dot = document.createElementNS(NS, "circle");
+        dot.setAttribute("cx", p.x + m.width - 12 - i * 10); dot.setAttribute("cy", p.y + 11);
+        dot.setAttribute("r", 3.5);
+        dot.setAttribute("fill", n.tests[k] ? ["#34d399", "#60a5fa", "#f472b6"][i] : "#3f3f46");
+        g.appendChild(dot);
+      });
+    }
+
+    g.addEventListener("click", event => {
+      if (event.metaKey) {
+        if (n.children && n.children.length) {
+          document.getElementById("sidebar").style.display = "none";
+          openView(n.label, n.children, []);
+        } else if (n.symbol) {
+          document.getElementById("sidebar").style.display = "none";
+          window.parent.postMessage({ type: "graphloom:navigate", symbolId: n.symbol }, "*");
+        }
+        return;
+      }
+      showSidebar(n);
+    });
+    scene.appendChild(g);
+  });
+}
+
+function showSidebar(n) {
+  const s = styleOf(n);
+  document.getElementById("s-title").textContent = n.label;
+  document.getElementById("s-meta").textContent =
+    s.icon + " " + n.kind + (n.element_type ? " · " + n.element_type : "") +
+    (n.confidence != null ? " · confidence " + n.confidence.toFixed(2) : "");
+  document.getElementById("s-tests").innerHTML = n.tests
+    ? ["unit", "integration", "e2e"].map(k =>
+        '<span class="chip ' + (n.tests[k] ? "on" : "off") + '">' + k + "</span>").join("")
+    : "";
+  document.getElementById("s-summary").textContent = n.summary || "";
+
+  const extra = document.getElementById("s-extra");
+  extra.innerHTML = "";
+
+  const refs = document.getElementById("s-refs");
+  refs.innerHTML = "";
+  if (n.cross_refs && n.cross_refs.length) {
+    const title = document.createElement("div");
+    title.className = "meta";
+    title.textContent = "Связи:";
+    refs.appendChild(title);
+    const list = document.createElement("div");
+    for (const ref of n.cross_refs) {
+      const a = document.createElement("a");
+      a.href = "#";
+      a.textContent = ref.label;
+      a.style.display = "block";
+      a.style.color = "#60a5fa";
+      a.style.marginTop = "4px";
+      a.style.textDecoration = "none";
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        window.parent.postMessage({ type: "graphloom:navigate", symbolId: ref.id, file: ref.file }, "*");
+      });
+      list.appendChild(a);
+    }
+    refs.appendChild(list);
+  }
+
+  if (n.kind === "call" && n.children && n.children.length) {
+    const btn = document.createElement("button");
+    btn.className = "expand";
+    btn.textContent = "Раскрыть flow";
+    btn.addEventListener("click", () => {
+      document.getElementById("sidebar").style.display = "none";
+      openView(n.label, n.children, []);
+    });
+    extra.appendChild(btn);
+  }
+
+  const code = document.getElementById("s-code");
+  if (n.source && sources[n.source.file]) {
+    const lines = sources[n.source.file].split("\n");
+    const from = Math.max(1, n.source.start_line - 2);
+    const to = Math.min(lines.length, n.source.end_line + 2);
+    let html = "";
+    for (let i = from; i <= to; i++) {
+      const esc = lines[i - 1].replace(/&/g, "&amp;").replace(/</g, "&lt;");
+      const body = '<span class="ln">' + i + "</span>" + esc;
+      html += i >= n.source.start_line && i <= n.source.end_line
+        ? '<span class="hl">' + body + "</span>" : body + "\n";
+    }
+    code.innerHTML = html;
+    code.style.display = "block";
+  } else {
+    code.style.display = "none";
+  }
+  document.getElementById("sidebar").style.display = "block";
+}
+
+document.getElementById("close").addEventListener("click", () => {
+  document.getElementById("sidebar").style.display = "none";
+});
+document.getElementById("search").addEventListener("input", ev => {
+  query = ev.target.value.trim().toLowerCase();
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

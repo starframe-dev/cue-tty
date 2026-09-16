@@ -1,0 +1,971 @@
+{
+  "title": "cmd/cuetty-cli/main.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:cmd/cuetty-cli/main.go",
+      "kind": "group",
+      "label": "Файл main.go",
+      "layer": "flow",
+      "source": {
+        "file": "cmd/cuetty-cli/main.go",
+        "start_line": 1,
+        "end_line": 82
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Основной файл пакета, содержащий импорты библиотек и определение главной функции приложения.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "func:cmd/cuetty-cli/main.go:main:14605657",
+          "kind": "group",
+          "label": "Функция main",
+          "layer": "flow",
+          "source": {
+            "file": "cmd/cuetty-cli/main.go",
+            "start_line": 12,
+            "end_line": 65
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/cmd/cuetty-cli.main",
+          "summary": "Точка входа в приложение, обрабатывающая аргументы командной строки и выполняющая различные команды.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:cmd/cuetty-cli/main.go:14605672",
+              "kind": "action",
+              "label": "Объявление переменной sessionName",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 14,
+                "end_line": 14
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Декларирует строковую переменную для хранения имени сессии.",
+              "coverage_ids": [
+                "statement:cmd/cuetty-cli/main.go:14605672",
+                "statement:cmd/cuetty-cli/main.go:14605696"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:cmd/cuetty-cli/main.go:14605758",
+              "kind": "action",
+              "label": "Парсинг флагов",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 15,
+                "end_line": 15
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Обрабатывает все флаговые аргументы командной строки.",
+              "coverage_ids": [
+                "statement:cmd/cuetty-cli/main.go:14605758",
+                "statement:cmd/cuetty-cli/main.go:14605773"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:cmd/cuetty-cli/main.go:14605854",
+              "kind": "decision",
+              "label": "Проверка на команду daemon",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 20,
+                "end_line": 27
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Условная ветка для запуска демона при наличии аргумента 'daemon'.",
+              "coverage_ids": [
+                "if:cmd/cuetty-cli/main.go:14605854"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14605898",
+                  "kind": "action",
+                  "label": "Присваивание экземпляра демона",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 23,
+                    "end_line": 23
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Сохраняет созданный объект демона в переменную d.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14605898",
+                    "if:cmd/cuetty-cli/main.go:14605921"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:cmd/cuetty-cli/main.go:NewDaemon:14605903",
+                      "kind": "call",
+                      "label": "Создание экземпляра демона",
+                      "layer": "calls",
+                      "source": {
+                        "file": "cmd/cuetty-cli/main.go",
+                        "start_line": 21,
+                        "end_line": 21
+                      },
+                      "element_type": null,
+                      "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.NewDaemon",
+                      "summary": "Инициализирует новый объект демона через фабричный метод.",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": [
+                        {
+                          "id": "github.com/starframe-dev/cue-tty/pkg/cli.NewDaemon",
+                          "file": "pkg/cli/daemon.go",
+                          "label": "→ NewDaemon in pkg/cli/daemon.go"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "statement:cmd/cuetty-cli/main.go:14605924",
+                      "kind": "action",
+                      "label": "Проверка ошибки запуска",
+                      "layer": "flow",
+                      "source": {
+                        "file": "cmd/cuetty-cli/main.go",
+                        "start_line": 22,
+                        "end_line": 22
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Проверяет наличие ошибки при запуске демона.",
+                      "coverage_ids": [
+                        "statement:cmd/cuetty-cli/main.go:14605924",
+                        "statement:cmd/cuetty-cli/main.go:14605956"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "call:cmd/cuetty-cli/main.go:Run:14605931",
+                          "kind": "call",
+                          "label": "Запуск демона",
+                          "layer": "calls",
+                          "source": {
+                            "file": "cmd/cuetty-cli/main.go",
+                            "start_line": 22,
+                            "end_line": 22
+                          },
+                          "element_type": null,
+                          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.Daemon.Run",
+                          "summary": "Выполняет метод запуска демона и обрабатывает возможные ошибки.",
+                          "coverage_ids": [],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": [
+                            {
+                              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Daemon.Run",
+                              "file": "pkg/cli/daemon.go",
+                              "label": "→ Run in pkg/cli/daemon.go"
+                            }
+                          ]
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "statement:cmd/cuetty-cli/main.go:14606009",
+                      "kind": "action",
+                      "label": "Выход с кодом ошибки",
+                      "layer": "flow",
+                      "source": {
+                        "file": "cmd/cuetty-cli/main.go",
+                        "start_line": 24,
+                        "end_line": 24
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Завершает программу с кодом выхода 1 при ошибке демона.",
+                      "coverage_ids": [
+                        "statement:cmd/cuetty-cli/main.go:14606009"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:cmd/cuetty-cli/main.go:14606026",
+                  "kind": "output",
+                  "label": "Возврат из main при запуске демона",
+                  "layer": "data",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 26,
+                    "end_line": 26
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Завершает выполнение функции main после успешного запуска демона.",
+                  "coverage_ids": [
+                    "return:cmd/cuetty-cli/main.go:14606026"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:cmd/cuetty-cli/main.go:14606076",
+              "kind": "decision",
+              "label": "Проверка на отсутствие команд",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 30,
+                "end_line": 36
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Условная ветка для обработки случая когда аргументы не предоставлены.",
+              "coverage_ids": [
+                "if:cmd/cuetty-cli/main.go:14606076"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14606098",
+                  "kind": "action",
+                  "label": "Вывод инструкции по использованию",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 31,
+                    "end_line": 31
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Выводит основную инструкцию по использованию программы на stderr.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14606098",
+                    "statement:cmd/cuetty-cli/main.go:14606178"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14606232",
+                  "kind": "action",
+                  "label": "Вывод пустой строки",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 33,
+                    "end_line": 33
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Добавляет пустую строку для визуального разделения в инструкции.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14606232",
+                    "statement:cmd/cuetty-cli/main.go:14606262"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14606348",
+                  "kind": "action",
+                  "label": "Выход при отсутствии команд",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 35,
+                    "end_line": 35
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Завершает программу с кодом ошибки 1 при отсутствии команд.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14606348"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:cmd/cuetty-cli/main.go:14606364",
+              "kind": "action",
+              "label": "Извлечение команды",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 40,
+                "end_line": 40
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Сохраняет первый позиционный аргумент как команду.",
+              "coverage_ids": [
+                "statement:cmd/cuetty-cli/main.go:14606364",
+                "statement:cmd/cuetty-cli/main.go:14606384"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:cmd/cuetty-cli/main.go:14606406",
+              "kind": "decision",
+              "label": "Проверка на дополнительные аргументы",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 40,
+                "end_line": 42
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Условная ветка для обработки дополнительных аргументов команды.",
+              "coverage_ids": [
+                "if:cmd/cuetty-cli/main.go:14606406"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14606427",
+                  "kind": "action",
+                  "label": "Срез аргументов команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 40,
+                    "end_line": 40
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Сохраняет все аргументы кроме первого в отдельный массив.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14606427"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:cmd/cuetty-cli/main.go:14606502",
+              "kind": "decision",
+              "label": "Проверка на команды list и show",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 45,
+                "end_line": 55
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Условная ветка для обработки специальных команд list и show.",
+              "coverage_ids": [
+                "if:cmd/cuetty-cli/main.go:14606502"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14606548",
+                  "kind": "action",
+                  "label": "Присваивание результата команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 48,
+                    "end_line": 48
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Сохраняет вывод и ошибку отправки команды в переменные.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14606548",
+                    "if:cmd/cuetty-cli/main.go:14606612"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:cmd/cuetty-cli/main.go:SendCommand:14606563",
+                      "kind": "call",
+                      "label": "Отправка команды для list/show",
+                      "layer": "calls",
+                      "source": {
+                        "file": "cmd/cuetty-cli/main.go",
+                        "start_line": 46,
+                        "end_line": 46
+                      },
+                      "element_type": null,
+                      "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SendCommand",
+                      "summary": "Выполняет отправку команды через пакет cli для команд list и show.",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": [
+                        {
+                          "id": "github.com/starframe-dev/cue-tty/pkg/cli.SendCommand",
+                          "file": "pkg/cli/daemon.go",
+                          "label": "→ SendCommand in pkg/cli/daemon.go"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "statement:cmd/cuetty-cli/main.go:14606631",
+                      "kind": "action",
+                      "label": "Вывод ошибки команды",
+                      "layer": "flow",
+                      "source": {
+                        "file": "cmd/cuetty-cli/main.go",
+                        "start_line": 48,
+                        "end_line": 48
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Выводит сообщение об ошибке выполнения команды на stderr.",
+                      "coverage_ids": [
+                        "statement:cmd/cuetty-cli/main.go:14606631",
+                        "statement:cmd/cuetty-cli/main.go:14606677"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:cmd/cuetty-cli/main.go:14606694",
+                  "kind": "decision",
+                  "label": "Проверка вывода команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 51,
+                    "end_line": 54
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Условная ветка для проверки наличия вывода команды.",
+                  "coverage_ids": [
+                    "if:cmd/cuetty-cli/main.go:14606694",
+                    "return:cmd/cuetty-cli/main.go:14606741"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:cmd/cuetty-cli/main.go:14606715",
+                      "kind": "action",
+                      "label": "Вывод результата команды",
+                      "layer": "flow",
+                      "source": {
+                        "file": "cmd/cuetty-cli/main.go",
+                        "start_line": 52,
+                        "end_line": 52
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Выводит результат команды на стандартный вывод.",
+                      "coverage_ids": [
+                        "statement:cmd/cuetty-cli/main.go:14606715"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:cmd/cuetty-cli/main.go:14606753",
+              "kind": "action",
+              "label": "Присваивание результата команды",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 59,
+                "end_line": 59
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Сохраняет вывод и ошибку отправки обычной команды в переменные.",
+              "coverage_ids": [
+                "statement:cmd/cuetty-cli/main.go:14606753",
+                "if:cmd/cuetty-cli/main.go:14606816"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:cmd/cuetty-cli/main.go:SendCommand:14606768",
+                  "kind": "call",
+                  "label": "Отправка обычной команды",
+                  "layer": "calls",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 57,
+                    "end_line": 57
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SendCommand",
+                  "summary": "Выполняет отправку команды через пакет cli для остальных команд.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cli.SendCommand",
+                      "file": "pkg/cli/daemon.go",
+                      "label": "→ SendCommand in pkg/cli/daemon.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14606834",
+                  "kind": "action",
+                  "label": "Вывод ошибки команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 59,
+                    "end_line": 59
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Выводит сообщение об ошибке выполнения команды на stderr.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14606834",
+                    "statement:cmd/cuetty-cli/main.go:14606879"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:cmd/cuetty-cli/main.go:14606894",
+              "kind": "decision",
+              "label": "Проверка вывода команды",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 62,
+                "end_line": 64
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Условная ветка для проверки наличия вывода команды.",
+              "coverage_ids": [
+                "if:cmd/cuetty-cli/main.go:14606894"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:cmd/cuetty-cli/main.go:14606914",
+                  "kind": "action",
+                  "label": "Вывод результата команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 63,
+                    "end_line": 63
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Выводит результат команды на стандартный вывод.",
+                  "coverage_ids": [
+                    "statement:cmd/cuetty-cli/main.go:14606914"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:cmd/cuetty-cli/main.go:splitCommandArgs:14607086",
+          "kind": "group",
+          "label": "Функция splitCommandArgs",
+          "layer": "flow",
+          "source": {
+            "file": "cmd/cuetty-cli/main.go",
+            "start_line": 69,
+            "end_line": 69
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/cmd/cuetty-cli.splitCommandArgs",
+          "summary": "Неиспользуемая функция для реконструкции позиционных аргументов, всегда возвращает nil.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:cmd/cuetty-cli/main.go:14607129",
+              "kind": "output",
+              "label": "Возврат nil из splitCommandArgs",
+              "layer": "data",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 69,
+                "end_line": 69
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает пустой массив nil как результат функции.",
+              "coverage_ids": [
+                "return:cmd/cuetty-cli/main.go:14607129"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:cmd/cuetty-cli/main.go:quoteArgs:14607214",
+          "kind": "group",
+          "label": "Функция quoteArgs",
+          "layer": "flow",
+          "source": {
+            "file": "cmd/cuetty-cli/main.go",
+            "start_line": 72,
+            "end_line": 82
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/cmd/cuetty-cli.quoteArgs",
+          "summary": "Функция для экранирования аргументов, добавляя кавычки при наличии пробелов.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:cmd/cuetty-cli/main.go:14607254",
+              "kind": "action",
+              "label": "Объявление массива частей",
+              "layer": "flow",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 76,
+                "end_line": 76
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Декларирует пустой массив для хранения обработанных частей аргументов.",
+              "coverage_ids": [
+                "statement:cmd/cuetty-cli/main.go:14607254",
+                "loop:cmd/cuetty-cli/main.go:14607274"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "if:cmd/cuetty-cli/main.go:14607301",
+                  "kind": "decision",
+                  "label": "Проверка на пробелы в аргументе",
+                  "layer": "flow",
+                  "source": {
+                    "file": "cmd/cuetty-cli/main.go",
+                    "start_line": 75,
+                    "end_line": 79
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Условная ветка для проверки наличия пробелов в текущем аргументе.",
+                  "coverage_ids": [
+                    "if:cmd/cuetty-cli/main.go:14607301"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:cmd/cuetty-cli/main.go:14607334",
+                      "kind": "action",
+                      "label": "Экранирование аргумента с пробелами",
+                      "layer": "flow",
+                      "source": {
+                        "file": "cmd/cuetty-cli/main.go",
+                        "start_line": 76,
+                        "end_line": 76
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Добавляет аргумент с пробелами в кавычках в массив частей.",
+                      "coverage_ids": [
+                        "statement:cmd/cuetty-cli/main.go:14607334",
+                        "else:cmd/cuetty-cli/main.go:14607387"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:cmd/cuetty-cli/main.go:14607392",
+                          "kind": "action",
+                          "label": "Присваивание аргумента без изменений",
+                          "layer": "flow",
+                          "source": {
+                            "file": "cmd/cuetty-cli/main.go",
+                            "start_line": 78,
+                            "end_line": 78
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Сохраняет аргумент без пробелов в массив частей без экранирования.",
+                          "coverage_ids": [
+                            "statement:cmd/cuetty-cli/main.go:14607392"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:cmd/cuetty-cli/main.go:14607425",
+              "kind": "output",
+              "label": "Возврат объединённого строки",
+              "layer": "data",
+              "source": {
+                "file": "cmd/cuetty-cli/main.go",
+                "start_line": 81,
+                "end_line": 81
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает объединённый массив частей в единую строку с разделителями.",
+              "coverage_ids": [
+                "return:cmd/cuetty-cli/main.go:14607425"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

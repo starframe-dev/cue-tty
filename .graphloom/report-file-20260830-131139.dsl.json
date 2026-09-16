@@ -1,0 +1,2823 @@
+{
+  "title": "pkg/ansi/screen.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/ansi/screen.go",
+      "kind": "group",
+      "label": "Файл пакета ANSI",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/ansi/screen.go",
+        "start_line": 1,
+        "end_line": 215
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит реализацию виртуального терминального экрана с поддержкой ANSI-последовательностей, стилей и управления курсором.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/ansi/screen.go:Cell:12346755",
+          "kind": "group",
+          "label": "Тип ячейки экрана",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 12,
+            "end_line": 12
+          },
+          "element_type": null,
+          "symbol": null,
+          "summary": "Этот тип представляет собой одиночный символ на экране, типизированный через внешнюю библиотеку portalis.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "type:pkg/ansi/screen.go:Cursor:12346828",
+          "kind": "group",
+          "label": "Тип курсора",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 15,
+            "end_line": 15
+          },
+          "element_type": null,
+          "symbol": null,
+          "summary": "Этот тип отслеживает текущую позицию курсора на экране, типизированный через внешнюю библиотеку portalis.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:EmptyCell:12346902",
+          "kind": "group",
+          "label": "Функция создания пустой ячейки",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 18,
+            "end_line": 18
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.EmptyCell",
+          "summary": "Эта функция возвращает ячейку с нулевыми значениями, представляющую пустой символ на экране.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12346926",
+              "kind": "output",
+              "label": "Возврат пустой ячейки",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 18,
+                "end_line": 18
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает созданный экземпляр пустой ячейки из функции EmptyCell.",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12346926"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "type:pkg/ansi/screen.go:Screen:12347014",
+          "kind": "group",
+          "label": "Тип экрана",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 21,
+            "end_line": 24
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen",
+          "summary": "Этот тип представляет виртуальный терминальный экран, содержащий буфер и стилизацию через встроенную структуру portalis.Screen.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:NewScreen:12347121",
+          "kind": "group",
+          "label": "Функция создания нового экрана",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 27,
+            "end_line": 29
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.NewScreen",
+          "summary": "Эта функция создаёт новый экран с заданными размерами колонок и строк, инициализируя его с сбросом стилей.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12347163",
+              "kind": "output",
+              "label": "Возврат нового экрана",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 28,
+                "end_line": 28
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает указатель на созданный экземпляр экрана с инициализированными размерами и стилями.",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12347163"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Launch",
+              "file": "pkg/cue/app.go",
+              "label": "← Launch in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:Resize:12347301",
+          "kind": "group",
+          "label": "Метод изменения размера экрана",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 32,
+            "end_line": 34
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Resize",
+          "summary": "Этот метод изменяет размеры экрана, сохраняя содержимое в левом верхнем углу при изменении.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12347344",
+              "kind": "action",
+              "label": "Вызов изменения размера",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 33,
+                "end_line": 33
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение вызывает метод изменения размера на базовом экране portalis с новыми параметрами колонок и строк.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12347344"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.Resize",
+              "file": "pkg/cue/app.go",
+              "label": "← Resize in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:ClearScreen:12347423",
+          "kind": "group",
+          "label": "Метод очистки экрана",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 37,
+            "end_line": 39
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.ClearScreen",
+          "summary": "Этот метод очищает весь активный буфер экрана, удаляя все содержимое.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12347457",
+              "kind": "action",
+              "label": "Вызов очистки буфера",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 38,
+                "end_line": 38
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение вызывает метод очистки на базовом экране portalis для сброса всего содержимого.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12347457"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:CurrentCursor:12347521",
+          "kind": "group",
+          "label": "Метод получения курсора",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 42,
+            "end_line": 44
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.CurrentCursor",
+          "summary": "Этот метод возвращает активный курсор экрана, давая доступ к текущей позиции курсора.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12347565",
+              "kind": "output",
+              "label": "Возврат курсора",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 43,
+                "end_line": 43
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает указатель на активный курсор экрана из базовой структуры portalis.",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12347565"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor",
+              "file": "pkg/cue/page.go",
+              "label": "← Cursor in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:MoveCursor:12347651",
+          "kind": "group",
+          "label": "Метод установки позиции курсора",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 47,
+            "end_line": 49
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.MoveCursor",
+          "summary": "Этот метод устанавливает абсолютную позицию курсора в заданные строку и колонку (0-индексированные).",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12347696",
+              "kind": "action",
+              "label": "Вызов установки курсора",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 48,
+                "end_line": 48
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение вызывает метод установки курсора на базовом экране с указанными координатами строки и колонки.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12347696"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:MoveCursorRel:12347792",
+          "kind": "group",
+          "label": "Метод относительного перемещения курсора",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 52,
+            "end_line": 63
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.MoveCursorRel",
+          "summary": "Этот метод перемещает курсор относительно текущей позиции по строкам и колонкам с обработкой границ.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/ansi/screen.go:12347838",
+              "kind": "decision",
+              "label": "Условие отрицательного смещения по строке",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 53,
+                "end_line": 57
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это условие проверяет, нужно ли переместить курсор вверх при отрицательном значении dy.",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12347838"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12347852",
+                  "kind": "action",
+                  "label": "Перемещение курсора вверх",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 54,
+                    "end_line": 54
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это выражение вызывает метод перемещения курсора вверх на указанное количество строк при отрицательном dy.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12347852"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "else:pkg/ansi/screen.go:12347883",
+                  "kind": "decision",
+                  "label": "Альтернативное условие для положительного смещения по строке",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 55,
+                    "end_line": 57
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это ветка else обрабатывает случай положительного значения dy для перемещения курсора вниз.",
+                  "coverage_ids": [
+                    "else:pkg/ansi/screen.go:12347883"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "if:pkg/ansi/screen.go:12347883",
+                      "kind": "decision",
+                      "label": "Условие положительного смещения по строке",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/screen.go",
+                        "start_line": 55,
+                        "end_line": 57
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Это условие проверяет, нужно ли переместить курсор вниз при положительном значении dy.",
+                      "coverage_ids": [
+                        "if:pkg/ansi/screen.go:12347883"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:pkg/ansi/screen.go:12347897",
+                          "kind": "action",
+                          "label": "Перемещение курсора вниз",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 56,
+                            "end_line": 56
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Это выражение вызывает метод перемещения курсора вниз на указанное количество строк при положительном dy.",
+                          "coverage_ids": [
+                            "statement:pkg/ansi/screen.go:12347897"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/ansi/screen.go:12347925",
+              "kind": "decision",
+              "label": "Условие отрицательного смещения по колонке",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 58,
+                "end_line": 62
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это условие проверяет, нужно ли переместить курсор влево при отрицательном значении dx.",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12347925"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12347939",
+                  "kind": "action",
+                  "label": "Перемещение курсора влево",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 59,
+                    "end_line": 59
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это выражение вызывает метод перемещения курсора назад на указанное количество колонок при отрицательном dx.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12347939"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "else:pkg/ansi/screen.go:12347976",
+                  "kind": "decision",
+                  "label": "Альтернативное условие для положительного смещения по колонке",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 60,
+                    "end_line": 62
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это ветка else обрабатывает случай положительного значения dx для перемещения курсора вправо.",
+                  "coverage_ids": [
+                    "else:pkg/ansi/screen.go:12347976"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "if:pkg/ansi/screen.go:12347976",
+                      "kind": "decision",
+                      "label": "Условие положительного смещения по колонке",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/screen.go",
+                        "start_line": 60,
+                        "end_line": 62
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Это условие проверяет, нужно ли переместить курсор вправо при положительном значении dx.",
+                      "coverage_ids": [
+                        "if:pkg/ansi/screen.go:12347976"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:pkg/ansi/screen.go:12347990",
+                          "kind": "action",
+                          "label": "Перемещение курсора вправо",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 61,
+                            "end_line": 61
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Это выражение вызывает метод перемещения курсора вперёд на указанное количество колонок при положительном dx.",
+                          "coverage_ids": [
+                            "statement:pkg/ansi/screen.go:12347990"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:scrollUp:12348076",
+          "kind": "group",
+          "label": "Метод прокрутки вверх",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 66,
+            "end_line": 68
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.scrollUp",
+          "summary": "Этот метод прокручивает область прокрутки экрана вверх на указанное количество строк.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12348112",
+              "kind": "action",
+              "label": "Вызов прокрутки вверх",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 67,
+                "end_line": 67
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение вызывает метод прокрутки области вверх на базовом экране portalis на n строк.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12348112"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:scrollDown:12348199",
+          "kind": "group",
+          "label": "Метод прокрутки вниз",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 71,
+            "end_line": 73
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.scrollDown",
+          "summary": "Этот метод прокручивает область прокрутки экрана вниз на указанное количество строк.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12348237",
+              "kind": "action",
+              "label": "Вызов прокрутки вниз",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 72,
+                "end_line": 72
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение вызывает метод прокрутки области вниз на базовом экране portalis на n строк.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12348237"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:SwitchAltBuffer:12348338",
+          "kind": "group",
+          "label": "Метод переключения буфера",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 76,
+            "end_line": 82
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.SwitchAltBuffer",
+          "summary": "Этот метод переключает между основным и альтернативным буферами экрана терминала.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/ansi/screen.go:12348384",
+              "kind": "decision",
+              "label": "Условие входа в альтернативный буфер",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 77,
+                "end_line": 81
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это условие проверяет, нужно ли переключиться на альтернативный буфер экрана при true.",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12348384"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12348395",
+                  "kind": "action",
+                  "label": "Вход в альтернативный буфер",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 78,
+                    "end_line": 78
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это выражение вызывает метод входа в альтернативный буфер экрана при необходимости переключения.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12348395"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "else:pkg/ansi/screen.go:12348429",
+                  "kind": "decision",
+                  "label": "Альтернативное условие выхода из альтернативного буфера",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 79,
+                    "end_line": 81
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это ветка else обрабатывает случай выхода из альтернативного буфера при false.",
+                  "coverage_ids": [
+                    "else:pkg/ansi/screen.go:12348429"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/ansi/screen.go:12348433",
+                      "kind": "action",
+                      "label": "Выход из альтернативного буфера",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/screen.go",
+                        "start_line": 80,
+                        "end_line": 80
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Это выражение вызывает метод выхода из альтернативного буфера экрана при необходимости переключения.",
+                      "coverage_ids": [
+                        "statement:pkg/ansi/screen.go:12348433"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.executeCSI",
+              "file": "pkg/ansi/parser.go",
+              "label": "← executeCSI in pkg/ansi/parser.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:RenderText:12348532",
+          "kind": "group",
+          "label": "Метод рендеринга текста",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 85,
+            "end_line": 87
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.RenderText",
+          "summary": "Этот метод возвращает содержимое экрана как обычный текст без ANSI-последовательностей.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12348572",
+              "kind": "output",
+              "label": "Возврат очищенного текста",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 86,
+                "end_line": 86
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает результат удаления ANSI-последовательностей из отрендеренного содержимого экрана.",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12348572"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.RenderText",
+              "file": "pkg/cue/app.go",
+              "label": "← RenderText in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:stripANSI:12348669",
+          "kind": "group",
+          "label": "Функция удаления ANSI-последовательностей",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 90,
+            "end_line": 115
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.stripANSI",
+          "summary": "Эта функция удаляет все ANSI-кодированные последовательности из строки, оставляя только обычный текст.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12348704",
+              "kind": "action",
+              "label": "Инициализация выходного буфера",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 93,
+                "end_line": 93
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение создаёт пустой срез байтов для накопления очищенного текста.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12348704"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/ansi/screen.go:12348720",
+              "kind": "action",
+              "label": "Инициализация индекса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 93,
+                "end_line": 93
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение устанавливает начальный индекс для обхода строки.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12348720"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/ansi/screen.go:12348728",
+              "kind": "loop",
+              "label": "Цикл обхода строки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 93,
+                "end_line": 113
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Этот цикл проходит по всем символам строки, обрабатывая ANSI-последовательности и обычный текст.",
+              "coverage_ids": [
+                "loop:pkg/ansi/screen.go:12348728"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "if:pkg/ansi/screen.go:12348747",
+                  "kind": "decision",
+                  "label": "Условие обнаружения ANSI-последовательности",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 94,
+                    "end_line": 112
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это условие проверяет, является ли текущий символ символом escape для пропуска ANSI-последовательности.",
+                  "coverage_ids": [
+                    "if:pkg/ansi/screen.go:12348747"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/ansi/screen.go:12348797",
+                      "kind": "action",
+                      "label": "Пропуск символа escape",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/screen.go",
+                        "start_line": 97,
+                        "end_line": 97
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Это выражение увеличивает индекс для пропуска начального символа escape последовательности.",
+                      "coverage_ids": [
+                        "statement:pkg/ansi/screen.go:12348797"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "if:pkg/ansi/screen.go:12348804",
+                      "kind": "decision",
+                      "label": "Условие обнаружения открывающей скобки",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/screen.go",
+                        "start_line": 97,
+                        "end_line": 108
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Это условие проверяет, следует ли за escape символом открывающей скобки для параметризованной последовательности.",
+                      "coverage_ids": [
+                        "if:pkg/ansi/screen.go:12348804"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:pkg/ansi/screen.go:12348839",
+                          "kind": "action",
+                          "label": "Пропуск открывающей скобки",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 97,
+                            "end_line": 97
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Это выражение увеличивает индекс для пропуска открывающей скобки последовательности.",
+                          "coverage_ids": [
+                            "statement:pkg/ansi/screen.go:12348839"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        },
+                        {
+                          "id": "loop:pkg/ansi/screen.go:12348847",
+                          "kind": "loop",
+                          "label": "Цикл пропуска параметров последовательности",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 99,
+                            "end_line": 101
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Этот цикл пропускает символы параметров ANSI-последовательности до конца или до допустимого символа.",
+                          "coverage_ids": [
+                            "loop:pkg/ansi/screen.go:12348847"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [
+                            {
+                              "id": "statement:pkg/ansi/screen.go:12348904",
+                              "kind": "action",
+                              "label": "Пропуск параметра последовательности",
+                              "layer": "flow",
+                              "source": {
+                                "file": "pkg/ansi/screen.go",
+                                "start_line": 99,
+                                "end_line": 99
+                              },
+                              "element_type": null,
+                              "symbol": null,
+                              "summary": "Это выражение увеличивает индекс внутри цикла пропуска параметров ANSI-последовательности.",
+                              "coverage_ids": [
+                                "statement:pkg/ansi/screen.go:12348904"
+                              ],
+                              "tests": null,
+                              "confidence": null,
+                              "children": [],
+                              "branches": [],
+                              "data_in": [],
+                              "data_out": [],
+                              "effects": [],
+                              "cross_refs": []
+                            }
+                          ],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        },
+                        {
+                          "id": "if:pkg/ansi/screen.go:12348918",
+                          "kind": "decision",
+                          "label": "Условие конца параметров последовательности",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 102,
+                            "end_line": 104
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Это условие проверяет, достигнут ли конец параметров ANSI-последовательности.",
+                          "coverage_ids": [
+                            "if:pkg/ansi/screen.go:12348918"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [
+                            {
+                              "id": "statement:pkg/ansi/screen.go:12348939",
+                              "kind": "action",
+                              "label": "Пропуск завершающего символа последовательности",
+                              "layer": "flow",
+                              "source": {
+                                "file": "pkg/ansi/screen.go",
+                                "start_line": 102,
+                                "end_line": 102
+                              },
+                              "element_type": null,
+                              "symbol": null,
+                              "summary": "Это выражение увеличивает индекс для пропуска завершающего символа ANSI-последовательности.",
+                              "coverage_ids": [
+                                "statement:pkg/ansi/screen.go:12348939"
+                              ],
+                              "tests": null,
+                              "confidence": null,
+                              "children": [],
+                              "branches": [],
+                              "data_in": [],
+                              "data_out": [],
+                              "effects": [],
+                              "cross_refs": []
+                            }
+                          ],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        },
+                        {
+                          "id": "else:pkg/ansi/screen.go:12348959",
+                          "kind": "decision",
+                          "label": "Альтернативное условие для двухбайтовой последовательности",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 105,
+                            "end_line": 108
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Это ветка else обрабатывает случай двухбайтовой ANSI-последовательности без открывающей скобки.",
+                          "coverage_ids": [
+                            "else:pkg/ansi/screen.go:12348959"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [
+                            {
+                              "id": "if:pkg/ansi/screen.go:12348959",
+                              "kind": "decision",
+                              "label": "Условие двухбайтовой последовательности",
+                              "layer": "flow",
+                              "source": {
+                                "file": "pkg/ansi/screen.go",
+                                "start_line": 105,
+                                "end_line": 108
+                              },
+                              "element_type": null,
+                              "symbol": null,
+                              "summary": "Это условие проверяет, следует ли за escape любой символ для двухбайтовой последовательности.",
+                              "coverage_ids": [
+                                "if:pkg/ansi/screen.go:12348959"
+                              ],
+                              "tests": null,
+                              "confidence": null,
+                              "children": [
+                                {
+                                  "id": "statement:pkg/ansi/screen.go:12349002",
+                                  "kind": "action",
+                                  "label": "Пропуск двухбайтовой последовательности",
+                                  "layer": "flow",
+                                  "source": {
+                                    "file": "pkg/ansi/screen.go",
+                                    "start_line": 105,
+                                    "end_line": 105
+                                  },
+                                  "element_type": null,
+                                  "symbol": null,
+                                  "summary": "Это выражение увеличивает индекс для пропуска двухбайтовой ANSI-последовательности.",
+                                  "coverage_ids": [
+                                    "statement:pkg/ansi/screen.go:12349002"
+                                  ],
+                                  "tests": null,
+                                  "confidence": null,
+                                  "children": [],
+                                  "branches": [],
+                                  "data_in": [],
+                                  "data_out": [],
+                                  "effects": [],
+                                  "cross_refs": []
+                                }
+                              ],
+                              "branches": [],
+                              "data_in": [],
+                              "data_out": [],
+                              "effects": [],
+                              "cross_refs": []
+                            }
+                          ],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "else:pkg/ansi/screen.go:12349020",
+                      "kind": "decision",
+                      "label": "Альтернативное условие для обычного символа",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/ansi/screen.go",
+                        "start_line": 109,
+                        "end_line": 112
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Это ветка else обрабатывает случай обычного символа, не являющегося частью ANSI-последовательности.",
+                      "coverage_ids": [
+                        "else:pkg/ansi/screen.go:12349020"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:pkg/ansi/screen.go:12349025",
+                          "kind": "action",
+                          "label": "Добавление обычного символа",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 110,
+                            "end_line": 110
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Это выражение добавляет обычный символ в выходной буфер очищенного текста.",
+                          "coverage_ids": [
+                            "statement:pkg/ansi/screen.go:12349025"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        },
+                        {
+                          "id": "statement:pkg/ansi/screen.go:12349052",
+                          "kind": "action",
+                          "label": "Пропуск обычного символа",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/ansi/screen.go",
+                            "start_line": 110,
+                            "end_line": 110
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Это выражение увеличивает индекс для перехода к следующему символу строки.",
+                          "coverage_ids": [
+                            "statement:pkg/ansi/screen.go:12349052"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/ansi/screen.go:12349064",
+              "kind": "output",
+              "label": "Возврат очищенного текста",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 114,
+                "end_line": 114
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает строку, созданную из выходного буфера очищенного текста.",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12349064"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.RenderText",
+              "file": "pkg/ansi/screen.go",
+              "label": "← RenderText in pkg/ansi/screen.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:CellsView:12349157",
+          "kind": "group",
+          "label": "Метод просмотра ячеек",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 118,
+            "end_line": 124
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.CellsView",
+          "summary": "Этот метод возвращает плоский срез активного буфера экрана для инспекции содержимого.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12349196",
+              "kind": "action",
+              "label": "Создание плоского среза",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 119,
+                "end_line": 119
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение создаёт новый срез ячеек размером в произведение строк и колонок экрана.",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12349196"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/ansi/screen.go:12349233",
+              "kind": "loop",
+              "label": "Цикл перебора строк буфера",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 120,
+                "end_line": 122
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Этот цикл перебирает все строки буфера экрана для плоского копирования содержимого.",
+              "coverage_ids": [
+                "loop:pkg/ansi/screen.go:12349233"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12349237",
+                  "kind": "action",
+                  "label": "Инициализация цикла по строкам",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 119,
+                    "end_line": 119
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это выражение инициализирует цикл для перебора всех строк буфера экрана.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12349237"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/screen.go:12349257",
+                  "kind": "action",
+                  "label": "Условие цикла по строкам",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 119,
+                    "end_line": 119
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это выражение определяет условие продолжения цикла перебора строк буфера экрана.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12349257"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/screen.go:12349265",
+                  "kind": "action",
+                  "label": "Копирование строки буфера",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 121,
+                    "end_line": 121
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Это выражение копирует содержимое строки буфера в плоский срез по вычисленному диапазону.",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12349265"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/ansi/screen.go:12349315",
+              "kind": "output",
+              "label": "Возврат плоского среза",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 123,
+                "end_line": 123
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает созданный плоский срез всех ячеек активного буфера экрана.",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12349315"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Current",
+              "file": "pkg/ansi/screen.go",
+              "label": "← Current in pkg/ansi/screen.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:Current:12349384",
+          "kind": "group",
+          "label": "Метод получения текущего буфера",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 127,
+            "end_line": 129
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Current",
+          "summary": "Этот метод возвращает активный буфер экрана как плоский срез для доступа к содержимому.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12349421",
+              "kind": "output",
+              "label": "Возврат текущего буфера",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 128,
+                "end_line": 128
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Это выражение возвращает результат вызова метода CellsView для получения плоского среза буфера.",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12349421"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:cell:12349494",
+          "kind": "group",
+          "label": "Метод получения ячейки экрана по координатам",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 132,
+            "end_line": 134
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.cell",
+          "summary": "Возвращает указатель на ячейку экрана в двумерном массиве по указанным координатам строки и столбца",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12349535",
+              "kind": "output",
+              "label": "Возвращение ячейки экрана",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 133,
+                "end_line": 133
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает указатель на ячейку в двумерном массиве ячеек экрана",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12349535"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:clearWrapPending:12349617",
+          "kind": "group",
+          "label": "Функция сброса флага ожидания переноса",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 137,
+            "end_line": 139
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.clearWrapPending",
+          "summary": "Сбрасывает внутренний флаг ожидания переноса строки в интерфейсе экрана",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12349656",
+              "kind": "action",
+              "label": "Вызов сброса флага переноса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 138,
+                "end_line": 138
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Выполняет вызов метода сброса флага переноса в объекте экрана",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12349656"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:Put:12349832",
+          "kind": "group",
+          "label": "Метод записи символа в текущую позицию курсора",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 143,
+            "end_line": 146
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Put",
+          "summary": "Записывает символ в текущую позицию курсора с применением текущего стиля и обрабатывает широкие символы",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12349865",
+              "kind": "action",
+              "label": "Синхронизация стиля перед записью",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 144,
+                "end_line": 144
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Выполняет синхронизацию стилей перед записью символа в экран",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12349865",
+                "statement:pkg/ansi/screen.go:12349880"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/ansi/screen.go:syncStyle:12349865",
+                  "kind": "call",
+                  "label": "Вызов синхронизации стиля",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 149,
+                    "end_line": 169
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.syncStyle",
+                  "summary": "Вызывает метод синхронизации стилей перед записью символа",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.syncStyle",
+                      "file": "pkg/ansi/screen.go",
+                      "label": "→ syncStyle in pkg/ansi/screen.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleGround",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleGround in pkg/ansi/parser.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Parser.handleUTF8",
+              "file": "pkg/ansi/parser.go",
+              "label": "← handleUTF8 in pkg/ansi/parser.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:syncStyle:12349980",
+          "kind": "group",
+          "label": "Метод синхронизации стилей курсора",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 149,
+            "end_line": 169
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.syncStyle",
+          "summary": "Копирует стили из обертки в курсор портала для применения стилей при записи символа",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/ansi/screen.go:12350012",
+              "kind": "action",
+              "label": "Получение ссылки на курсор",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 145,
+                "end_line": 145
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Получает указатель на курсор экрана для модификации его стиля",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12350012",
+                "statement:pkg/ansi/screen.go:12350036"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/ansi/screen.go:12350050",
+              "kind": "decision",
+              "label": "Проверка флага жирного шрифта",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 152,
+                "end_line": 157
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет установлен ли флаг жирного шрифта для применения к курсору",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12350050",
+                "if:pkg/ansi/screen.go:12350105"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12350070",
+                  "kind": "action",
+                  "label": "Установка жирного шрифта",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 153,
+                    "end_line": 153
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает бит жирного шрифта в стиле курсора",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12350070"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/screen.go:12350124",
+                  "kind": "action",
+                  "label": "Установка тусклого шрифта",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 156,
+                    "end_line": 156
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает бит тусклого шрифта в стиле курсора",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12350124"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/ansi/screen.go:12350158",
+              "kind": "decision",
+              "label": "Проверка флага курсивного шрифта",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 158,
+                "end_line": 163
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет установлен ли флаг курсивного шрифта для применения к курсору",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12350158",
+                "if:pkg/ansi/screen.go:12350217"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12350180",
+                  "kind": "action",
+                  "label": "Установка курсивного шрифта",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 159,
+                    "end_line": 159
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает бит курсивного шрифта в стиле курсора",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12350180"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/screen.go:12350242",
+                  "kind": "action",
+                  "label": "Установка подчеркивания",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 167,
+                    "end_line": 167
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает бит подчеркивания в стиле курсора",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12350242"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/ansi/screen.go:12350282",
+              "kind": "decision",
+              "label": "Проверка флага инверсии цветов",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 164,
+                "end_line": 166
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет установлен ли флаг инверсии цветов для применения к курсору",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12350282"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12350305",
+                  "kind": "action",
+                  "label": "Установка инверсии цветов",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 167,
+                    "end_line": 167
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает бит инверсии цветов в стиле курсора",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12350305"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/ansi/screen.go:12350343",
+              "kind": "action",
+              "label": "Установка цвета фона",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 167,
+                "end_line": 167
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Устанавливает цвет фона курсора после конвертации из ANSI",
+              "coverage_ids": [
+                "statement:pkg/ansi/screen.go:12350343",
+                "statement:pkg/ansi/screen.go:12350380"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/ansi/screen.go:colorToLipgloss:12350351",
+                  "kind": "call",
+                  "label": "Конвертация цвета фона",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 172,
+                    "end_line": 177
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.colorToLipgloss",
+                  "summary": "Вызывает функцию конвертации цвета для установки фона курсора",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/ansi.colorToLipgloss",
+                      "file": "pkg/ansi/screen.go",
+                      "label": "→ colorToLipgloss in pkg/ansi/screen.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "call:pkg/ansi/screen.go:colorToLipgloss:12350388",
+                  "kind": "call",
+                  "label": "Конвертация цвета текста",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 172,
+                    "end_line": 177
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.colorToLipgloss",
+                  "summary": "Вызывает функцию конвертации цвета для установки текста курсора",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/ansi.colorToLipgloss",
+                      "file": "pkg/ansi/screen.go",
+                      "label": "→ colorToLipgloss in pkg/ansi/screen.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Put",
+              "file": "pkg/ansi/screen.go",
+              "label": "← Put in pkg/ansi/screen.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:colorToLipgloss:12350489",
+          "kind": "group",
+          "label": "Функция конвертации цвета ANSI в lipgloss",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 172,
+            "end_line": 177
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.colorToLipgloss",
+          "summary": "Конвертирует цвет из формата ANSI в формат lipgloss, поддерживая 256-цветную и RGB палитры",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/ansi/screen.go:12350537",
+              "kind": "decision",
+              "label": "Проверка 256-цветной палитры",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 173,
+                "end_line": 176
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет используется ли 256-цветная палитра для конвертации цвета",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12350537",
+                "return:pkg/ansi/screen.go:12350590"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/ansi/screen.go:12350552",
+                  "kind": "output",
+                  "label": "Возврат цвета из 256-цветной палитры",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 174,
+                    "end_line": 174
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает цвет из 256-цветной палитры через функцию ansi256Color",
+                  "coverage_ids": [
+                    "return:pkg/ansi/screen.go:12350552"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.syncStyle",
+              "file": "pkg/ansi/screen.go",
+              "label": "← syncStyle in pkg/ansi/screen.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.syncStyle",
+              "file": "pkg/ansi/screen.go",
+              "label": "← syncStyle in pkg/ansi/screen.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:ansi256Color:12350731",
+          "kind": "group",
+          "label": "Функция конвертации индекса 256-цветной палитры",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 180,
+            "end_line": 202
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.ansi256Color",
+          "summary": "Конвертирует индекс 256-цветной палитры в цвет lipgloss, поддерживая базовую и расширенную палитры",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/ansi/screen.go:12350774",
+              "kind": "decision",
+              "label": "Проверка диапазона индекса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 181,
+                "end_line": 192
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет находится ли индекс в допустимом диапазоне от 0 до 255",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12350774",
+                "if:pkg/ansi/screen.go:12350812"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/ansi/screen.go:12350798",
+                  "kind": "output",
+                  "label": "Возврат пустой строки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 182,
+                    "end_line": 182
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает пустую строку при некорректном индексе цвета",
+                  "coverage_ids": [
+                    "return:pkg/ansi/screen.go:12350798"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/screen.go:12350826",
+                  "kind": "action",
+                  "label": "Инициализация базовых цветов",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 191,
+                    "end_line": 191
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Инициализирует массив из 16 базовых цветов ANSI палитры",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12350826",
+                    "return:pkg/ansi/screen.go:12351040"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/ansi/screen.go:12351077",
+              "kind": "decision",
+              "label": "Проверка расширенной палитры",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 193,
+                "end_line": 200
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет используется ли расширенная 216-цветная палитра для конвертации",
+              "coverage_ids": [
+                "if:pkg/ansi/screen.go:12351077",
+                "statement:pkg/ansi/screen.go:12351206"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/ansi/screen.go:12351092",
+                  "kind": "action",
+                  "label": "Вычитание смещения индекса",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 191,
+                    "end_line": 191
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вычитает 16 из индекса для перехода к расширенной палитре",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12351092",
+                    "statement:pkg/ansi/screen.go:12351102"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/ansi/screen.go:12351116",
+                  "kind": "action",
+                  "label": "Расчет зеленого канала",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 198,
+                    "end_line": 198
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вычисляет значение зеленого канала для расширенной палитры",
+                  "coverage_ids": [
+                    "statement:pkg/ansi/screen.go:12351116",
+                    "statement:pkg/ansi/screen.go:12351135"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:pkg/ansi/screen.go:12351148",
+                  "kind": "output",
+                  "label": "Возврат цвета из расширенной палитры",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/ansi/screen.go",
+                    "start_line": 198,
+                    "end_line": 198
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает цвет из расширенной 216-цветной палитры через rgb",
+                  "coverage_ids": [
+                    "return:pkg/ansi/screen.go:12351148"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/ansi/screen.go:12351227",
+              "kind": "output",
+              "label": "Возврат серого цвета",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 201,
+                "end_line": 201
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает серый цвет из 24-цветной палитры через rgb",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12351227"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.colorToLipgloss",
+              "file": "pkg/ansi/screen.go",
+              "label": "← colorToLipgloss in pkg/ansi/screen.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:rgb:12351266",
+          "kind": "group",
+          "label": "Функция формирования hex-кода цвета",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 204,
+            "end_line": 206
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.rgb",
+          "summary": "Формирует hex-код цвета из трех компонентов RGB",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12351298",
+              "kind": "output",
+              "label": "Возврат hex-кода цвета",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 205,
+                "end_line": 205
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает hex-код цвета в формате #RRGGBB",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12351298"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/ansi/screen.go:12351381",
+              "kind": "output",
+              "label": "Возврат hex-строки байта",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 209,
+                "end_line": 209
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает двухзначную hex-строку числа",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12351381"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.ansi256Color",
+              "file": "pkg/ansi/screen.go",
+              "label": "← ansi256Color in pkg/ansi/screen.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.ansi256Color",
+              "file": "pkg/ansi/screen.go",
+              "label": "← ansi256Color in pkg/ansi/screen.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/ansi.colorToLipgloss",
+              "file": "pkg/ansi/screen.go",
+              "label": "← colorToLipgloss in pkg/ansi/screen.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/ansi/screen.go:StringWidth:12351468",
+          "kind": "group",
+          "label": "Функция получения ширины строки",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/ansi/screen.go",
+            "start_line": 213,
+            "end_line": 215
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.StringWidth",
+          "summary": "Возвращает ширину строки в символах с учетом широких символов",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/ansi/screen.go:12351502",
+              "kind": "output",
+              "label": "Возврат ширины строки",
+              "layer": "data",
+              "source": {
+                "file": "pkg/ansi/screen.go",
+                "start_line": 214,
+                "end_line": 214
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает ширину строки в символах через библиотеку uniseg",
+              "coverage_ids": [
+                "return:pkg/ansi/screen.go:12351502"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

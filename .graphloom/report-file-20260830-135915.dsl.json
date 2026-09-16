@@ -1,0 +1,2169 @@
+{
+  "title": "pkg/cli/session.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cli/session.go",
+      "kind": "group",
+      "label": "Файл пакета cli",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cli/session.go",
+        "start_line": 1,
+        "end_line": 152
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит определение структуры сессий и менеджера сессий для интерактивного REPL cue-tty.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/cli/session.go:Session:14573664",
+          "kind": "group",
+          "label": "Структура Session",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 14,
+            "end_line": 20
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.Session",
+          "summary": "Представляет собой сессию TUI с именем, приложением, страницей, HTTP-адресом API и рабочей директорией.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "type:pkg/cli/session.go:SessionManager:14573923",
+          "kind": "group",
+          "label": "Структура SessionManager",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 23,
+            "end_line": 26
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager",
+          "summary": "Управляет набором именованных сессий с использованием мьютекса для синхронизации доступа.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cli/session.go:NewSessionManager:14574053",
+          "kind": "group",
+          "label": "Функция создания менеджера сессий",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 29,
+            "end_line": 33
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.NewSessionManager",
+          "summary": "Инициализирует новый менеджер сессий, создавая пустую карту для хранения сессий.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cli/session.go:14574097",
+              "kind": "output",
+              "label": "Возврат менеджера сессий",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 30,
+                "end_line": 32
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает только что созданный менеджер сессий с пустой картой сессий.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14574097"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.NewDaemon",
+              "file": "pkg/cli/daemon.go",
+              "label": "← NewDaemon in pkg/cli/daemon.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Run",
+              "file": "pkg/cli/repl.go",
+              "label": "← Run in pkg/cli/repl.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:GetOrCreate:14574231",
+          "kind": "group",
+          "label": "Функция получения или создания сессии",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 36,
+            "end_line": 47
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.GetOrCreate",
+          "summary": "Возвращает существующую сессию по имени или создаёт новую, если сессия не найдена.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/session.go:14574294",
+              "kind": "action",
+              "label": "Блокировка мьютекса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 37,
+                "end_line": 37
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Защищает доступ к карте сессий с помощью блокировки мьютекса.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574294"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574308",
+              "kind": "action",
+              "label": "Отмена блокировки мьютекса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 38,
+                "end_line": 38
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Планирует разблокировку мьютекса после завершения критической секции.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574308"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/session.go:14574331",
+              "kind": "decision",
+              "label": "Условие существования сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 40,
+                "end_line": 42
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, существует ли сессия с указанным именем в карте сессий.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14574331"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/session.go:14574334",
+                  "kind": "action",
+                  "label": "Проверка существования сессии",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 38,
+                    "end_line": 38
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Извлекает сессию из карты по имени и проверяет её существование.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/session.go:14574334"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:pkg/cli/session.go:14574369",
+                  "kind": "output",
+                  "label": "Возврат существующей сессии",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 41,
+                    "end_line": 41
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает найденную сессию, если она существует в карте.",
+                  "coverage_ids": [
+                    "return:pkg/cli/session.go:14574369"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574383",
+              "kind": "action",
+              "label": "Создание новой сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 44,
+                "end_line": 44
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализирует новую сессию с указанным именем для последующего добавления в карту.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574383"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574410",
+              "kind": "action",
+              "label": "Добавление сессии в карту",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 45,
+                "end_line": 45
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Добавляет созданную сессию в карту сессий под её именем.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574410"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14574433",
+              "kind": "output",
+              "label": "Возврат созданной сессии",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 46,
+                "end_line": 46
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает только что созданную сессию после её добавления в карту.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14574433"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleCommand",
+              "file": "pkg/cli/daemon.go",
+              "label": "← handleCommand in pkg/cli/daemon.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Run",
+              "file": "pkg/cli/repl.go",
+              "label": "← Run in pkg/cli/repl.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:Get:14574479",
+          "kind": "group",
+          "label": "Функция получения сессии по имени",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 50,
+            "end_line": 55
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Get",
+          "summary": "Возвращает сессию по имени и флаг её существования без создания новой.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/session.go:14574542",
+              "kind": "action",
+              "label": "Блокировка мьютекса при получении",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 51,
+                "end_line": 51
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Защищает доступ к карте сессий с помощью блокировки мьютекса.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574542"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574556",
+              "kind": "action",
+              "label": "Отмена блокировки мьютекса при получении",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 52,
+                "end_line": 52
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Планирует разблокировку мьютекса после завершения критической секции.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574556"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574578",
+              "kind": "action",
+              "label": "Извлечение сессии из карты",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 52,
+                "end_line": 52
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Получает сессию из карты по имени и проверяет её существование.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574578"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14574606",
+              "kind": "output",
+              "label": "Возврат сессии и флага",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 54,
+                "end_line": 54
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает сессию и булевый флаг, указывающий на её существование.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14574606"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.makeCmdList",
+              "file": "pkg/cli/commands.go",
+              "label": "← makeCmdList in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.makeCmdShow",
+              "file": "pkg/cli/commands.go",
+              "label": "← makeCmdShow in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:List:14574657",
+          "kind": "group",
+          "label": "Функция получения списка сессий",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 58,
+            "end_line": 66
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.List",
+          "summary": "Возвращает массив всех имён существующих сессий в менеджере.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/session.go:14574702",
+              "kind": "action",
+              "label": "Блокировка мьютекса при перечислении",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 59,
+                "end_line": 59
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Защищает доступ к карте сессий с помощью блокировки мьютекса.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574702"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574716",
+              "kind": "action",
+              "label": "Отмена блокировки мьютекса при перечислении",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 60,
+                "end_line": 60
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Планирует разблокировку мьютекса после завершения критической секции.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574716"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574738",
+              "kind": "action",
+              "label": "Создание массива имён сессий",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 61,
+                "end_line": 61
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализирует пустой массив для хранения имён всех сессий.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574738"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cli/session.go:14574784",
+              "kind": "loop",
+              "label": "Перебор сессий в карте",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 62,
+                "end_line": 64
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Итерируется по всем сессиям в карте для извлечения их имён.",
+              "coverage_ids": [
+                "loop:pkg/cli/session.go:14574784"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/session.go:14574818",
+                  "kind": "action",
+                  "label": "Добавление имени в массив",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 63,
+                    "end_line": 63
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Добавляет текущее имя сессии в массив для последующего возврата.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/session.go:14574818"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14574850",
+              "kind": "output",
+              "label": "Возврат списка имён сессий",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 65,
+                "end_line": 65
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает заполненный массив имён всех сессий.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14574850"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.makeCmdList",
+              "file": "pkg/cli/commands.go",
+              "label": "← makeCmdList in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.makeCmdShow",
+              "file": "pkg/cli/commands.go",
+              "label": "← makeCmdShow in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:Close:14574901",
+          "kind": "group",
+          "label": "Функция закрытия сессии",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 69,
+            "end_line": 83
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close",
+          "summary": "Закрывает сессию по имени, удаляя её из менеджера и останавливая приложение.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/session.go:14574955",
+              "kind": "action",
+              "label": "Блокировка мьютекса при закрытии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 70,
+                "end_line": 70
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Защищает доступ к карте сессий с помощью блокировки мьютекса.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574955"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14574969",
+              "kind": "action",
+              "label": "Извлечение сессии из карты",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 70,
+                "end_line": 70
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Получает сессию из карты по имени для последующей проверки существования.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14574969"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/session.go:14574997",
+              "kind": "decision",
+              "label": "Проверка существования сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 72,
+                "end_line": 75
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, существует ли сессия с указанным именем в карте.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14574997"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/session.go:14575008",
+                  "kind": "action",
+                  "label": "Разблокировка мьютекса при ошибке",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 73,
+                    "end_line": 73
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Разблокирует мьютекс, если сессия не найдена в карте.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/session.go:14575008"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:pkg/cli/session.go:14575025",
+                  "kind": "output",
+                  "label": "Возврат ошибки несуществования сессии",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 74,
+                    "end_line": 74
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку, если сессия с указанным именем не найдена.",
+                  "coverage_ids": [
+                    "return:pkg/cli/session.go:14575025"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14575077",
+              "kind": "action",
+              "label": "Удаление сессии из карты",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 76,
+                "end_line": 76
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Удаляет сессию из карты сессий после успешной проверки существования.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14575077"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14575104",
+              "kind": "action",
+              "label": "Разблокировка мьютекса после удаления",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 77,
+                "end_line": 77
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Разблокирует мьютекс после удаления сессии из карты.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14575104"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/session.go:14575121",
+              "kind": "decision",
+              "label": "Проверка наличия приложения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 79,
+                "end_line": 81
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, запущено ли приложение в сессии для его корректного закрытия.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14575121"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cli/session.go:14575141",
+                  "kind": "output",
+                  "label": "Возврат ошибки закрытия приложения",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 80,
+                    "end_line": 80
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку от закрытия приложения, если оно запущено.",
+                  "coverage_ids": [
+                    "return:pkg/cli/session.go:14575141"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14575166",
+              "kind": "output",
+              "label": "Возврат nil при успешном закрытии",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 82,
+                "end_line": 82
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает nil, если приложение не запущено или закрылось успешно.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14575166"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.CloseAll",
+              "file": "pkg/cli/session.go",
+              "label": "← CloseAll in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:CloseAll:14575213",
+          "kind": "group",
+          "label": "Функция закрытия всех сессий",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 86,
+            "end_line": 101
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.CloseAll",
+          "summary": "Закрывает все сессии в менеджере и собирает возникшие ошибки.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/session.go:14575261",
+              "kind": "action",
+              "label": "Блокировка мьютекса при закрытии всех",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 87,
+                "end_line": 87
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Защищает доступ к карте сессий с помощью блокировки мьютекса.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14575261"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14575275",
+              "kind": "action",
+              "label": "Создание массива имён сессий",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 88,
+                "end_line": 88
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализирует пустой массив для хранения имён всех сессий.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14575275"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cli/session.go:14575321",
+              "kind": "loop",
+              "label": "Перебор сессий для получения имён",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 89,
+                "end_line": 91
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Итерируется по всем сессиям в карте для извлечения их имён.",
+              "coverage_ids": [
+                "loop:pkg/cli/session.go:14575321"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/session.go:14575355",
+                  "kind": "action",
+                  "label": "Добавление имени в массив",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 90,
+                    "end_line": 90
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Добавляет текущее имя сессии в массив для последующего использования.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/session.go:14575355"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14575387",
+              "kind": "action",
+              "label": "Разблокировка мьютекса после перебора",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 92,
+                "end_line": 92
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Разблокирует мьютекс после завершения перебора сессий.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14575387"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14575404",
+              "kind": "action",
+              "label": "Инициализация массива ошибок",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 92,
+                "end_line": 92
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт пустой массив для хранения ошибок при закрытии сессий.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14575404"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cli/session.go:14575422",
+              "kind": "loop",
+              "label": "Перебор имён для закрытия сессий",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 95,
+                "end_line": 99
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Итерируется по всем именам сессий для их последовательного закрытия.",
+              "coverage_ids": [
+                "loop:pkg/cli/session.go:14575422"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "if:pkg/cli/session.go:14575453",
+                  "kind": "decision",
+                  "label": "Условие наличия ошибки",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 96,
+                    "end_line": 98
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверяет, возникла ли ошибка при закрытии сессии.",
+                  "coverage_ids": [
+                    "if:pkg/cli/session.go:14575453"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/session.go:14575456",
+                      "kind": "action",
+                      "label": "Проверка ошибки закрытия",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/session.go",
+                        "start_line": 96,
+                        "end_line": 96
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Проверяет результат закрытия сессии и собирает возникшие ошибки.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/session.go:14575456"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "call:pkg/cli/session.go:Close:14575463",
+                          "kind": "call",
+                          "label": "Вызов закрытия сессии",
+                          "layer": "calls",
+                          "source": {
+                            "file": "pkg/cli/session.go",
+                            "start_line": 69,
+                            "end_line": 83
+                          },
+                          "element_type": null,
+                          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close",
+                          "summary": "Вызывает функцию закрытия для каждой сессии в цикле.",
+                          "coverage_ids": [],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": [
+                            {
+                              "id": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close",
+                              "file": "pkg/cli/session.go",
+                              "label": "→ Close in pkg/cli/session.go"
+                            }
+                          ]
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "statement:pkg/cli/session.go:14575495",
+                      "kind": "action",
+                      "label": "Добавление ошибки в массив",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/session.go",
+                        "start_line": 97,
+                        "end_line": 97
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Добавляет возникшую ошибку в массив ошибок для последующего возврата.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/session.go:14575495"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14575528",
+              "kind": "output",
+              "label": "Возврат массива ошибок",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 100,
+                "end_line": 100
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает массив ошибок, возникших при закрытии всех сессий.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14575528"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Run",
+              "file": "pkg/cli/repl.go",
+              "label": "← Run in pkg/cli/repl.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:Launch:14575732",
+          "kind": "group",
+          "label": "Функция запуска приложения в сессии",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 106,
+            "end_line": 133
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+          "summary": "Запускает TUI-приложение в сессии, выделяя порт и настраивая окружение.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cli/session.go:14575798",
+              "kind": "decision",
+              "label": "Проверка запущенного приложения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 107,
+                "end_line": 109
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, не запущено ли уже приложение в сессии.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14575798"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cli/session.go:14575818",
+                  "kind": "output",
+                  "label": "Возврат ошибки при повторном запуске",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 108,
+                    "end_line": 108
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку, если приложение уже запущено в этой сессии.",
+                  "coverage_ids": [
+                    "return:pkg/cli/session.go:14575818"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14575960",
+              "kind": "action",
+              "label": "Присвоение порта сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 112,
+                "end_line": 112
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает найденный порт сессии для формирования HTTP-адреса.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14575960"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/session.go:findFreePort:14575968",
+                  "kind": "call",
+                  "label": "Вызов поиска свободного порта",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 136,
+                    "end_line": 144
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.findFreePort",
+                  "summary": "Вызывает функцию поиска свободного TCP порта для HTTP API приложения.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cli.findFreePort",
+                      "file": "pkg/cli/session.go",
+                      "label": "→ findFreePort in pkg/cli/session.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/session.go:14575984",
+              "kind": "decision",
+              "label": "Условие наличия порта",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 113,
+                "end_line": 115
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, был ли найден свободный порт для использования.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14575984"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/session.go:14576000",
+                  "kind": "action",
+                  "label": "Установка HTTP-адреса сессии",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 114,
+                    "end_line": 114
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает HTTP-адрес сессии с найденным портом для API элемента дерева.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/session.go:14576000"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14576059",
+              "kind": "action",
+              "label": "Создание опций запуска",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 118,
+                "end_line": 118
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализирует массив опций для запуска приложения с аргументами и размером.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14576059"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/session.go:WithArgs:14576083",
+                  "kind": "call",
+                  "label": "Добавление опции аргументов",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 118,
+                    "end_line": 118
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithArgs",
+                  "summary": "Добавляет опцию передачи аргументов командной строки в список опций.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.WithArgs",
+                      "file": "pkg/cue/options.go",
+                      "label": "→ WithArgs in pkg/cue/options.go"
+                    }
+                  ]
+                },
+                {
+                  "id": "call:pkg/cli/session.go:WithSize:14576108",
+                  "kind": "call",
+                  "label": "Добавление опции размера",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 119,
+                    "end_line": 119
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithSize",
+                  "summary": "Добавляет опцию размера терминала 80x24 в список опций запуска.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.WithSize",
+                      "file": "pkg/cue/options.go",
+                      "label": "→ WithSize in pkg/cue/options.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/session.go:14576134",
+              "kind": "decision",
+              "label": "Условие наличия порта",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 121,
+                "end_line": 123
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, был ли найден порт для добавления опции окружения.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14576134"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/session.go:14576150",
+                  "kind": "action",
+                  "label": "Присвоение опций запуска",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 122,
+                    "end_line": 122
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Присваивает расширенный список опций для запуска приложения.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/session.go:14576150"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:pkg/cli/session.go:WithEnv:14576170",
+                      "kind": "call",
+                      "label": "Добавление опции окружения",
+                      "layer": "calls",
+                      "source": {
+                        "file": "pkg/cli/session.go",
+                        "start_line": 122,
+                        "end_line": 122
+                      },
+                      "element_type": null,
+                      "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WithEnv",
+                      "summary": "Добавляет опцию установки переменной окружения для HTTP порта warp.",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": [
+                        {
+                          "id": "github.com/starframe-dev/cue-tty/pkg/cue.WithEnv",
+                          "file": "pkg/cue/options.go",
+                          "label": "→ WithEnv in pkg/cue/options.go"
+                        }
+                      ]
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14576226",
+              "kind": "action",
+              "label": "Присвоение результата запуска",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 125,
+                "end_line": 125
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает результат запуска приложения и ошибку сессии.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14576226"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/session.go:Launch:14576238",
+                  "kind": "call",
+                  "label": "Вызов запуска приложения",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 125,
+                    "end_line": 125
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Launch",
+                  "summary": "Вызывает функцию запуска приложения из пакета cue с переданными опциями.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Launch",
+                      "file": "pkg/cue/app.go",
+                      "label": "→ Launch in pkg/cue/app.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/session.go:14576268",
+              "kind": "decision",
+              "label": "Проверка ошибки запуска",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 126,
+                "end_line": 128
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, возникла ли ошибка при запуске приложения.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14576268"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cli/session.go:14576286",
+                  "kind": "output",
+                  "label": "Возврат ошибки запуска",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 127,
+                    "end_line": 127
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку запуска с обёрткой ошибки для последующей обработки.",
+                  "coverage_ids": [
+                    "return:pkg/cli/session.go:14576286"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14576328",
+              "kind": "action",
+              "label": "Присваивание приложения сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 131,
+                "end_line": 131
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Передаёт объект приложения в поле сессии для последующего использования.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14576328"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14576341",
+              "kind": "action",
+              "label": "Присваивание страницы сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 131,
+                "end_line": 131
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Записывает полученную страницу в поле сессии для доступа к интерфейсу.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14576341"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/session.go:Page:14576350",
+                  "kind": "call",
+                  "label": "Вызов метода создания страницы",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 131,
+                    "end_line": 131
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.Page",
+                  "summary": "Вызывает метод Page у приложения для получения новой страницы сессии.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.Page",
+                      "file": "pkg/cue/app.go",
+                      "label": "→ Page in pkg/cue/app.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14576362",
+              "kind": "output",
+              "label": "Возврат nil из конструктора",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 132,
+                "end_line": 132
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Завершает инициализацию сессии и возвращает nil как успешный результат.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14576362"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdLaunch",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdLaunch in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:findFreePort:14576434",
+          "kind": "group",
+          "label": "Функция поиска свободного порта",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 136,
+            "end_line": 144
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.findFreePort",
+          "summary": "Ищет доступный TCP порт для запуска сервера, используя автоматическое назначение.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/session.go:14576461",
+              "kind": "action",
+              "label": "Создание TCP-слушателя",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 137,
+                "end_line": 137
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализирует TCP-слушатель на порту 0 для определения свободного порта.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14576461"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/session.go:14576497",
+              "kind": "decision",
+              "label": "Проверка ошибки создания слушателя",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 138,
+                "end_line": 140
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет наличие ошибки при создании TCP-слушателя и обрабатывает её.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14576497"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cli/session.go:14576515",
+                  "kind": "output",
+                  "label": "Возврат нуля при ошибке",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 139,
+                    "end_line": 139
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает 0 как значение порта в случае неудачи создания слушателя.",
+                  "coverage_ids": [
+                    "return:pkg/cli/session.go:14576515"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14576528",
+              "kind": "action",
+              "label": "Извлечение номера порта",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 141,
+                "end_line": 141
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Получает номер порта из адреса слушателя после успешного создания.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14576528"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/session.go:14576567",
+              "kind": "action",
+              "label": "Закрытие TCP-слушателя",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 142,
+                "end_line": 142
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Закрывает созданный слушатель для освобождения ресурсов перед возвратом порта.",
+              "coverage_ids": [
+                "statement:pkg/cli/session.go:14576567"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14576579",
+              "kind": "output",
+              "label": "Возврат найденного порта",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 143,
+                "end_line": 143
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает номер свободного порта для использования при запуске сервера.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14576579"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/session.go:Close:14576642",
+          "kind": "group",
+          "label": "Метод закрытия сессии",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/session.go",
+            "start_line": 147,
+            "end_line": 152
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Close",
+          "summary": "Завершает работу приложения в текущей сессии и освобождает ресурсы.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cli/session.go:14576677",
+              "kind": "decision",
+              "label": "Проверка наличия приложения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 148,
+                "end_line": 150
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, инициализировано ли приложение в сессии перед попыткой закрытия.",
+              "coverage_ids": [
+                "if:pkg/cli/session.go:14576677"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cli/session.go:14576697",
+                  "kind": "output",
+                  "label": "Возврат nil при отсутствии приложения",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/session.go",
+                    "start_line": 149,
+                    "end_line": 149
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает nil если приложение не инициализировано, считая закрытие успешным.",
+                  "coverage_ids": [
+                    "return:pkg/cli/session.go:14576697"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/session.go:14576712",
+              "kind": "output",
+              "label": "Возврат результата закрытия приложения",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/session.go",
+                "start_line": 151,
+                "end_line": 151
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Передаёт ошибку или результат закрытия из метода приложения сессии.",
+              "coverage_ids": [
+                "return:pkg/cli/session.go:14576712"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdCloseSession",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdCloseSession in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdExit",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdExit in pkg/cli/commands.go"
+            }
+          ]
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

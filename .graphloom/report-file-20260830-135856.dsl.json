@@ -1,0 +1,1490 @@
+{
+  "title": "pkg/cue/app.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cue/app.go",
+      "kind": "group",
+      "label": "Файл приложения cue",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cue/app.go",
+        "start_line": 1,
+        "end_line": 163
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Основной файл пакета cue, содержащий определение структуры приложения TUI и все его методы управления.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/cue/app.go:App:12374673",
+          "kind": "group",
+          "label": "Структура App",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 14,
+            "end_line": 24
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App",
+          "summary": "Определяет структуру приложения TUI с полями для бэкенда, парсера, экрана, опций и синхронизации.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/app.go:Launch:12374961",
+          "kind": "group",
+          "label": "Функция запуска приложения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 27,
+            "end_line": 59
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Launch",
+          "summary": "Запускает новое TUI приложение, инициализирует бэкенд, экран, парсер и запускает фоновый цикл чтения.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12375022",
+              "kind": "action",
+              "label": "Инициализация опций",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 28,
+                "end_line": 28
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт и заполняет структуру опций приложения начальными значениями.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375022"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/app.go:DefaultOptions:12375027",
+                  "kind": "call",
+                  "label": "Вызов DefaultOptions",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 28,
+                    "end_line": 28
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.DefaultOptions",
+                  "summary": "Вызывает функцию для получения значений по умолчанию для опций запуска приложения.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.DefaultOptions",
+                      "file": "pkg/cue/options.go",
+                      "label": "→ DefaultOptions in pkg/cue/options.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cue/app.go:12375045",
+              "kind": "loop",
+              "label": "Цикл обработки опций",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 29,
+                "end_line": 31
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Перебирает все переданные опции и применяет их к структуре опций.",
+              "coverage_ids": [
+                "loop:pkg/cue/app.go:12375045"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/app.go:12375073",
+                  "kind": "action",
+                  "label": "Применение опции",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 30,
+                    "end_line": 30
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Применяет обработчик опции к структуре опций для изменения конфигурации.",
+                  "coverage_ids": [
+                    "statement:pkg/cue/app.go:12375073"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:pkg/cue/app.go:fn:12375073",
+                      "kind": "call",
+                      "label": "Вызов обработчика опции",
+                      "layer": "calls",
+                      "source": {
+                        "file": "pkg/cue/app.go",
+                        "start_line": 30,
+                        "end_line": 30
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Выполняет функцию-обработчик для применения конкретной опции к конфигурации.",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/app.go:12375236",
+              "kind": "decision",
+              "label": "Проверка замены окружения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 35,
+                "end_line": 37
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, нужно ли объединять переменные окружения с текущими процессом.",
+              "coverage_ids": [
+                "if:pkg/cue/app.go:12375236"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/app.go:12375258",
+                  "kind": "action",
+                  "label": "Объединение переменных окружения",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 36,
+                    "end_line": 36
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Добавляет переменные окружения приложения к переменным текущего процесса.",
+                  "coverage_ids": [
+                    "statement:pkg/cue/app.go:12375258"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12375302",
+              "kind": "action",
+              "label": "Инициализация бэкенда",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 39,
+                "end_line": 39
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт и сохраняет ссылку на запущенный псевдотерминальный бэкенд.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375302"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/app.go:Start:12375318",
+                  "kind": "call",
+                  "label": "Запуск бэкенда PTY",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 39,
+                    "end_line": 39
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Start",
+                  "summary": "Запускает псевдотерминальный бэкенд для выполнения команды с заданными параметрами.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/pty.Start",
+                      "file": "pkg/pty/pty.go",
+                      "label": "→ Start in pkg/pty/pty.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/app.go:12375379",
+              "kind": "decision",
+              "label": "Проверка ошибки запуска",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 40,
+                "end_line": 42
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет наличие ошибки при запуске бэкенда и возвращает её при необходимости.",
+              "coverage_ids": [
+                "if:pkg/cue/app.go:12375379"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/app.go:12375397",
+                  "kind": "output",
+                  "label": "Возврат ошибки запуска",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 41,
+                    "end_line": 41
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает ошибку при неудачном запуске бэкенда псевдотерминала.",
+                  "coverage_ids": [
+                    "return:pkg/cue/app.go:12375397"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12375418",
+              "kind": "action",
+              "label": "Инициализация экрана",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 44,
+                "end_line": 44
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт и сохраняет ссылку на новый экран приложения.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375418"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/app.go:NewScreen:12375428",
+                  "kind": "call",
+                  "label": "Создание экрана",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 44,
+                    "end_line": 44
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.NewScreen",
+                  "summary": "Инициализирует новый экран с заданными размерами терминала.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/ansi.NewScreen",
+                      "file": "pkg/ansi/screen.go",
+                      "label": "→ NewScreen in pkg/ansi/screen.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12375463",
+              "kind": "action",
+              "label": "Инициализация парсера",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 45,
+                "end_line": 45
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт и сохраняет ссылку на новый парсер ANSI.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375463"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/app.go:NewParser:12375473",
+                  "kind": "call",
+                  "label": "Создание парсера",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 45,
+                    "end_line": 45
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.NewParser",
+                  "summary": "Создаёт новый парсер ANSI для обработки вывода терминала.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/ansi.NewParser",
+                      "file": "pkg/ansi/parser.go",
+                      "label": "→ NewParser in pkg/ansi/parser.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12375498",
+              "kind": "action",
+              "label": "Инициализация структуры приложения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 52,
+                "end_line": 52
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт новую структуру App, заполняя её всеми инициализированными компонентами.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375498"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12375670",
+              "kind": "action",
+              "label": "Запуск фоновой петли чтения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 56,
+                "end_line": 56
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Запускает фоновую горуутину для чтения данных из бэкенда PTY.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375670"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/app.go:12375690",
+              "kind": "output",
+              "label": "Возврат запущенного приложения",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 58,
+                "end_line": 58
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает ссылку на запущенное приложение TUI.",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12375690"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:Page:12375759",
+          "kind": "group",
+          "label": "Метод получения страницы",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 62,
+            "end_line": 64
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.Page",
+          "summary": "Возвращает текущую страницу приложения для взаимодействия с пользователем.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/app.go:12375789",
+              "kind": "output",
+              "label": "Возврат страницы",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 63,
+                "end_line": 63
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт и возвращает новую структуру страницы, привязанную к приложению.",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12375789"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Launch",
+              "file": "pkg/cli/session.go",
+              "label": "← Launch in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:Resize:12375852",
+          "kind": "group",
+          "label": "Метод изменения размера",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 67,
+            "end_line": 72
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.Resize",
+          "summary": "Изменяет размеры терминала, обновляя экран и бэкенд PTY.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12375898",
+              "kind": "action",
+              "label": "Блокировка мьютекса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 68,
+                "end_line": 68
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Блокирует мьютекс для защиты от конкурентного доступа к состоянию экрана.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375898"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12375911",
+              "kind": "action",
+              "label": "Разблокировка мьютекса",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 69,
+                "end_line": 69
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Освобождает мьютекс после завершения изменения размера экрана.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375911"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12375932",
+              "kind": "action",
+              "label": "Вызов изменения размера экрана",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 70,
+                "end_line": 70
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Выполняет изменение размера экрана с заданными колонками и строками.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12375932"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/app.go:Resize:12375932",
+                  "kind": "call",
+                  "label": "Изменение размера экрана",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 70,
+                    "end_line": 70
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Resize",
+                  "summary": "Вызывает метод изменения размера на объекте экрана.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.Resize",
+                      "file": "pkg/ansi/screen.go",
+                      "label": "→ Resize in pkg/ansi/screen.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/app.go:12375961",
+              "kind": "output",
+              "label": "Возврат ошибки изменения размера",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 71,
+                "end_line": 71
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает ошибку от бэкенда при изменении размера терминала.",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12375961"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdResize",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdResize in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:Close:12376032",
+          "kind": "group",
+          "label": "Метод закрытия приложения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 75,
+            "end_line": 80
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.Close",
+          "summary": "Завершает работу приложения, закрывая канал чтения и бэкенд PTY.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12376063",
+              "kind": "action",
+              "label": "Закрытие канала остановки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 77,
+                "end_line": 77
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Закрывает канал stopReader для остановки фоновой петли чтения.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12376063"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/app.go:12376114",
+              "kind": "output",
+              "label": "Возврат ошибки закрытия",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 79,
+                "end_line": 79
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает ошибку от бэкенда при завершении работы приложения.",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12376114"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Session.Close",
+              "file": "pkg/cli/session.go",
+              "label": "← Close in pkg/cli/session.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.Close",
+              "file": "pkg/cli/session.go",
+              "label": "← Close in pkg/cli/session.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:Wait:12376182",
+          "kind": "group",
+          "label": "Метод ожидания завершения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 83,
+            "end_line": 85
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.Wait",
+          "summary": "Блокирует выполнение до завершения процесса, запущенного в бэкенде.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/app.go:12376212",
+              "kind": "output",
+              "label": "Возврат ошибки ожидания",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 84,
+                "end_line": 84
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает ошибку завершения процесса из бэкенда PTY.",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12376212"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/app.go:readLoop:12376239",
+          "kind": "group",
+          "label": "Фоновая функция чтения",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 87,
+            "end_line": 129
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.readLoop",
+          "summary": "Читает данные из бэкенда PTY, обрабатывает их через парсер и автоматически отвечает на запросы терминала.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12376267",
+              "kind": "action",
+              "label": "Создание канала данных",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 88,
+                "end_line": 88
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создаёт канал для передачи буферов данных из фоновой горутины.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12376267"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/app.go:12376296",
+              "kind": "action",
+              "label": "Запуск фоновой горутины чтения",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 94,
+                "end_line": 94
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Запускает фоновую горуутину для чтения данных из бэкенда PTY.",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12376296"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cue/app.go:12376525",
+              "kind": "loop",
+              "label": "Основной цикл обработки данных",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 105,
+                "end_line": 128
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Обрабатывает входящие данные из канала, обновляет логирование и парсит вывод терминала.",
+              "coverage_ids": [
+                "loop:pkg/cue/app.go:12376525"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/app.go:12376533",
+                  "kind": "action",
+                  "label": "Обработка данных в цикле",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 116,
+                    "end_line": 116
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Обрабатывает полученные данные, обновляет логирование и передаёт их парсеру.",
+                  "coverage_ids": [
+                    "statement:pkg/cue/app.go:12376533"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Launch",
+              "file": "pkg/cue/app.go",
+              "label": "← Launch in pkg/cue/app.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:write:12377081",
+          "kind": "group",
+          "label": "Метод write",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 131,
+            "end_line": 134
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.write",
+          "summary": "Метод записывает байтовые данные в backend и возвращает ошибку",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12377123",
+              "kind": "action",
+              "label": "Присваивание ошибки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 132,
+                "end_line": 132
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Присваивает ошибку от backend в переменную err",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12377123",
+                "return:pkg/cue/app.go:12377156"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/app.go:Write:12377133",
+                  "kind": "call",
+                  "label": "Вызов Write у backend",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 132,
+                    "end_line": 132
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.Write",
+                  "summary": "Выполняет запись данных в backend через метод Write",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/pty.Backend.Write",
+                      "file": "pkg/pty/pty.go",
+                      "label": "→ Write in pkg/pty/pty.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.DisableMouse",
+              "file": "pkg/cue/page.go",
+              "label": "← DisableMouse in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.EnableMouse",
+              "file": "pkg/cue/page.go",
+              "label": "← EnableMouse in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseClick",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseClick in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseClick",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseClick in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseDown",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseDown in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseMove",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseMove in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseMove",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseMove in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollDown",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseScrollDown in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollUp",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseScrollUp in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseUp",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseUp in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Press",
+              "file": "pkg/cue/page.go",
+              "label": "← Press in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Type",
+              "file": "pkg/cue/page.go",
+              "label": "← Type in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:screenState:12377223",
+          "kind": "group",
+          "label": "Метод screenState",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 137,
+            "end_line": 141
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.screenState",
+          "summary": "Возвращает текущее состояние экрана с блокировкой mutex",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12377267",
+              "kind": "action",
+              "label": "Блокировка mutex",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 138,
+                "end_line": 138
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Блокирует mutex для защиты доступа к состоянию экрана",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12377267",
+                "statement:pkg/cue/app.go:12377280"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/app.go:12377301",
+              "kind": "output",
+              "label": "Возврат экрана",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 140,
+                "end_line": 140
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает ссылку на объект экрана",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12377301"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor",
+              "file": "pkg/cue/page.go",
+              "label": "← Cursor in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:RenderText:12377376",
+          "kind": "group",
+          "label": "Метод RenderText",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 144,
+            "end_line": 148
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.RenderText",
+          "summary": "Возвращает экран в виде обычного текста с блокировкой mutex",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12377413",
+              "kind": "action",
+              "label": "Блокировка mutex",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 145,
+                "end_line": 145
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Блокирует mutex для защиты доступа к состоянию экрана",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12377413",
+                "statement:pkg/cue/app.go:12377426"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/app.go:12377447",
+              "kind": "output",
+              "label": "Возврат текста",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 147,
+                "end_line": 147
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает текст экрана через метод RenderText",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12377447"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+              "file": "pkg/cue/page.go",
+              "label": "← Text in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/app.go:RawLog:12377550",
+          "kind": "group",
+          "label": "Метод RawLog",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 151,
+            "end_line": 155
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.RawLog",
+          "summary": "Возвращает сырые байты из PTY для отладки с блокировкой mutex",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/app.go:12377583",
+              "kind": "action",
+              "label": "Блокировка mutex",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 152,
+                "end_line": 152
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Блокирует mutex для защиты доступа к сырым логам",
+              "coverage_ids": [
+                "statement:pkg/cue/app.go:12377583",
+                "statement:pkg/cue/app.go:12377596"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/app.go:12377617",
+              "kind": "output",
+              "label": "Возврат лога",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 154,
+                "end_line": 154
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает копию сырых байтов лога",
+              "coverage_ids": [
+                "return:pkg/cue/app.go:12377617"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/app.go:waitStable:12377732",
+          "kind": "group",
+          "label": "Метод waitStable",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/app.go",
+            "start_line": 158,
+            "end_line": 163
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.waitStable",
+          "summary": "Ожидает отсутствия новых данных в течение заданной длительности",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cue/app.go:12377777",
+              "kind": "decision",
+              "label": "Проверка длительности",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/app.go",
+                "start_line": 159,
+                "end_line": 162
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, равна ли переданная длительность нулю",
+              "coverage_ids": [
+                "if:pkg/cue/app.go:12377777",
+                "statement:pkg/cue/app.go:12377821"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/app.go:12377791",
+                  "kind": "action",
+                  "label": "Установка значения по умолчанию",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/app.go",
+                    "start_line": 162,
+                    "end_line": 162
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает длительность ожидания в 50 миллисекунд по умолчанию",
+                  "coverage_ids": [
+                    "statement:pkg/cue/app.go:12377791"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

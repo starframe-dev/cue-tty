@@ -1,0 +1,701 @@
+{
+  "title": "pkg/cue/artifact.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cue/artifact.go",
+      "kind": "group",
+      "label": "файл пакета cue с определениями типов и функций",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cue/artifact.go",
+        "start_line": 1,
+        "end_line": 84
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "файл пакета cue содержит определения структур Event и Artifact, а также функции для сохранения артефактов и записи таймлайна",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/cue/artifact.go:Event:12377967",
+          "kind": "group",
+          "label": "структура события для записи действий в таймлайне",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/artifact.go",
+            "start_line": 12,
+            "end_line": 16
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Event",
+          "summary": "структура Event хранит временную метку, тип действия и детали события для последующей записи в таймлайн",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "type:pkg/cue/artifact.go:Artifact:12378148",
+          "kind": "group",
+          "label": "структура артефакта для хранения состояния экрана",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/artifact.go",
+            "start_line": 19,
+            "end_line": 24
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Artifact",
+          "summary": "структура Artifact содержит имя, рендер, ANSI-код и таймлайн для сохранения состояния экрана",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/artifact.go:SaveArtifact:12378368",
+          "kind": "group",
+          "label": "функция сохранения текущего состояния страницы в директорию",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/artifact.go",
+            "start_line": 27,
+            "end_line": 62
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.SaveArtifact",
+          "summary": "функция SaveArtifact сохраняет текст страницы в файл render.txt и состояние в файл state.json в указанной директории",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cue/artifact.go:12378430",
+              "kind": "decision",
+              "label": "проверка ошибки создания директории",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 28,
+                "end_line": 32
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверка на ошибку при создании директории с возвратом ошибки при неудаче",
+              "coverage_ids": [
+                "if:pkg/cue/artifact.go:12378430",
+                "statement:pkg/cue/artifact.go:12378496"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/artifact.go:12378433",
+                  "kind": "action",
+                  "label": "создание директории для сохранения артефакта",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 28,
+                    "end_line": 28
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "создание директории с правами доступа 0o755 для размещения файлов артефакта",
+                  "coverage_ids": [
+                    "statement:pkg/cue/artifact.go:12378433",
+                    "return:pkg/cue/artifact.go:12378480"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "call:pkg/cue/artifact.go:Text:12378509",
+                  "kind": "call",
+                  "label": "вызов метода получения текста страницы",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 32,
+                    "end_line": 32
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                  "summary": "вызов метода Text для получения текстового содержимого текущей страницы",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Text in pkg/cue/page.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/artifact.go:12378519",
+              "kind": "decision",
+              "label": "проверка ошибки получения текста",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 33,
+                "end_line": 38
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверка на ошибку при получении текста страницы с возвратом ошибки при неудаче",
+              "coverage_ids": [
+                "if:pkg/cue/artifact.go:12378519",
+                "statement:pkg/cue/artifact.go:12378568"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/artifact.go:12378537",
+                  "kind": "output",
+                  "label": "возврат ошибки получения текста",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 34,
+                    "end_line": 34
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возврат ошибки при неудачном получении текста страницы",
+                  "coverage_ids": [
+                    "return:pkg/cue/artifact.go:12378537"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/artifact.go:12378617",
+              "kind": "decision",
+              "label": "проверка ошибки записи файла render.txt",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 39,
+                "end_line": 44
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверка на ошибку при записи файла render.txt с возвратом ошибки при неудаче",
+              "coverage_ids": [
+                "if:pkg/cue/artifact.go:12378617",
+                "statement:pkg/cue/artifact.go:12378715"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/artifact.go:12378620",
+                  "kind": "action",
+                  "label": "запись текста в файл render.txt",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 39,
+                    "end_line": 39
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "запись текстового содержимого страницы в файл render.txt с правами доступа 0o644",
+                  "coverage_ids": [
+                    "statement:pkg/cue/artifact.go:12378620",
+                    "return:pkg/cue/artifact.go:12378684"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "call:pkg/cue/artifact.go:Cursor:12378732",
+                  "kind": "call",
+                  "label": "вызов метода получения координат курсора",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 44,
+                    "end_line": 44
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor",
+                  "summary": "вызов метода Cursor для получения текущих координат курсора страницы",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Cursor in pkg/cue/page.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/artifact.go:12378744",
+              "kind": "decision",
+              "label": "проверка ошибки получения координат курсора",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 45,
+                "end_line": 51
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверка на ошибку при получении координат курсора с возвратом ошибки при неудаче",
+              "coverage_ids": [
+                "if:pkg/cue/artifact.go:12378744",
+                "statement:pkg/cue/artifact.go:12378777"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/artifact.go:12378762",
+                  "kind": "output",
+                  "label": "возврат ошибки получения координат курсора",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 46,
+                    "end_line": 46
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возврат ошибки при неудачном получении координат курсора страницы",
+                  "coverage_ids": [
+                    "return:pkg/cue/artifact.go:12378762"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/artifact.go:12378876",
+              "kind": "action",
+              "label": "формирование пути к файлу state.json",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 52,
+                "end_line": 52
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "формирование полного пути к файлу state.json в директории артефакта с именем",
+              "coverage_ids": [
+                "statement:pkg/cue/artifact.go:12378876",
+                "statement:pkg/cue/artifact.go:12378925"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/artifact.go:12378975",
+              "kind": "decision",
+              "label": "проверка ошибки сериализации JSON",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 54,
+                "end_line": 59
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверка на ошибку при сериализации состояния в JSON с возвратом ошибки при неудаче",
+              "coverage_ids": [
+                "if:pkg/cue/artifact.go:12378975",
+                "if:pkg/cue/artifact.go:12379008"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/artifact.go:12378993",
+                  "kind": "output",
+                  "label": "возврат ошибки сериализации JSON",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 55,
+                    "end_line": 55
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возврат ошибки при неудачной сериализации состояния страницы в JSON",
+                  "coverage_ids": [
+                    "return:pkg/cue/artifact.go:12378993"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cue/artifact.go:12379011",
+                  "kind": "action",
+                  "label": "запись состояния в файл state.json",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 57,
+                    "end_line": 57
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "запись сериализованного состояния страницы в файл state.json с правами доступа 0o644",
+                  "coverage_ids": [
+                    "statement:pkg/cue/artifact.go:12379011",
+                    "return:pkg/cue/artifact.go:12379067"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/artifact.go:12379083",
+              "kind": "output",
+              "label": "завершение сохранения артефакта",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 61,
+                "end_line": 61
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "успешное завершение функции сохранения артефакта с созданием обоих файлов",
+              "coverage_ids": [
+                "return:pkg/cue/artifact.go:12379083"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/artifact.go:NewEvent:12379150",
+          "kind": "group",
+          "label": "функция создания нового события",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/artifact.go",
+            "start_line": 65,
+            "end_line": 71
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.NewEvent",
+          "summary": "функция NewEvent создает новое событие с текущей временной меткой, действием и деталями",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/artifact.go:12379196",
+              "kind": "output",
+              "label": "возврат созданного события",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 66,
+                "end_line": 70
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возврат созданного события с текущим временем, переданным действием и деталями",
+              "coverage_ids": [
+                "return:pkg/cue/artifact.go:12379196"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/artifact.go:WriteTimeline:12379350",
+          "kind": "group",
+          "label": "функция записи таймлайна в markdown файл",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/artifact.go",
+            "start_line": 74,
+            "end_line": 84
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.WriteTimeline",
+          "summary": "функция WriteTimeline создает markdown файл с таймлайном событий в указанной директории",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cue/artifact.go:12379406",
+              "kind": "decision",
+              "label": "проверка ошибки создания директории",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 75,
+                "end_line": 78
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверка на ошибку при создании директории для таймлайна с возвратом ошибки при неудаче",
+              "coverage_ids": [
+                "if:pkg/cue/artifact.go:12379406",
+                "statement:pkg/cue/artifact.go:12379471"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/artifact.go:12379409",
+                  "kind": "action",
+                  "label": "создание директории для таймлайна",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 75,
+                    "end_line": 75
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "создание директории для таймлайна с правами доступа 0o755 при необходимости",
+                  "coverage_ids": [
+                    "statement:pkg/cue/artifact.go:12379409",
+                    "return:pkg/cue/artifact.go:12379456"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/artifact.go:12379485",
+              "kind": "action",
+              "label": "добавление заголовка таймлайна",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 79,
+                "end_line": 79
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "добавление заголовка Timeline в буфер для формирования markdown файла",
+              "coverage_ids": [
+                "statement:pkg/cue/artifact.go:12379485",
+                "loop:pkg/cue/artifact.go:12379521"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/artifact.go:12379550",
+                  "kind": "action",
+                  "label": "добавление строки события в буфер",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/artifact.go",
+                    "start_line": 81,
+                    "end_line": 81
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "добавление отформатированной строки события с временем, действием и деталями в буфер",
+                  "coverage_ids": [
+                    "statement:pkg/cue/artifact.go:12379550"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/artifact.go:12379645",
+              "kind": "output",
+              "label": "запись таймлайна в файл",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/artifact.go",
+                "start_line": 83,
+                "end_line": 83
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "запись сформированного содержимого таймлайна в файл timeline.md с правами доступа 0o644",
+              "coverage_ids": [
+                "return:pkg/cue/artifact.go:12379645"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

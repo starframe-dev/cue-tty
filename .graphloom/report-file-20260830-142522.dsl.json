@@ -1,0 +1,2239 @@
+{
+  "title": "pkg/cue/page.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cue/page.go",
+      "kind": "group",
+      "label": "файл пакета cue",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cue/page.go",
+        "start_line": 1,
+        "end_line": 153
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "основной файл пакета cue, содержащий определение структуры Page и методы для взаимодействия с TUI страницей",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "type:pkg/cue/page.go:Page:12365681",
+          "kind": "group",
+          "label": "структура Page",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 10,
+            "end_line": 15
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page",
+          "summary": "определяет структуру страницы с полями для приложения, кнопки перетаскивания и координаты перетаскивания",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/page.go:Press:12365928",
+          "kind": "group",
+          "label": "метод Press",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 19,
+            "end_line": 25
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Press",
+          "summary": "отправляет нажатие клавиши, преобразуя строковое представление в последовательность и передавая её приложению",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12365970",
+              "kind": "action",
+              "label": "присваивание seq",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 20,
+                "end_line": 20
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет результат преобразования клавиши в переменную seq для последующей проверки",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12365970"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/page.go:ResolveKey:12365977",
+                  "kind": "call",
+                  "label": "вызов ResolveKey",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 20,
+                    "end_line": 20
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.ResolveKey",
+                  "summary": "преобразует строковое представление клавиши в последовательность для отправки в терминал",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.ResolveKey",
+                      "file": "pkg/cue/keyboard.go",
+                      "label": "→ ResolveKey in pkg/cue/keyboard.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/page.go:12365994",
+              "kind": "decision",
+              "label": "условие проверки seq",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 21,
+                "end_line": 23
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверяет, возвращает ли ResolveKey nil при невалидной клавише",
+              "coverage_ids": [
+                "if:pkg/cue/page.go:12365994"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/page.go:12366012",
+                  "kind": "output",
+                  "label": "возврат nil при ошибке",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 22,
+                    "end_line": 22
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возвращает nil, если клавиша не распознана и не может быть отправлена",
+                  "coverage_ids": [
+                    "return:pkg/cue/page.go:12366012"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12366027",
+              "kind": "output",
+              "label": "возврат результата записи",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 24,
+                "end_line": 24
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при успешной отправке последовательности клавиши",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12366027"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdPress",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdPress in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:Type:12366097",
+          "kind": "group",
+          "label": "метод Type",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 28,
+            "end_line": 36
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Type",
+          "summary": "отправляет текст по одному символу с задержкой между каждым символом для имитации ввода",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "loop:pkg/cue/page.go:12366139",
+              "kind": "loop",
+              "label": "цикл по символам",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 29,
+                "end_line": 34
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проходит по каждому символу текста и отправляет его в терминал с небольшой задержкой",
+              "coverage_ids": [
+                "loop:pkg/cue/page.go:12366139"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "if:pkg/cue/page.go:12366166",
+                  "kind": "decision",
+                  "label": "условие ошибки записи",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 30,
+                    "end_line": 32
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "проверяет наличие ошибки при отправке символа и прерывает цикл при ошибке",
+                  "coverage_ids": [
+                    "if:pkg/cue/page.go:12366166"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cue/page.go:12366169",
+                      "kind": "action",
+                      "label": "проверка ошибки записи",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cue/page.go",
+                        "start_line": 30,
+                        "end_line": 30
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "проверяет, возникла ли ошибка при отправке символа в терминал",
+                      "coverage_ids": [
+                        "statement:pkg/cue/page.go:12366169"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "call:pkg/cue/page.go:write:12366176",
+                          "kind": "call",
+                          "label": "вызов write",
+                          "layer": "calls",
+                          "source": {
+                            "file": "pkg/cue/page.go",
+                            "start_line": 30,
+                            "end_line": 30
+                          },
+                          "element_type": null,
+                          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.write",
+                          "summary": "отправляет байтовый массив с символом в приложение терминала",
+                          "coverage_ids": [],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": [
+                            {
+                              "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.write",
+                              "file": "pkg/cue/app.go",
+                              "label": "→ write in pkg/cue/app.go"
+                            }
+                          ]
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "return:pkg/cue/page.go:12366224",
+                      "kind": "output",
+                      "label": "возврат ошибки",
+                      "layer": "data",
+                      "source": {
+                        "file": "pkg/cue/page.go",
+                        "start_line": 31,
+                        "end_line": 31
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "возвращает ошибку при неудачной отправке символа в терминал",
+                      "coverage_ids": [
+                        "return:pkg/cue/page.go:12366224"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cue/page.go:12366241",
+                  "kind": "action",
+                  "label": "задержка между символами",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 33,
+                    "end_line": 33
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "вставляет задержку в 5 миллисекунд между отправкой каждого символа текста",
+                  "coverage_ids": [
+                    "statement:pkg/cue/page.go:12366241"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12366278",
+              "kind": "output",
+              "label": "возврат nil после цикла",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 35,
+                "end_line": 35
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает nil после успешной отправки всех символов текста",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12366278"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdType",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdType in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:Text:12366352",
+          "kind": "group",
+          "label": "метод Text",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 39,
+            "end_line": 41
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+          "summary": "возвращает содержимое экрана в виде обычного текста без ANSI-кодов",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/page.go:12366393",
+              "kind": "output",
+              "label": "возврат текста экрана",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 40,
+                "end_line": 40
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает результат рендеринга экрана из приложения в виде строки",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12366393"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdExpect",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdExpect in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdLaunch",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdLaunch in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdRender",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdRender in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdSave",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdSave in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdText",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdText in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.makeCmdShow",
+              "file": "pkg/cli/commands.go",
+              "label": "← makeCmdShow in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToContain",
+              "file": "pkg/cue/expect.go",
+              "label": "← ToContain in pkg/cue/expect.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToMatch",
+              "file": "pkg/cue/expect.go",
+              "label": "← ToMatch in pkg/cue/expect.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToNotContain",
+              "file": "pkg/cue/expect.go",
+              "label": "← ToNotContain in pkg/cue/expect.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Lines",
+              "file": "pkg/cue/page.go",
+              "label": "← Lines in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.SaveArtifact",
+              "file": "pkg/cue/artifact.go",
+              "label": "← SaveArtifact in pkg/cue/artifact.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.WaitFor",
+              "file": "pkg/cue/page.go",
+              "label": "← WaitFor in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:Lines:12366466",
+          "kind": "group",
+          "label": "метод Lines",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 44,
+            "end_line": 50
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Lines",
+          "summary": "возвращает содержимое экрана как массив строк, разбитых по переносам строки",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12366510",
+              "kind": "action",
+              "label": "присваивание текста",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 45,
+                "end_line": 45
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет результат вызова Text в переменную text для последующей обработки",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12366510"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/page.go:Text:12366523",
+                  "kind": "call",
+                  "label": "вызов Text",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 39,
+                    "end_line": 41
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                  "summary": "вызывает метод Text для получения полного текста экрана перед разбиением",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Text in pkg/cue/page.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/page.go:12366533",
+              "kind": "decision",
+              "label": "условие ошибки Text",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 46,
+                "end_line": 48
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверяет наличие ошибки при получении текста экрана",
+              "coverage_ids": [
+                "if:pkg/cue/page.go:12366533"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/page.go:12366551",
+                  "kind": "output",
+                  "label": "возврат ошибки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 47,
+                    "end_line": 47
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возвращает ошибку и nil при неудачном получении текста экрана",
+                  "coverage_ids": [
+                    "return:pkg/cue/page.go:12366551"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12366571",
+              "kind": "output",
+              "label": "возврат массива строк",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 49,
+                "end_line": 49
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает массив строк, полученных разбиением текста по переносам строки",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12366571"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.BuildNodeTree",
+              "file": "pkg/cli/nodes.go",
+              "label": "← BuildNodeTree in pkg/cli/nodes.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdLines",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdLines in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Line",
+              "file": "pkg/cue/page.go",
+              "label": "← Line in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:Line:12366654",
+          "kind": "group",
+          "label": "метод Line",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 53,
+            "end_line": 62
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Line",
+          "summary": "возвращает конкретную строку экрана по индексу, проверяя границы массива",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12366700",
+              "kind": "action",
+              "label": "присваивание линий",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 54,
+                "end_line": 54
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет результат вызова Lines в переменную lines для последующей проверки",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12366700"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/page.go:Lines:12366714",
+                  "kind": "call",
+                  "label": "вызов Lines",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 44,
+                    "end_line": 50
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Lines",
+                  "summary": "вызывает метод Lines для получения массива всех строк экрана",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Lines",
+                      "file": "pkg/cue/page.go",
+                      "label": "→ Lines in pkg/cue/page.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/page.go:12366725",
+              "kind": "decision",
+              "label": "условие ошибки Lines",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 55,
+                "end_line": 57
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверяет наличие ошибки при получении массива строк экрана",
+              "coverage_ids": [
+                "if:pkg/cue/page.go:12366725"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/page.go:12366743",
+                  "kind": "output",
+                  "label": "возврат пустой строки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 56,
+                    "end_line": 56
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возвращает пустую строку и ошибку при неудачном получении массива строк",
+                  "coverage_ids": [
+                    "return:pkg/cue/page.go:12366743"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/page.go:12366762",
+              "kind": "decision",
+              "label": "условие выхода за границы",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 58,
+                "end_line": 60
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверяет, находится ли индекс строки за пределами допустимого диапазона",
+              "coverage_ids": [
+                "if:pkg/cue/page.go:12366762"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/page.go:12366794",
+                  "kind": "output",
+                  "label": "возврат пустой строки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 59,
+                    "end_line": 59
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возвращает пустую строку при попытке получить строку за пределами массива",
+                  "coverage_ids": [
+                    "return:pkg/cue/page.go:12366794"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12366813",
+              "kind": "output",
+              "label": "возврат строки по индексу",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 61,
+                "end_line": 61
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает содержимое строки на указанном индексе из массива строк",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12366813"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdLine",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdLine in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToHaveLine",
+              "file": "pkg/cue/expect.go",
+              "label": "← ToHaveLine in pkg/cue/expect.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:Cursor:12366895",
+          "kind": "group",
+          "label": "метод Cursor",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 65,
+            "end_line": 69
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Cursor",
+          "summary": "возвращает текущие координаты курсора на экране в виде строки и столбца",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12366948",
+              "kind": "action",
+              "label": "присваивание состояния",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 66,
+                "end_line": 66
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет результат вызова screenState в переменную s для последующего использования",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12366948"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/page.go:screenState:12366953",
+                  "kind": "call",
+                  "label": "вызов screenState",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 66,
+                    "end_line": 66
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.screenState",
+                  "summary": "получает состояние экрана из приложения для доступа к информации о курсоре",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.screenState",
+                      "file": "pkg/cue/app.go",
+                      "label": "→ screenState in pkg/cue/app.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/page.go:12366974",
+              "kind": "action",
+              "label": "присваивание курсора",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 67,
+                "end_line": 67
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет результат вызова CurrentCursor в переменную cur для возврата координат",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12366974"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/page.go:CurrentCursor:12366981",
+                  "kind": "call",
+                  "label": "вызов CurrentCursor",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 67,
+                    "end_line": 67
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.CurrentCursor",
+                  "summary": "получает текущую позицию курсора из состояния экрана",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/ansi.Screen.CurrentCursor",
+                      "file": "pkg/ansi/screen.go",
+                      "label": "→ CurrentCursor in pkg/ansi/screen.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12367000",
+              "kind": "output",
+              "label": "возврат координат курсора",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 68,
+                "end_line": 68
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает строку и столбец текущей позиции курсора на экране",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12367000"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.BuildNodeTree",
+              "file": "pkg/cli/nodes.go",
+              "label": "← BuildNodeTree in pkg/cli/nodes.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdCursor",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdCursor in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdSave",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdSave in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Expectation.ToHaveCursorAt",
+              "file": "pkg/cue/expect.go",
+              "label": "← ToHaveCursorAt in pkg/cue/expect.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.SaveArtifact",
+              "file": "pkg/cue/artifact.go",
+              "label": "← SaveArtifact in pkg/cue/artifact.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:MouseClick:12367139",
+          "kind": "group",
+          "label": "метод MouseClick",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 73,
+            "end_line": 80
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseClick",
+          "summary": "отправляет событие клика мыши в координатах x, y используя протокол SGR",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12367184",
+              "kind": "action",
+              "label": "присваивание down",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 74,
+                "end_line": 74
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет последовательность нажатия кнопки мыши в переменную down",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12367184"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/page.go:MouseSGR:12367192",
+                  "kind": "call",
+                  "label": "вызов MouseSGR для нажатия",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 74,
+                    "end_line": 74
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+                  "summary": "создаёт последовательность SGR для события нажатия кнопки мыши в заданных координатах",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+                      "file": "pkg/cue/keyboard.go",
+                      "label": "→ MouseSGR in pkg/cue/keyboard.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/page.go:12367218",
+              "kind": "action",
+              "label": "присваивание up",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 75,
+                "end_line": 75
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет последовательность отпускания кнопки мыши в переменную up",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12367218"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cue/page.go:MouseSGR:12367224",
+                  "kind": "call",
+                  "label": "вызов MouseSGR для отпускания",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 75,
+                    "end_line": 75
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+                  "summary": "создаёт последовательность SGR для события отпускания кнопки мыши в тех же координатах",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+                      "file": "pkg/cue/keyboard.go",
+                      "label": "→ MouseSGR in pkg/cue/keyboard.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/page.go:12367249",
+              "kind": "decision",
+              "label": "условие ошибки down",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 76,
+                "end_line": 78
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверяет, возникла ли ошибка при отправке события нажатия кнопки мыши",
+              "coverage_ids": [
+                "if:pkg/cue/page.go:12367249"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/page.go:12367252",
+                  "kind": "action",
+                  "label": "проверка ошибки down",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 76,
+                    "end_line": 76
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "проверяет наличие ошибки при отправке события нажатия кнопки мыши",
+                  "coverage_ids": [
+                    "statement:pkg/cue/page.go:12367252"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:pkg/cue/page.go:write:12367259",
+                      "kind": "call",
+                      "label": "вызов write для down",
+                      "layer": "calls",
+                      "source": {
+                        "file": "pkg/cue/page.go",
+                        "start_line": 76,
+                        "end_line": 76
+                      },
+                      "element_type": null,
+                      "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.App.write",
+                      "summary": "отправляет последовательность нажатия кнопки мыши в приложение терминала",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": [
+                        {
+                          "id": "github.com/starframe-dev/cue-tty/pkg/cue.App.write",
+                          "file": "pkg/cue/app.go",
+                          "label": "→ write in pkg/cue/app.go"
+                        }
+                      ]
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:pkg/cue/page.go:12367293",
+                  "kind": "output",
+                  "label": "возврат ошибки",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 77,
+                    "end_line": 77
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возвращает ошибку при неудачной отправке события нажатия кнопки мыши",
+                  "coverage_ids": [
+                    "return:pkg/cue/page.go:12367293"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12367308",
+              "kind": "output",
+              "label": "возврат результата отправки up",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 79,
+                "end_line": 79
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке события отпускания кнопки мыши",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12367308"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdClick",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdClick in pkg/cli/commands.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdClick",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdClick in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:MouseScrollUp:12367386",
+          "kind": "group",
+          "label": "метод MouseScrollUp",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 83,
+            "end_line": 85
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollUp",
+          "summary": "отправляет событие прокрутки вверх в заданных координатах используя протокол SGR",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/page.go:12367434",
+              "kind": "output",
+              "label": "возврат результата прокрутки вверх",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 84,
+                "end_line": 84
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке события прокрутки вверх",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12367434"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdScroll",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdScroll in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:MouseScrollDown:12367539",
+          "kind": "group",
+          "label": "метод MouseScrollDown",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 88,
+            "end_line": 90
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollDown",
+          "summary": "отправляет событие прокрутки вниз в заданных координатах используя протокол SGR",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/page.go:12367589",
+              "kind": "output",
+              "label": "возврат результата прокрутки вниз",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 89,
+                "end_line": 89
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке события прокрутки вниз",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12367589"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdScroll",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdScroll in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:MouseDown:12367722",
+          "kind": "group",
+          "label": "метод MouseDown",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 94,
+            "end_line": 99
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseDown",
+          "summary": "отправляет событие нажатия кнопки мыши и сохраняет координаты для последующего перетаскивания",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12367774",
+              "kind": "action",
+              "label": "установка кнопки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 98,
+                "end_line": 98
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет номер нажатой кнопки мыши в поле dragBtn структуры Page",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12367774"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/page.go:12367794",
+              "kind": "action",
+              "label": "установка координаты X",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 98,
+                "end_line": 98
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет координату X нажатия кнопки мыши в поле dragX структуры Page",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12367794"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/page.go:12367807",
+              "kind": "action",
+              "label": "установка координаты Y",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 98,
+                "end_line": 98
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "сохраняет координату Y нажатия кнопки мыши в поле dragY структуры Page",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12367807"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12367820",
+              "kind": "output",
+              "label": "возврат события нажатия",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 98,
+                "end_line": 98
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке события нажатия кнопки мыши",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12367820"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdMouse",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdMouse in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:MouseUp:12367915",
+          "kind": "group",
+          "label": "метод MouseUp",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 102,
+            "end_line": 105
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseUp",
+          "summary": "отправляет событие отпускания кнопки мыши и сбрасывает состояние перетаскивания",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12367965",
+              "kind": "action",
+              "label": "сброс кнопки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 104,
+                "end_line": 104
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "устанавливает dragBtn в -1 для сброса состояния перетаскивания",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12367965"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12367981",
+              "kind": "output",
+              "label": "возврат события отпускания",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 104,
+                "end_line": 104
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке события отпускания кнопки мыши",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12367981"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.cmdMouse",
+              "file": "pkg/cli/commands.go",
+              "label": "← cmdMouse in pkg/cli/commands.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/page.go:MouseMove:12368260",
+          "kind": "group",
+          "label": "метод MouseMove",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 110,
+            "end_line": 118
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseMove",
+          "summary": "отправляет событие движения мыши, обрабатывая перетаскивание если кнопка зажата",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cue/page.go:12368304",
+              "kind": "decision",
+              "label": "условие перетаскивания",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 111,
+                "end_line": 116
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "проверяет, зажата ли кнопка мыши для обработки события как перетаскивания",
+              "coverage_ids": [
+                "if:pkg/cue/page.go:12368304"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/page.go:12368326",
+                  "kind": "action",
+                  "label": "обновление координаты X",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 115,
+                    "end_line": 115
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "обновляет координату X перетаскивания в поле dragX структуры Page",
+                  "coverage_ids": [
+                    "statement:pkg/cue/page.go:12368326"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cue/page.go:12368340",
+                  "kind": "action",
+                  "label": "обновление координаты Y",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 115,
+                    "end_line": 115
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "обновляет координату Y перетаскивания в поле dragY структуры Page",
+                  "coverage_ids": [
+                    "statement:pkg/cue/page.go:12368340"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:pkg/cue/page.go:12368420",
+                  "kind": "output",
+                  "label": "возврат события перетаскивания",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 115,
+                    "end_line": 115
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "возвращает ошибку от приложения при отправке события движения мыши с зажатым курсором",
+                  "coverage_ids": [
+                    "return:pkg/cue/page.go:12368420"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12368482",
+              "kind": "output",
+              "label": "возврат события движения",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 117,
+                "end_line": 117
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке события движения мыши без перетаскивания",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12368482"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/page.go:EnableMouse:12368594",
+          "kind": "group",
+          "label": "метод EnableMouse",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 121,
+            "end_line": 124
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.EnableMouse",
+          "summary": "включает отслеживание движения мыши в терминале используя протокол SGR",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/page.go:12368691",
+              "kind": "output",
+              "label": "возврат результата включения мыши",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 123,
+                "end_line": 123
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке команд включения отслеживания мыши",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12368691"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/page.go:DisableMouse:12368799",
+          "kind": "group",
+          "label": "метод DisableMouse",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 127,
+            "end_line": 129
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.DisableMouse",
+          "summary": "выключает отслеживание движения мыши в терминале используя протокол SGR",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/page.go:12368838",
+              "kind": "output",
+              "label": "возврат результата выключения мыши",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 128,
+                "end_line": 128
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "возвращает ошибку от приложения при отправке команд выключения отслеживания мыши",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12368838"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/page.go:WaitFor:12368964",
+          "kind": "group",
+          "label": "WaitFor",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 132,
+            "end_line": 145
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.WaitFor",
+          "summary": "Метод ожидает появления указанного текста в интерфейсе в течение заданного времени.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/page.go:12369032",
+              "kind": "action",
+              "label": "Расчет дедлайна",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 139,
+                "end_line": 139
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Вычисляет временную метку дедлайна, добавив указанный интервал к текущему времени.",
+              "coverage_ids": [
+                "statement:pkg/cue/page.go:12369032",
+                "loop:pkg/cue/page.go:12369069"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/page.go:12369105",
+                  "kind": "action",
+                  "label": "Присваивание результата",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 135,
+                    "end_line": 135
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Сохраняет полученный текст и ошибку в переменные для дальнейшей проверки.",
+                  "coverage_ids": [
+                    "statement:pkg/cue/page.go:12369105",
+                    "if:pkg/cue/page.go:12369126"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:pkg/cue/page.go:Text:12369115",
+                      "kind": "call",
+                      "label": "Вызов метода Text",
+                      "layer": "calls",
+                      "source": {
+                        "file": "pkg/cue/page.go",
+                        "start_line": 39,
+                        "end_line": 41
+                      },
+                      "element_type": null,
+                      "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                      "summary": "Вызывает метод получения текущего текста страницы.",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": [
+                        {
+                          "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Text",
+                          "file": "pkg/cue/page.go",
+                          "label": "→ Text in pkg/cue/page.go"
+                        }
+                      ]
+                    },
+                    {
+                      "id": "return:pkg/cue/page.go:12369145",
+                      "kind": "output",
+                      "label": "Возврат ошибки",
+                      "layer": "data",
+                      "source": {
+                        "file": "pkg/cue/page.go",
+                        "start_line": 137,
+                        "end_line": 137
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Возвращает ошибку, если получение текста не удалось.",
+                      "coverage_ids": [
+                        "return:pkg/cue/page.go:12369145"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cue/page.go:12369162",
+                  "kind": "decision",
+                  "label": "Проверка содержимого",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 139,
+                    "end_line": 142
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверяет, содержит ли текущий текст искомую строку.",
+                  "coverage_ids": [
+                    "if:pkg/cue/page.go:12369162",
+                    "statement:pkg/cue/page.go:12369213"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "return:pkg/cue/page.go:12369196",
+                      "kind": "output",
+                      "label": "Возврат успеха",
+                      "layer": "data",
+                      "source": {
+                        "file": "pkg/cue/page.go",
+                        "start_line": 140,
+                        "end_line": 140
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Возвращает nil, если искомый текст был найден в текущем содержании.",
+                      "coverage_ids": [
+                        "return:pkg/cue/page.go:12369196"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/page.go:12369251",
+              "kind": "output",
+              "label": "Ошибка таймаута",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 144,
+                "end_line": 144
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает ошибку таймаута, если цикл ожидания завершился без нахождения текста.",
+              "coverage_ids": [
+                "return:pkg/cue/page.go:12369251"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/page.go:WaitStable:12369356",
+          "kind": "group",
+          "label": "WaitStable",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/page.go",
+            "start_line": 148,
+            "end_line": 153
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.Page.WaitStable",
+          "summary": "Метод обеспечивает краткую паузу для стабилизации состояния интерфейса.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cue/page.go:12369402",
+              "kind": "decision",
+              "label": "Проверка длительности",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/page.go",
+                "start_line": 149,
+                "end_line": 152
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, равен ли переданный интервал нулю, и заменяет его на значение по умолчанию.",
+              "coverage_ids": [
+                "if:pkg/cue/page.go:12369402",
+                "statement:pkg/cue/page.go:12369447"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/page.go:12369416",
+                  "kind": "action",
+                  "label": "Установка по умолчанию",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/page.go",
+                    "start_line": 152,
+                    "end_line": 152
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает интервал по умолчанию в 100 миллисекунд, если передан нулевой срок.",
+                  "coverage_ids": [
+                    "statement:pkg/cue/page.go:12369416"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

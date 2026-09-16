@@ -1,0 +1,720 @@
+{
+  "title": "pkg/cue/keyboard.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cue/keyboard.go",
+      "kind": "group",
+      "label": "Файл пакета cue с обработкой ввода",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cue/keyboard.go",
+        "start_line": 1,
+        "end_line": 99
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Этот файл содержит функции для обработки клавиатуры и мыши, включая кодирование событий терминала",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "variable:pkg/cue/keyboard.go:KeyMap:12371454",
+          "kind": "state",
+          "label": "Карта клавиш",
+          "layer": "state",
+          "source": {
+            "file": "pkg/cue/keyboard.go",
+            "start_line": 4,
+            "end_line": 33
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.KeyMap",
+          "summary": "Хранит сопоставление читаемых названий клавиш с их терминальными последовательностями",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cue/keyboard.go:ResolveKey:12372671",
+          "kind": "group",
+          "label": "Функция разрешения клавиши",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/keyboard.go",
+            "start_line": 37,
+            "end_line": 60
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.ResolveKey",
+          "summary": "Преобразует имя клавиши в байтовую последовательность терминала с поддержкой разных форматов",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cue/keyboard.go:12372733",
+              "kind": "decision",
+              "label": "Условие прямой проверки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 39,
+                "end_line": 52
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, существует ли ключ в карте и возвращает соответствующую последовательность",
+              "coverage_ids": [
+                "if:pkg/cue/keyboard.go:12372733",
+                "if:pkg/cue/keyboard.go:12372818"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/keyboard.go:12372736",
+                  "kind": "action",
+                  "label": "Проверка ключа в карте",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 44,
+                    "end_line": 44
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Выполняет прямую проверку наличия ключа в карте KeyMap",
+                  "coverage_ids": [
+                    "statement:pkg/cue/keyboard.go:12372736",
+                    "return:pkg/cue/keyboard.go:12372773"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cue/keyboard.go:12372866",
+                  "kind": "action",
+                  "label": "Извлечение символа Ctrl+",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 47,
+                    "end_line": 47
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Извлекает символ после префикса Ctrl+ из строки",
+                  "coverage_ids": [
+                    "statement:pkg/cue/keyboard.go:12372866",
+                    "if:pkg/cue/keyboard.go:12372894"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "return:pkg/cue/keyboard.go:12372932",
+                      "kind": "output",
+                      "label": "Возврат для заглавной буквы",
+                      "layer": "data",
+                      "source": {
+                        "file": "pkg/cue/keyboard.go",
+                        "start_line": 47,
+                        "end_line": 47
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Возвращает байт, соответствующий заглавной букве в терминальной последовательности",
+                      "coverage_ids": [
+                        "return:pkg/cue/keyboard.go:12372932"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cue/keyboard.go:12372983",
+                  "kind": "decision",
+                  "label": "Проверка строчных букв",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 49,
+                    "end_line": 51
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверяет, находится ли символ в диапазоне строчных латинских букв",
+                  "coverage_ids": [
+                    "if:pkg/cue/keyboard.go:12372983"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "return:pkg/cue/keyboard.go:12373021",
+                      "kind": "output",
+                      "label": "Возврат для строчной буквы",
+                      "layer": "data",
+                      "source": {
+                        "file": "pkg/cue/keyboard.go",
+                        "start_line": 50,
+                        "end_line": 50
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Возвращает байт, соответствующий строчной букве в терминальной последовательности",
+                      "coverage_ids": [
+                        "return:pkg/cue/keyboard.go:12373021"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/keyboard.go:12373099",
+              "kind": "decision",
+              "label": "Условие одиночного символа",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 55,
+                "end_line": 59
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, является ли входной параметр одиночным символом",
+              "coverage_ids": [
+                "if:pkg/cue/keyboard.go:12373099",
+                "return:pkg/cue/keyboard.go:12373164"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/keyboard.go:12373134",
+                  "kind": "output",
+                  "label": "Возврат одиночного символа",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 56,
+                    "end_line": 56
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает байт одиночного символа как терминальную последовательность",
+                  "coverage_ids": [
+                    "return:pkg/cue/keyboard.go:12373134"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.Press",
+              "file": "pkg/cue/page.go",
+              "label": "← Press in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/keyboard.go:MouseSGR:12373382",
+          "kind": "group",
+          "label": "Функция кодирования события мыши",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/keyboard.go",
+            "start_line": 66,
+            "end_line": 78
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+          "summary": "Кодирует событие мыши используя расширенный протокол SGR с поддержкой кнопок и координат",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cue/keyboard.go:12373441",
+              "kind": "action",
+              "label": "Приведение кнопки к типу byte",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 67,
+                "end_line": 67
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Приводит параметр кнопки к типу byte для последующей обработки",
+              "coverage_ids": [
+                "statement:pkg/cue/keyboard.go:12373441",
+                "if:pkg/cue/keyboard.go:12373463"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/keyboard.go:12373484",
+                  "kind": "action",
+                  "label": "Установка значения кнопки",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 67,
+                    "end_line": 67
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает значение кнопки в 0 при отпускании согласно протоколу SGR 1006",
+                  "coverage_ids": [
+                    "statement:pkg/cue/keyboard.go:12373484"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cue/keyboard.go:12373542",
+              "kind": "action",
+              "label": "Установка суффикса M",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 71,
+                "end_line": 71
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализирует суффикс события мыши как M для нажатия кнопки",
+              "coverage_ids": [
+                "statement:pkg/cue/keyboard.go:12373542",
+                "if:pkg/cue/keyboard.go:12373566"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cue/keyboard.go:12373587",
+                  "kind": "action",
+                  "label": "Установка суффикса m",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 71,
+                    "end_line": 71
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Устанавливает суффикс m для события отпускания кнопки мыши",
+                  "coverage_ids": [
+                    "statement:pkg/cue/keyboard.go:12373587"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cue/keyboard.go:12373695",
+              "kind": "output",
+              "label": "Возврат последовательности мыши",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 77,
+                "end_line": 77
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает закодированную байтовую последовательность события мыши",
+              "coverage_ids": [
+                "return:pkg/cue/keyboard.go:12373695"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseClick",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseClick in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseClick",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseClick in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseDown",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseDown in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseMove",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseMove in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollDown",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseScrollDown in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseScrollUp",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseScrollUp in pkg/cue/page.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseUp",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseUp in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/keyboard.go:MouseSGRMove:12373950",
+          "kind": "group",
+          "label": "Функция кодирования движения мыши",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/keyboard.go",
+            "start_line": 82,
+            "end_line": 84
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGRMove",
+          "summary": "Кодирует событие движения курсора мыши используя протокол SGR 1006",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "return:pkg/cue/keyboard.go:12373988",
+              "kind": "output",
+              "label": "Возврат движения мыши",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 83,
+                "end_line": 83
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возвращает закодированную последовательность движения мыши с координатами",
+              "coverage_ids": [
+                "return:pkg/cue/keyboard.go:12373988"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.Page.MouseMove",
+              "file": "pkg/cue/page.go",
+              "label": "← MouseMove in pkg/cue/page.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cue/keyboard.go:itoa:12374111",
+          "kind": "group",
+          "label": "Быстрая функция преобразования числа в строку",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cue/keyboard.go",
+            "start_line": 87,
+            "end_line": 99
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cue.itoa",
+          "summary": "Реализует оптимизированное преобразование целого числа в строку для малых значений",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "if:pkg/cue/keyboard.go:12374141",
+              "kind": "decision",
+              "label": "Условие отрицательного числа",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 88,
+                "end_line": 93
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, является ли число отрицательным для обработки знака",
+              "coverage_ids": [
+                "if:pkg/cue/keyboard.go:12374141",
+                "if:pkg/cue/keyboard.go:12374192"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/keyboard.go:12374160",
+                  "kind": "output",
+                  "label": "Возврат с минусом",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 89,
+                    "end_line": 89
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает строку с минусом и рекурсивным вызовом для положительного значения",
+                  "coverage_ids": [
+                    "return:pkg/cue/keyboard.go:12374160"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:pkg/cue/keyboard.go:12374212",
+                  "kind": "output",
+                  "label": "Возврат однозначного числа",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 92,
+                    "end_line": 92
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает строковое представление однозначного числа",
+                  "coverage_ids": [
+                    "return:pkg/cue/keyboard.go:12374212"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cue/keyboard.go:12374251",
+              "kind": "decision",
+              "label": "Условие двузначного числа",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cue/keyboard.go",
+                "start_line": 94,
+                "end_line": 98
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверяет, является ли число двузначным для соответствующего преобразования",
+              "coverage_ids": [
+                "if:pkg/cue/keyboard.go:12374251",
+                "return:pkg/cue/keyboard.go:12374388"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cue/keyboard.go:12374272",
+                  "kind": "output",
+                  "label": "Возврат двузначного числа",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cue/keyboard.go",
+                    "start_line": 95,
+                    "end_line": 95
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возвращает строковое представление двузначного числа через деление и остаток",
+                  "coverage_ids": [
+                    "return:pkg/cue/keyboard.go:12374272"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+              "file": "pkg/cue/keyboard.go",
+              "label": "← MouseSGR in pkg/cue/keyboard.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+              "file": "pkg/cue/keyboard.go",
+              "label": "← MouseSGR in pkg/cue/keyboard.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGR",
+              "file": "pkg/cue/keyboard.go",
+              "label": "← MouseSGR in pkg/cue/keyboard.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGRMove",
+              "file": "pkg/cue/keyboard.go",
+              "label": "← MouseSGRMove in pkg/cue/keyboard.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.MouseSGRMove",
+              "file": "pkg/cue/keyboard.go",
+              "label": "← MouseSGRMove in pkg/cue/keyboard.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cue.itoa",
+              "file": "pkg/cue/keyboard.go",
+              "label": "← itoa in pkg/cue/keyboard.go"
+            }
+          ]
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}

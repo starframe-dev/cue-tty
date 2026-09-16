@@ -1,0 +1,2031 @@
+{
+  "title": "pkg/cli/repl.go",
+  "level": "file",
+  "nodes": [
+    {
+      "id": "file:pkg/cli/repl.go",
+      "kind": "group",
+      "label": "Файл пакета cli",
+      "layer": "flow",
+      "source": {
+        "file": "pkg/cli/repl.go",
+        "start_line": 1,
+        "end_line": 124
+      },
+      "element_type": null,
+      "symbol": null,
+      "summary": "Импорт стандартных пакетов bufio, fmt, os и strings для работы с буферизированным вводом, форматированием вывода, операционной системой и строковыми операциями.",
+      "coverage_ids": [],
+      "tests": null,
+      "confidence": null,
+      "children": [
+        {
+          "id": "func:pkg/cli/repl.go:Run:14603277",
+          "kind": "group",
+          "label": "Функция запуска REPL",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/repl.go",
+            "start_line": 11,
+            "end_line": 80
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.Run",
+          "summary": "Основная функция запуска интерактивной оболочки с заданным именем сессии, поддерживающая как интерактивный режим, так и выполнение команд из аргументов.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/repl.go:14603315",
+              "kind": "action",
+              "label": "Инициализация менеджера сессий",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 12,
+                "end_line": 12
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Создание экземпляра менеджера сессий для последующего управления интерактивной сессией.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14603315"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/repl.go:NewSessionManager:14603321",
+                  "kind": "call",
+                  "label": "Создание менеджера сессий",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 12,
+                    "end_line": 12
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.NewSessionManager",
+                  "summary": "Инициализация нового менеджера сессий для управления состоянием интерактивной оболочки.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cli.NewSessionManager",
+                      "file": "pkg/cli/session.go",
+                      "label": "→ NewSessionManager in pkg/cli/session.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14603342",
+              "kind": "action",
+              "label": "Получение сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 13,
+                "end_line": 13
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Получение или создание сессии по имени для использования в интерактивной оболочке.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14603342"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/repl.go:GetOrCreate:14603353",
+                  "kind": "call",
+                  "label": "Получение или создание сессии",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 13,
+                    "end_line": 13
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.GetOrCreate",
+                  "summary": "Получение существующей или создание новой сессии с указанным именем для работы REPL.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.GetOrCreate",
+                      "file": "pkg/cli/session.go",
+                      "label": "→ GetOrCreate in pkg/cli/session.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14603382",
+              "kind": "action",
+              "label": "Получение команд",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 14,
+                "end_line": 14
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализация коллекции команд для обработки пользовательских запросов в REPL.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14603382"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/repl.go:Commands:14603394",
+                  "kind": "call",
+                  "label": "Получение команд",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 14,
+                    "end_line": 14
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.Commands",
+                  "summary": "Получение коллекции доступных команд для выполнения в интерактивной сессии.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cli.Commands",
+                      "file": "pkg/cli/commands.go",
+                      "label": "→ Commands in pkg/cli/commands.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14603471",
+              "kind": "action",
+              "label": "Получение аргументов командной строки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 19,
+                "end_line": 19
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Извлечение аргументов командной строки начиная со второго элемента для обработки как команд.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14603471"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14603533",
+              "kind": "action",
+              "label": "Создание отфильтрованного списка аргументов",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 19,
+                "end_line": 19
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализация пустого слайса для хранения отфильтрованных аргументов командной строки.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14603533"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14603575",
+              "kind": "action",
+              "label": "Инициализация флага пропуска",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 19,
+                "end_line": 19
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Установка флага skipNext в false для отслеживания состояния обработки аргументов.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14603575"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cli/repl.go:14603594",
+              "kind": "loop",
+              "label": "Цикл обработки аргументов",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 21,
+                "end_line": 34
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проход по всем аргументам командной строки для фильтрации флага -s и его значений.",
+              "coverage_ids": [
+                "loop:pkg/cli/repl.go:14603594"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "if:pkg/cli/repl.go:14603623",
+                  "kind": "decision",
+                  "label": "Проверка флага пропуска",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 22,
+                    "end_line": 25
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка флага skipNext для пропуска текущего аргумента при обработке флага -s.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14603623"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14603640",
+                      "kind": "action",
+                      "label": "Сброс флага пропуска",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 19,
+                        "end_line": 19
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Сброс флага skipNext в false после обработки флага -s для продолжения цикла.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14603640"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "statement:pkg/cli/repl.go:14603660",
+                      "kind": "action",
+                      "label": "Пропуск текущего аргумента",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 19,
+                        "end_line": 19
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Пропуск текущего аргумента при обработке флага -s без добавления в отфильтрованный список.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14603660"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14603675",
+                  "kind": "decision",
+                  "label": "Проверка флага -s",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 26,
+                    "end_line": 29
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка текущего аргумента на равенство флага -s для установки флага пропуска.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14603675"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14603695",
+                      "kind": "action",
+                      "label": "Установка флага пропуска",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 30,
+                        "end_line": 30
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Установка флага skipNext в true при обнаружении флага -s для пропуска следующего аргумента.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14603695"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "statement:pkg/cli/repl.go:14603714",
+                      "kind": "action",
+                      "label": "Пропуск следующего аргумента",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 30,
+                        "end_line": 30
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Пропуск следующего аргумента после флага -s без добавления в отфильтрованный список.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14603714"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14603729",
+                  "kind": "decision",
+                  "label": "Проверка флага -s=",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 30,
+                    "end_line": 32
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка аргумента на наличие префикса -s= для пропуска значений флага.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14603729"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14603767",
+                      "kind": "action",
+                      "label": "Пропуск аргумента с префиксом",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 30,
+                        "end_line": 30
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Пропуск аргумента, начинающегося с -s= без добавления в отфильтрованный список.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14603767"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cli/repl.go:14603782",
+                  "kind": "action",
+                  "label": "Добавление аргумента в список",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 33,
+                    "end_line": 33
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Добавление отфильтрованного аргумента в слайс для последующего выполнения как команды.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/repl.go:14603782"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/repl.go:14603876",
+              "kind": "decision",
+              "label": "Проверка наличия аргументов",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 37,
+                "end_line": 44
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверка наличия отфильтрованных аргументов для запуска команды в неинтерактивном режиме.",
+              "coverage_ids": [
+                "if:pkg/cli/repl.go:14603876"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/repl.go:14603901",
+                  "kind": "action",
+                  "label": "Вызов функции runCommand",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 38,
+                    "end_line": 38
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вызов функции runCommand для выполнения команды с объединёнными аргументами.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/repl.go:14603901"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:pkg/cli/repl.go:runCommand:14603916",
+                      "kind": "call",
+                      "label": "Выполнение команды",
+                      "layer": "calls",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 82,
+                        "end_line": 97
+                      },
+                      "element_type": null,
+                      "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.runCommand",
+                      "summary": "Выполнение команды с объединёнными аргументами в неинтерактивном режиме.",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": [
+                        {
+                          "id": "github.com/starframe-dev/cue-tty/pkg/cli.runCommand",
+                          "file": "pkg/cli/repl.go",
+                          "label": "→ runCommand in pkg/cli/repl.go"
+                        }
+                      ]
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14603977",
+                  "kind": "decision",
+                  "label": "Проверка ошибки выполнения",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 39,
+                    "end_line": 41
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка наличия ошибки при выполнении команды для возврата ошибки пользователю.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14603977"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "return:pkg/cli/repl.go:14603996",
+                      "kind": "output",
+                      "label": "Возврат ошибки",
+                      "layer": "data",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 40,
+                        "end_line": 40
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Возврат ошибки выполнения команды пользователю при возникновении проблемы.",
+                      "coverage_ids": [
+                        "return:pkg/cli/repl.go:14603996"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cli/repl.go:14604013",
+                  "kind": "action",
+                  "label": "Вывод результата команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 42,
+                    "end_line": 42
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вывод результата выполнения команды на стандартный вывод при успешном выполнении.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/repl.go:14604013"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "return:pkg/cli/repl.go:14604035",
+                  "kind": "output",
+                  "label": "Возврат nil",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 43,
+                    "end_line": 43
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возврат nil для указания успешного завершения выполнения команды в неинтерактивном режиме.",
+                  "coverage_ids": [
+                    "return:pkg/cli/repl.go:14604035"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14604077",
+              "kind": "action",
+              "label": "Сообщение о готовности сессии",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 47,
+                "end_line": 47
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Вывод сообщения о готовности интерактивной сессии с приглашением ввести help для команд.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14604077"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14604161",
+              "kind": "action",
+              "label": "Создание сканера ввода",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 49,
+                "end_line": 49
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализация сканера стандартного ввода для чтения команд в интерактивном режиме.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14604161"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cli/repl.go:14604200",
+              "kind": "loop",
+              "label": "Цикл интерактивного REPL",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 50,
+                "end_line": 75
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Бесконечный цикл обработки команд в интерактивном режиме до выхода или ошибки.",
+              "coverage_ids": [
+                "loop:pkg/cli/repl.go:14604200"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/repl.go:14604208",
+                  "kind": "action",
+                  "label": "Вывод приглашения",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 51,
+                    "end_line": 51
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вывод приглашения для ввода команды в интерактивной оболочке.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/repl.go:14604208"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14604233",
+                  "kind": "decision",
+                  "label": "Проверка завершения сканера",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 52,
+                    "end_line": 54
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка завершения сканера ввода для выхода из цикла при ошибке или EOF.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14604233"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14604257",
+                      "kind": "action",
+                      "label": "Выход из цикла",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 52,
+                        "end_line": 52
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Выход из цикла интерактивного REPL при завершении сканера ввода.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14604257"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cli/repl.go:14604270",
+                  "kind": "action",
+                  "label": "Очистка строки ввода",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 56,
+                    "end_line": 56
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Удаление пробельных символов из прочитанной строки ввода для обработки команды.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/repl.go:14604270"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14604314",
+                  "kind": "decision",
+                  "label": "Проверка пустой строки",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 57,
+                    "end_line": 59
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка пустой строки ввода для пропуска пустых команд в интерактивном режиме.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14604314"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14604333",
+                      "kind": "action",
+                      "label": "Пропуск пустой строки",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 56,
+                        "end_line": 56
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Пропуск пустой строки ввода без выполнения команды в интерактивном режиме.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14604333"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "statement:pkg/cli/repl.go:14604349",
+                  "kind": "action",
+                  "label": "Вызов runCommand для ввода",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 61,
+                    "end_line": 61
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Вызов функции runCommand для обработки команды из строки ввода пользователя.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/repl.go:14604349"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "call:pkg/cli/repl.go:runCommand:14604364",
+                      "kind": "call",
+                      "label": "Выполнение команды из ввода",
+                      "layer": "calls",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 82,
+                        "end_line": 97
+                      },
+                      "element_type": null,
+                      "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.runCommand",
+                      "summary": "Выполнение команды из строки ввода пользователя в интерактивном режиме REPL.",
+                      "coverage_ids": [],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": [
+                        {
+                          "id": "github.com/starframe-dev/cue-tty/pkg/cli.runCommand",
+                          "file": "pkg/cli/repl.go",
+                          "label": "→ runCommand in pkg/cli/repl.go"
+                        }
+                      ]
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14604402",
+                  "kind": "decision",
+                  "label": "Проверка ошибки команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 62,
+                    "end_line": 65
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка наличия ошибки при выполнении команды из ввода пользователя.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14604402"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14604421",
+                      "kind": "action",
+                      "label": "Вывод ошибки",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 63,
+                        "end_line": 63
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Вывод сообщения об ошибке выполнения команды на стандартный вывод ошибки.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14604421"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "statement:pkg/cli/repl.go:14604467",
+                      "kind": "action",
+                      "label": "Пропуск при ошибке",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 63,
+                        "end_line": 63
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Пропуск следующей итерации цикла при ошибке выполнения команды.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14604467"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14604483",
+                  "kind": "decision",
+                  "label": "Проверка команды выхода",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 67,
+                    "end_line": 70
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка результата команды на равенство Goodbye! для выхода из интерактивного REPL.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14604483"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14604512",
+                      "kind": "action",
+                      "label": "Вывод сообщения выхода",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 68,
+                        "end_line": 68
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Вывод сообщения Goodbye! при завершении работы интерактивной оболочки.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14604512"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "statement:pkg/cli/repl.go:14604535",
+                      "kind": "action",
+                      "label": "Выход из цикла",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 68,
+                        "end_line": 68
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Выход из цикла интерактивного REPL при получении команды выхода.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14604535"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                },
+                {
+                  "id": "if:pkg/cli/repl.go:14604548",
+                  "kind": "decision",
+                  "label": "Проверка результата команды",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 72,
+                    "end_line": 74
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Проверка наличия результата выполнения команды для вывода на стандартный вывод.",
+                  "coverage_ids": [
+                    "if:pkg/cli/repl.go:14604548"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "statement:pkg/cli/repl.go:14604569",
+                      "kind": "action",
+                      "label": "Вывод результата команды",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 73,
+                        "end_line": 73
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Вывод результата выполнения команды на стандартный вывод при наличии результата.",
+                      "coverage_ids": [
+                        "statement:pkg/cli/repl.go:14604569"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14604610",
+              "kind": "action",
+              "label": "Закрытие сессий",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 78,
+                "end_line": 78
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Выполнение очистки всех сессий перед завершением работы интерактивной оболочки.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14604610"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/repl.go:CloseAll:14604610",
+                  "kind": "call",
+                  "label": "Закрытие всех сессий",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 78,
+                    "end_line": 78
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.CloseAll",
+                  "summary": "Вызов метода закрытия всех сессий для очистки ресурсов при завершении работы.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cli.SessionManager.CloseAll",
+                      "file": "pkg/cli/session.go",
+                      "label": "→ CloseAll in pkg/cli/session.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/repl.go:14604625",
+              "kind": "output",
+              "label": "Возврат ошибки сканера",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 79,
+                "end_line": 79
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возврат ошибки сканера ввода при завершении работы интерактивной оболочки.",
+              "coverage_ids": [
+                "return:pkg/cli/repl.go:14604625"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": []
+        },
+        {
+          "id": "func:pkg/cli/repl.go:runCommand:14604649",
+          "kind": "group",
+          "label": "Функция выполнения команды",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/repl.go",
+            "start_line": 82,
+            "end_line": 97
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.runCommand",
+          "summary": "Функция обработки команды из строки ввода с парсингом, поиском обработчика и выполнением.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/repl.go:14604751",
+              "kind": "action",
+              "label": "Парсинг строки команды",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 83,
+                "end_line": 83
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Вызов функции parseLine для разделения строки ввода на компоненты команды.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14604751"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "call:pkg/cli/repl.go:parseLine:14604760",
+                  "kind": "call",
+                  "label": "Парсинг строки команды",
+                  "layer": "calls",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 100,
+                    "end_line": 124
+                  },
+                  "element_type": null,
+                  "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.parseLine",
+                  "summary": "Вызов функции parseLine для разделения строки ввода на команду и аргументы.",
+                  "coverage_ids": [],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": [
+                    {
+                      "id": "github.com/starframe-dev/cue-tty/pkg/cli.parseLine",
+                      "file": "pkg/cli/repl.go",
+                      "label": "→ parseLine in pkg/cli/repl.go"
+                    }
+                  ]
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/repl.go:14604777",
+              "kind": "decision",
+              "label": "Проверка пустого парсинга",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 84,
+                "end_line": 86
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверка пустого результата парсинга строки для возврата nil при отсутствии команды.",
+              "coverage_ids": [
+                "if:pkg/cli/repl.go:14604777"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cli/repl.go:14604800",
+                  "kind": "output",
+                  "label": "Возврат пустых значений",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 85,
+                    "end_line": 85
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возврат пустой строки и nil при отсутствии команды в строке ввода.",
+                  "coverage_ids": [
+                    "return:pkg/cli/repl.go:14604800"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14604820",
+              "kind": "action",
+              "label": "Извлечение имени команды",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 84,
+                "end_line": 84
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Извлечение первого элемента из разобранной строки как имени команды.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14604820"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14604841",
+              "kind": "action",
+              "label": "Извлечение аргументов команды",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 93,
+                "end_line": 93
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Извлечение оставшихся элементов разобранной строки как аргументов команды.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14604841"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14604861",
+              "kind": "action",
+              "label": "Получение обработчика команды",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 93,
+                "end_line": 93
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Получение обработчика команды из коллекции команд по имени команды.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14604861"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/repl.go:14604895",
+              "kind": "decision",
+              "label": "Проверка существования команды",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 92,
+                "end_line": 94
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверка существования обработчика команды в коллекции команд для возврата ошибки.",
+              "coverage_ids": [
+                "if:pkg/cli/repl.go:14604895"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "return:pkg/cli/repl.go:14604906",
+                  "kind": "output",
+                  "label": "Возврат ошибки неизвестной команды",
+                  "layer": "data",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 93,
+                    "end_line": 93
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Возврат ошибки с сообщением об неизвестной команде и приглашением ввести help.",
+                  "coverage_ids": [
+                    "return:pkg/cli/repl.go:14604906"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/repl.go:14605002",
+              "kind": "output",
+              "label": "Выполнение обработчика команды",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 96,
+                "end_line": 96
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Выполнение обработчика команды с аргументами и возврат результата пользователю.",
+              "coverage_ids": [
+                "return:pkg/cli/repl.go:14605002"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Daemon.handleCommand",
+              "file": "pkg/cli/daemon.go",
+              "label": "← handleCommand in pkg/cli/daemon.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Run",
+              "file": "pkg/cli/repl.go",
+              "label": "← Run in pkg/cli/repl.go"
+            },
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.Run",
+              "file": "pkg/cli/repl.go",
+              "label": "← Run in pkg/cli/repl.go"
+            }
+          ]
+        },
+        {
+          "id": "func:pkg/cli/repl.go:parseLine:14605117",
+          "kind": "group",
+          "label": "Функция разбора строки",
+          "layer": "flow",
+          "source": {
+            "file": "pkg/cli/repl.go",
+            "start_line": 100,
+            "end_line": 124
+          },
+          "element_type": null,
+          "symbol": "github.com/starframe-dev/cue-tty/pkg/cli.parseLine",
+          "summary": "Функция разделения строки ввода на команды и аргументы с поддержкой кавычек.",
+          "coverage_ids": [],
+          "tests": null,
+          "confidence": null,
+          "children": [
+            {
+              "id": "statement:pkg/cli/repl.go:14605157",
+              "kind": "action",
+              "label": "Инициализация слайса частей",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 96,
+                "end_line": 96
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализация пустого слайса для хранения разобранной строки на части.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14605157"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14605177",
+              "kind": "action",
+              "label": "Создание строителя",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 102,
+                "end_line": 102
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Инициализация строителя для накопления текущего фрагмента строки при разборе.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14605177"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "statement:pkg/cli/repl.go:14605206",
+              "kind": "action",
+              "label": "Инициализация флага кавычек",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 103,
+                "end_line": 103
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Установка флага inQuote в false для отслеживания состояния кавычек при разборе.",
+              "coverage_ids": [
+                "statement:pkg/cli/repl.go:14605206"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "loop:pkg/cli/repl.go:14605225",
+              "kind": "loop",
+              "label": "Цикл по символам строки",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 105,
+                "end_line": 117
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проход по каждому символу строки для разбора на команды и аргументы.",
+              "coverage_ids": [
+                "loop:pkg/cli/repl.go:14605225"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "switch:pkg/cli/repl.go:14605252",
+                  "kind": "action",
+                  "label": "Переключатель типов символов",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 111,
+                    "end_line": 111
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Переключение по типу текущего символа для обработки кавычек, пробелов и других символов.",
+                  "coverage_ids": [
+                    "switch:pkg/cli/repl.go:14605252"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [
+                    {
+                      "id": "case:pkg/cli/repl.go:14605263",
+                      "kind": "action",
+                      "label": "Обработка кавычек",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 110,
+                        "end_line": 110
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Обработка символов кавычек для переключения флага inQuote при разборе строки.",
+                      "coverage_ids": [
+                        "case:pkg/cli/repl.go:14605263"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:pkg/cli/repl.go:14605281",
+                          "kind": "action",
+                          "label": "Переключение флага кавычек",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/cli/repl.go",
+                            "start_line": 110,
+                            "end_line": 110
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Переключение флага inQuote при обнаружении символа кавычки в строке.",
+                          "coverage_ids": [
+                            "statement:pkg/cli/repl.go:14605281"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "case:pkg/cli/repl.go:14605302",
+                      "kind": "action",
+                      "label": "Обработка пробелов вне кавычек",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 111,
+                        "end_line": 111
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Обработка пробельных символов вне кавычек для разделения команды и аргументов.",
+                      "coverage_ids": [
+                        "case:pkg/cli/repl.go:14605302"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "if:pkg/cli/repl.go:14605332",
+                          "kind": "decision",
+                          "label": "Проверка содержимого строителя",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/cli/repl.go",
+                            "start_line": 110,
+                            "end_line": 113
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Проверка наличия содержимого в строителе перед добавлением части в слайс.",
+                          "coverage_ids": [
+                            "if:pkg/cli/repl.go:14605332"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [
+                            {
+                              "id": "statement:pkg/cli/repl.go:14605359",
+                              "kind": "action",
+                              "label": "Добавление части в слайс",
+                              "layer": "flow",
+                              "source": {
+                                "file": "pkg/cli/repl.go",
+                                "start_line": 111,
+                                "end_line": 111
+                              },
+                              "element_type": null,
+                              "symbol": null,
+                              "summary": "Добавление накопленного содержимого строителя в слайс частей строки.",
+                              "coverage_ids": [
+                                "statement:pkg/cli/repl.go:14605359"
+                              ],
+                              "tests": null,
+                              "confidence": null,
+                              "children": [],
+                              "branches": [],
+                              "data_in": [],
+                              "data_out": [],
+                              "effects": [],
+                              "cross_refs": []
+                            },
+                            {
+                              "id": "statement:pkg/cli/repl.go:14605403",
+                              "kind": "action",
+                              "label": "Сброс строителя",
+                              "layer": "flow",
+                              "source": {
+                                "file": "pkg/cli/repl.go",
+                                "start_line": 112,
+                                "end_line": 112
+                              },
+                              "element_type": null,
+                              "symbol": null,
+                              "summary": "Сброс строителя после добавления части в слайс для накопления следующей части.",
+                              "coverage_ids": [
+                                "statement:pkg/cli/repl.go:14605403"
+                              ],
+                              "tests": null,
+                              "confidence": null,
+                              "children": [],
+                              "branches": [],
+                              "data_in": [],
+                              "data_out": [],
+                              "effects": [],
+                              "cross_refs": []
+                            }
+                          ],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    },
+                    {
+                      "id": "case:pkg/cli/repl.go:14605426",
+                      "kind": "action",
+                      "label": "Обработка других символов",
+                      "layer": "flow",
+                      "source": {
+                        "file": "pkg/cli/repl.go",
+                        "start_line": 115,
+                        "end_line": 115
+                      },
+                      "element_type": null,
+                      "symbol": null,
+                      "summary": "Обработка всех остальных символов как части текущего аргумента команды.",
+                      "coverage_ids": [
+                        "case:pkg/cli/repl.go:14605426"
+                      ],
+                      "tests": null,
+                      "confidence": null,
+                      "children": [
+                        {
+                          "id": "statement:pkg/cli/repl.go:14605438",
+                          "kind": "action",
+                          "label": "Добавление символа в строитель",
+                          "layer": "flow",
+                          "source": {
+                            "file": "pkg/cli/repl.go",
+                            "start_line": 115,
+                            "end_line": 115
+                          },
+                          "element_type": null,
+                          "symbol": null,
+                          "summary": "Добавление текущего символа в строитель для накопления аргумента команды.",
+                          "coverage_ids": [
+                            "statement:pkg/cli/repl.go:14605438"
+                          ],
+                          "tests": null,
+                          "confidence": null,
+                          "children": [],
+                          "branches": [],
+                          "data_in": [],
+                          "data_out": [],
+                          "effects": [],
+                          "cross_refs": []
+                        }
+                      ],
+                      "branches": [],
+                      "data_in": [],
+                      "data_out": [],
+                      "effects": [],
+                      "cross_refs": []
+                    }
+                  ],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "if:pkg/cli/repl.go:14605468",
+              "kind": "decision",
+              "label": "Проверка оставшегося содержимого",
+              "layer": "flow",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 119,
+                "end_line": 121
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Проверка наличия оставшегося содержимого в строителе после цикла по символам.",
+              "coverage_ids": [
+                "if:pkg/cli/repl.go:14605468"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [
+                {
+                  "id": "statement:pkg/cli/repl.go:14605493",
+                  "kind": "action",
+                  "label": "Добавление последнего фрагмента",
+                  "layer": "flow",
+                  "source": {
+                    "file": "pkg/cli/repl.go",
+                    "start_line": 120,
+                    "end_line": 120
+                  },
+                  "element_type": null,
+                  "symbol": null,
+                  "summary": "Добавление последнего накопленного фрагмента строителя в слайс частей.",
+                  "coverage_ids": [
+                    "statement:pkg/cli/repl.go:14605493"
+                  ],
+                  "tests": null,
+                  "confidence": null,
+                  "children": [],
+                  "branches": [],
+                  "data_in": [],
+                  "data_out": [],
+                  "effects": [],
+                  "cross_refs": []
+                }
+              ],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            },
+            {
+              "id": "return:pkg/cli/repl.go:14605538",
+              "kind": "output",
+              "label": "Возврат разобранной строки",
+              "layer": "data",
+              "source": {
+                "file": "pkg/cli/repl.go",
+                "start_line": 123,
+                "end_line": 123
+              },
+              "element_type": null,
+              "symbol": null,
+              "summary": "Возврат слайса разобранной строки на команды и аргументы пользователю.",
+              "coverage_ids": [
+                "return:pkg/cli/repl.go:14605538"
+              ],
+              "tests": null,
+              "confidence": null,
+              "children": [],
+              "branches": [],
+              "data_in": [],
+              "data_out": [],
+              "effects": [],
+              "cross_refs": []
+            }
+          ],
+          "branches": [],
+          "data_in": [],
+          "data_out": [],
+          "effects": [],
+          "cross_refs": [
+            {
+              "id": "github.com/starframe-dev/cue-tty/pkg/cli.runCommand",
+              "file": "pkg/cli/repl.go",
+              "label": "← runCommand in pkg/cli/repl.go"
+            }
+          ]
+        }
+      ],
+      "branches": [],
+      "data_in": [],
+      "data_out": [],
+      "effects": [],
+      "cross_refs": []
+    }
+  ],
+  "edges": []
+}
