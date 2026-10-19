@@ -19,20 +19,14 @@ type Page struct {
 func (p *Page) Press(key string) error {
 	seq := ResolveKey(key)
 	if seq == nil {
-		return nil
+		return fmt.Errorf("unknown key %q", key)
 	}
 	return p.app.write(seq)
 }
 
 // Type sends text character by character.
 func (p *Page) Type(text string) error {
-	for _, r := range text {
-		if err := p.app.write([]byte(string(r))); err != nil {
-			return err
-		}
-		time.Sleep(5 * time.Millisecond)
-	}
-	return nil
+	return p.app.write([]byte(text))
 }
 
 // Text returns the visible screen as plain text (no ANSI).
@@ -56,21 +50,23 @@ func (p *Page) Line(n int) (string, error) {
 		return "", err
 	}
 	if n < 0 || n >= len(lines) {
-		return "", nil
+		return "", fmt.Errorf("line index out of range: %d", n)
 	}
 	return lines[n], nil
 }
 
 // Cursor returns the current cursor position (row, col).
 func (p *Page) Cursor() (row, col int, err error) {
-	s := p.app.screenState()
-	cur := s.CurrentCursor()
-	return cur.Row, cur.Col, nil
+	row, col = p.app.CursorPosition()
+	return row, col, nil
 }
 
 // MouseClick sends a mouse click at (x, y) using SGR protocol.
 // Coordinates are 0-based cell positions.
 func (p *Page) MouseClick(x, y int) error {
+	if err := p.app.validateCoordinates(x, y); err != nil {
+		return err
+	}
 	down := MouseSGR(0, x, y, false)
 	up := MouseSGR(0, x, y, true)
 	if err := p.app.write(down); err != nil {
@@ -81,17 +77,29 @@ func (p *Page) MouseClick(x, y int) error {
 
 // MouseScrollUp sends a scroll-up event at (x, y).
 func (p *Page) MouseScrollUp(x, y int) error {
+	if err := p.app.validateCoordinates(x, y); err != nil {
+		return err
+	}
 	return p.app.write(MouseSGR(64, x, y, false))
 }
 
 // MouseScrollDown sends a scroll-down event at (x, y).
 func (p *Page) MouseScrollDown(x, y int) error {
+	if err := p.app.validateCoordinates(x, y); err != nil {
+		return err
+	}
 	return p.app.write(MouseSGR(65, x, y, false))
 }
 
 // MouseDown sends a mouse button-down event.
 // button: 0=left, 1=middle, 2=right.
 func (p *Page) MouseDown(button, x, y int) error {
+	if button < 0 || button > 2 {
+		return fmt.Errorf("invalid mouse button %d", button)
+	}
+	if err := p.app.validateCoordinates(x, y); err != nil {
+		return err
+	}
 	p.dragBtn = button
 	p.dragX = x
 	p.dragY = y
@@ -100,6 +108,9 @@ func (p *Page) MouseDown(button, x, y int) error {
 
 // MouseUp sends a mouse button-up event.
 func (p *Page) MouseUp(button, x, y int) error {
+	if err := p.app.validateCoordinates(x, y); err != nil {
+		return err
+	}
 	p.dragBtn = -1
 	return p.app.write(MouseSGR(button, x, y, true))
 }
@@ -108,6 +119,9 @@ func (p *Page) MouseUp(button, x, y int) error {
 // If a button is currently held (from MouseDown), the motion is reported as
 // a drag event (same button with motion flag) instead of a plain hover motion.
 func (p *Page) MouseMove(x, y int) error {
+	if err := p.app.validateCoordinates(x, y); err != nil {
+		return err
+	}
 	if p.dragBtn >= 0 {
 		p.dragX = x
 		p.dragY = y
@@ -118,15 +132,10 @@ func (p *Page) MouseMove(x, y int) error {
 }
 
 // EnableMouse enables mouse tracking in the terminal (SGR protocol).
-func (p *Page) EnableMouse() error {
-	// Enable basic mouse tracking + SGR extended coordinates
-	return p.app.write([]byte("\x1b[?1000h\x1b[?1006h\x1b[?1015h"))
-}
+func (p *Page) EnableMouse() error { return nil }
 
 // DisableMouse disables mouse tracking.
-func (p *Page) DisableMouse() error {
-	return p.app.write([]byte("\x1b[?1000l\x1b[?1006l\x1b[?1015l"))
-}
+func (p *Page) DisableMouse() error { return nil }
 
 // WaitFor waits until the screen contains the given text.
 func (p *Page) WaitFor(text string, timeout time.Duration) error {
@@ -144,10 +153,11 @@ func (p *Page) WaitFor(text string, timeout time.Duration) error {
 	return fmt.Errorf("timeout waiting for %q", text)
 }
 
-// WaitStable sleeps briefly to let the TUI settle.
+// WaitStable waits until the rendered screen is unchanged for d, with a
+// bounded maximum wait to avoid hanging on continuously animated screens.
 func (p *Page) WaitStable(d time.Duration) {
-	if d == 0 {
+	if d <= 0 {
 		d = 100 * time.Millisecond
 	}
-	time.Sleep(d)
+	p.app.waitStable(d)
 }

@@ -2,8 +2,11 @@
 package cli
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"net"
+	"path/filepath"
 	"strconv"
 	"sync"
 
@@ -12,11 +15,13 @@ import (
 
 // Session represents a named TUI session.
 type Session struct {
-	Name     string
-	App      *cue.App
-	Page     *cue.Page
-	HTTPAddr string // HTTP address of the app's element tree API
-	WorkDir  string // working directory of the client (for save/artifacts)
+	Name      string
+	App       *cue.App
+	Page      *cue.Page
+	HTTPAddr  string // HTTP address of the app's element tree API
+	httpToken string // per-session bearer token for the element tree API
+	WorkDir   string // working directory of the client (for save/artifacts)
+	mu        sync.Mutex
 }
 
 // SessionManager manages named sessions.
@@ -26,6 +31,10 @@ type SessionManager struct {
 }
 
 // NewSessionManager creates a new session manager.
+func validSessionName(name string) bool {
+	return name != "" && name != "." && name != ".." && !filepath.IsAbs(name) && filepath.Base(name) == name
+}
+
 func NewSessionManager() *SessionManager {
 	return &SessionManager{
 		sessions: make(map[string]*Session),
@@ -76,10 +85,9 @@ func (sm *SessionManager) Close(name string) error {
 	delete(sm.sessions, name)
 	sm.mu.Unlock()
 
-	if s.App != nil {
-		return s.App.Close()
-	}
-	return nil
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.Close()
 }
 
 // CloseAll closes all sessions.
@@ -108,9 +116,17 @@ func (s *Session) Launch(command string, args ...string) error {
 		return fmt.Errorf("app already running in session %q, use close first", s.Name)
 	}
 
-	// Allocate a free port for the app's HTTP element tree
+	s.HTTPAddr = ""
+	s.httpToken = ""
+	// Allocate a free port and authenticate the expected HTTP server so that
+	// a port collision cannot silently attach this session to another service.
 	port := findFreePort()
 	if port > 0 {
+		token, err := newHTTPToken()
+		if err != nil {
+			return fmt.Errorf("generate HTTP inspector token: %w", err)
+		}
+		s.httpToken = token
 		s.HTTPAddr = "http://localhost:" + strconv.Itoa(port)
 	}
 
@@ -118,12 +134,20 @@ func (s *Session) Launch(command string, args ...string) error {
 		cue.WithArgs(args...),
 		cue.WithSize(80, 24),
 	}
+	if s.WorkDir != "" {
+		opts = append(opts, cue.WithDir(s.WorkDir))
+	}
 	if port > 0 {
-		opts = append(opts, cue.WithEnv("WARP_HTTP_PORT="+strconv.Itoa(port)))
+		opts = append(opts, cue.WithEnv(
+			"WARP_HTTP_PORT="+strconv.Itoa(port),
+			"WARP_HTTP_TOKEN="+s.httpToken,
+		))
 	}
 
 	app, err := cue.Launch(command, opts...)
 	if err != nil {
+		s.HTTPAddr = ""
+		s.httpToken = ""
 		return fmt.Errorf("launch: %w", err)
 	}
 
@@ -133,8 +157,16 @@ func (s *Session) Launch(command string, args ...string) error {
 }
 
 // findFreePort finds a free TCP port by listening on :0.
+func newHTTPToken() (string, error) {
+	var token [32]byte
+	if _, err := rand.Read(token[:]); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(token[:]), nil
+}
+
 func findFreePort() int {
-	ln, err := net.Listen("tcp", ":0")
+	ln, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return 0
 	}
@@ -146,7 +178,15 @@ func findFreePort() int {
 // Close stops the application in this session.
 func (s *Session) Close() error {
 	if s.App == nil {
+		s.HTTPAddr = ""
+		s.httpToken = ""
+		s.Page = nil
 		return nil
 	}
-	return s.App.Close()
+	app := s.App
+	s.App = nil
+	s.Page = nil
+	s.HTTPAddr = ""
+	s.httpToken = ""
+	return app.Close()
 }

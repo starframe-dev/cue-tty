@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"time"
+
+	"github.com/starframe-dev/cue-tty/pkg/internal/privatefs"
 )
 
 // Event records an action in the timeline.
@@ -25,28 +27,35 @@ type Artifact struct {
 
 // SaveArtifact captures current state and saves to a directory.
 func (p *Page) SaveArtifact(dir string, name string) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := validateArtifactName(name); err != nil {
 		return err
 	}
-
-	text, err := p.Text()
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return err
+	}
+	info, err := os.Lstat(dir)
 	if err != nil {
 		return err
 	}
+	if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() {
+		return fmt.Errorf("refusing non-directory artifact path %q", dir)
+	}
+	if err := os.Chmod(dir, 0o700); err != nil {
+		return err
+	}
+
+	snapshot := p.app.Snapshot()
+	text := snapshot.Text
 
 	// render.txt
 	rpath := filepath.Join(dir, name+".render.txt")
-	if err := os.WriteFile(rpath, []byte(text), 0o644); err != nil {
+	if err := privatefs.WriteFile(rpath, []byte(text)); err != nil {
 		return err
 	}
 
 	// state.json
-	row, col, err := p.Cursor()
-	if err != nil {
-		return err
-	}
 	state := map[string]any{
-		"cursor": map[string]int{"row": row, "col": col},
+		"cursor": map[string]int{"row": snapshot.CursorRow, "col": snapshot.CursorCol},
 		"text":   text,
 	}
 	spath := filepath.Join(dir, name+".state.json")
@@ -54,7 +63,7 @@ func (p *Page) SaveArtifact(dir string, name string) error {
 	if err != nil {
 		return err
 	}
-	if err := os.WriteFile(spath, data, 0o644); err != nil {
+	if err := privatefs.WriteFile(spath, data); err != nil {
 		return err
 	}
 
@@ -62,6 +71,13 @@ func (p *Page) SaveArtifact(dir string, name string) error {
 }
 
 // NewEvent creates an event with current timestamp.
+func validateArtifactName(name string) error {
+	if name == "" || name == "." || name == ".." || filepath.IsAbs(name) || filepath.Base(name) != name {
+		return fmt.Errorf("invalid artifact name %q", name)
+	}
+	return nil
+}
+
 func NewEvent(action, detail string) Event {
 	return Event{
 		Timestamp: time.Now().UnixMilli(),
@@ -72,7 +88,17 @@ func NewEvent(action, detail string) Event {
 
 // WriteTimeline writes a markdown timeline to a file.
 func WriteTimeline(dir string, events []Event) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o700); err != nil {
+		return err
+	}
+	info, err := os.Lstat(dir)
+	if err != nil {
+		return err
+	}
+	if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() {
+		return fmt.Errorf("refusing non-directory timeline path %q", dir)
+	}
+	if err := os.Chmod(dir, 0o700); err != nil {
 		return err
 	}
 	var b []byte
@@ -80,5 +106,5 @@ func WriteTimeline(dir string, events []Event) error {
 	for _, e := range events {
 		b = append(b, fmt.Sprintf("- **%d ms**: %s — %s\n", e.Timestamp, e.Action, e.Detail)...)
 	}
-	return os.WriteFile(filepath.Join(dir, "timeline.md"), b, 0o644)
+	return privatefs.WriteFile(filepath.Join(dir, "timeline.md"), b)
 }

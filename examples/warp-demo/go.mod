@@ -4,7 +4,7 @@ go 1.26.2
 
 require (
 	github.com/charmbracelet/bubbletea v1.1.0
-	github.com/starframe-dev/warp v0.0.0
+	github.com/starframe-dev/warp v0.1.1
 )
 
 require (
@@ -26,7 +26,4 @@ require (
 	golang.org/x/text v0.3.8 // indirect
 )
 
-replace (
-	github.com/starframe-dev/cue-tty => ../..
-	github.com/starframe-dev/warp => /Users/a/Space/Projects/Starframe/warp
-)
+replace github.com/starframe-dev/cue-tty => ../..

@@ -33,36 +33,56 @@ func (b RemoteBounds) Center() (int, int) {
 
 // FetchElements fetches the element tree from the app's HTTP server.
 func FetchElements(httpAddr string) ([]RemoteElement, error) {
+	return FetchElementsWithToken(httpAddr, "")
+}
+
+// FetchElementsWithToken fetches an element tree using an optional bearer token.
+func FetchElementsWithToken(httpAddr, token string) ([]RemoteElement, error) {
 	if httpAddr == "" {
 		return nil, fmt.Errorf("no HTTP address configured")
 	}
 
-	url := httpAddr + "/elements"
-	if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
-		url = "http://127.0.0.1:" + url + "/elements"
+	baseURL := strings.TrimRight(httpAddr, "/")
+	if !strings.HasPrefix(baseURL, "http://") && !strings.HasPrefix(baseURL, "https://") {
+		baseURL = "http://" + baseURL
 	}
-	// Replace localhost with 127.0.0.1 to avoid IPv6 issues
+	url := baseURL + "/elements"
+	// Resolve localhost explicitly to IPv4 for local Warp servers.
 	url = strings.Replace(url, "localhost", "127.0.0.1", 1)
 
-	var body []byte
+	client := &http.Client{Timeout: 500 * time.Millisecond}
 	var resp *http.Response
 	var err error
-
-	for i := 0; i < 50; i++ {
-		resp, err = http.Get(url)
-		if err == nil {
+	deadline := time.Now().Add(2 * time.Second)
+	for {
+		request, requestErr := http.NewRequest(http.MethodGet, url, nil)
+		if requestErr != nil {
+			return nil, fmt.Errorf("create elements request: %w", requestErr)
+		}
+		if token != "" {
+			request.Header.Set("Authorization", "Bearer "+token)
+		}
+		resp, err = client.Do(request)
+		if err == nil || time.Now().After(deadline) {
 			break
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(50 * time.Millisecond)
 	}
 	if err != nil {
 		return nil, fmt.Errorf("fetch elements: %w", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("fetch elements: HTTP status %s", resp.Status)
+	}
 
-	body, err = io.ReadAll(resp.Body)
+	const maxResponseBytes = 1 << 20
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxResponseBytes+1))
 	if err != nil {
 		return nil, fmt.Errorf("read response: %w", err)
+	}
+	if len(body) > maxResponseBytes {
+		return nil, fmt.Errorf("elements response exceeds %d bytes", maxResponseBytes)
 	}
 
 	var elements []RemoteElement

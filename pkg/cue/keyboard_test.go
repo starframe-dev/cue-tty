@@ -5,6 +5,13 @@ import (
 	"testing"
 )
 
+func TestMouseSGRCoordinatesExceeding999(t *testing.T) {
+	got := string(MouseSGR(0, 1234, 1000, false))
+	if got != "\x1b[<0;1235;1001M" {
+		t.Fatalf("unexpected encoding for large coordinates: %q", got)
+	}
+}
+
 func TestResolveKey(t *testing.T) {
 	tests := []struct {
 		key      string

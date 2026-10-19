@@ -151,8 +151,8 @@ func (p *demoPanel) Elements(width, height int) []warp.Element {
 
 	elems := []warp.Element{
 		{
-			Role: "header",
-			Name: "Warp Demo",
+			Role:   "header",
+			Name:   "Warp Demo",
 			Bounds: warp.Bounds{X: 0, Y: 0, W: width, H: 1},
 		},
 	}
@@ -201,11 +201,11 @@ func main() {
 	w.SetRoot(p)
 
 	// Start HTTP element tree server
-	addr := ":0"
+	addr := "127.0.0.1:0"
 	if port := os.Getenv("WARP_HTTP_PORT"); port != "" {
-		addr = ":" + port
+		addr = "127.0.0.1:" + port
 	}
-	if err := w.ServeHTTP(addr); err != nil {
+	if err := w.ServeHTTPWithOptions(addr, warp.InspectorOptions{BearerToken: os.Getenv("WARP_HTTP_TOKEN")}); err != nil {
 		panic(err)
 	}
 

@@ -9,6 +9,9 @@ import (
 
 // Run starts the REPL with the given session name.
 func Run(sessionName string) error {
+	if !validSessionName(sessionName) {
+		return fmt.Errorf("invalid session name %q", sessionName)
+	}
 	sm := NewSessionManager()
 	session := sm.GetOrCreate(sessionName)
 	commands := Commands(sm)
@@ -64,8 +67,11 @@ func Run(sessionName string) error {
 			continue
 		}
 
-		if result == "Goodbye!" {
-			fmt.Println(result)
+		command := parseLine(line)
+		if len(command) > 0 && (command[0] == "exit" || command[0] == "quit") {
+			if result != "" {
+				fmt.Println(result)
+			}
 			break
 		}
 
@@ -88,11 +94,14 @@ func runCommand(session *Session, commands map[string]CommandHandler, line strin
 	cmdName := parts[0]
 	args := parts[1:]
 
+	return runCommandArgs(session, commands, cmdName, args)
+}
+
+func runCommandArgs(session *Session, commands map[string]CommandHandler, cmdName string, args []string) (string, error) {
 	handler, ok := commands[cmdName]
 	if !ok {
 		return "", fmt.Errorf("unknown command: %q (type 'help' for available commands)", cmdName)
 	}
-
 	return handler(session, args)
 }
 

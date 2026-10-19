@@ -1,7 +1,7 @@
 package cue
 
 import (
-	"bytes"
+	"fmt"
 	"os"
 	"sync"
 	"time"
@@ -10,17 +10,29 @@ import (
 	"github.com/starframe-dev/cue-tty/pkg/pty"
 )
 
+const maxRawLogBytes = 1 << 20
+
+// ScreenSnapshot is a consistent plain-text and cursor view of an app.
+type ScreenSnapshot struct {
+	Text      string
+	CursorRow int
+	CursorCol int
+}
+
 // App represents a running TUI application.
 type App struct {
-	backend    *pty.Backend
-	parser     *ansi.Parser
-	screen     *ansi.Screen
-	opts       Options
-	mu         sync.Mutex
-	closeOnce  sync.Once
-	done       chan struct{}
-	stopReader chan struct{}
-	rawLog     []byte // debug: raw PTY output
+	backend     *pty.Backend
+	parser      *ansi.Parser
+	screen      *ansi.Screen
+	opts        Options
+	mu          sync.Mutex
+	closeOnce   sync.Once
+	closeErr    error
+	done        chan struct{}
+	timeout     *time.Timer
+	timeoutDone chan struct{}
+	timeoutStop sync.Once
+	rawLog      []byte
 }
 
 // Launch starts a TUI application.
@@ -29,9 +41,6 @@ func Launch(command string, opts ...Option) (*App, error) {
 	for _, fn := range opts {
 		fn(&o)
 	}
-
-	// Merge with the current process environment by default so that env vars
-	// set by the application under test (e.g. WARP_HTTP_PORT) remain visible.
 	if !o.EnvReplaced {
 		o.Env = append(os.Environ(), o.Env...)
 	}
@@ -40,92 +49,104 @@ func Launch(command string, opts ...Option) (*App, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	screen := ansi.NewScreen(o.Width, o.Height)
-	parser := ansi.NewParser(screen)
-
 	app := &App{
-		backend:    backend,
-		parser:     parser,
-		screen:     screen,
-		opts:       o,
-		done:       make(chan struct{}),
-		stopReader: make(chan struct{}),
+		backend:     backend,
+		parser:      ansi.NewParser(screen),
+		screen:      screen,
+		opts:        o,
+		done:        make(chan struct{}),
+		timeoutDone: make(chan struct{}),
 	}
-
+	app.parser.SetResponseCallback(func(response []byte) {
+		_, _ = app.backend.Write(response)
+	})
+	if o.Timeout > 0 {
+		app.timeout = time.NewTimer(o.Timeout)
+		go app.watchTimeout()
+	}
 	go app.readLoop()
-
 	return app, nil
 }
 
 // Page returns the current page for interaction.
-func (a *App) Page() *Page {
-	return &Page{app: a}
-}
+func (a *App) Page() *Page { return &Page{app: a, dragBtn: -1} }
 
 // Resize changes terminal dimensions.
 func (a *App) Resize(cols, rows int) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
+	if err := a.backend.Resize(cols, rows); err != nil {
+		return err
+	}
 	a.screen.Resize(cols, rows)
-	return a.backend.Resize(cols, rows)
+	return nil
 }
 
-// Close kills the application.
+// Close terminates the application and waits for the PTY reader to finish.
 func (a *App) Close() error {
 	a.closeOnce.Do(func() {
-		close(a.stopReader)
+		a.stopTimeout()
+		a.closeErr = a.backend.Close()
+		<-a.done
 	})
-	return a.backend.Close()
+	return a.closeErr
 }
 
-// Wait blocks until the process exits.
+// Wait blocks until the process exits and the PTY reader has stopped.
 func (a *App) Wait() error {
-	return a.backend.Wait()
+	err := a.backend.Wait()
+	<-a.done
+	a.stopTimeout()
+	return err
+}
+
+func (a *App) watchTimeout() {
+	select {
+	case <-a.timeout.C:
+		_ = a.Close()
+	case <-a.timeoutDone:
+	}
+}
+
+func (a *App) stopTimeout() {
+	a.timeoutStop.Do(func() {
+		if a.timeout != nil {
+			a.timeout.Stop()
+			close(a.timeoutDone)
+		}
+	})
 }
 
 func (a *App) readLoop() {
-	dataCh := make(chan []byte)
-	go func() {
-		buf := make([]byte, 4096)
-		for {
-			n, err := a.backend.Read(buf)
-			if err != nil {
-				close(dataCh)
-				return
-			}
-			if n > 0 {
-				cp := make([]byte, n)
-				copy(cp, buf[:n])
-				dataCh <- cp
-			}
-		}
-	}()
-
+	defer close(a.done)
+	buf := make([]byte, 4096)
 	for {
-		select {
-		case <-a.stopReader:
-			return
-		case data, ok := <-dataCh:
-			if !ok {
-				return
-			}
+		n, err := a.backend.Read(buf)
+		if n > 0 {
+			data := buf[:n]
 			a.mu.Lock()
-			a.rawLog = append(a.rawLog, data...)
+			a.appendRawLog(data)
 			a.parser.Feed(data)
 			a.mu.Unlock()
-
-			// Auto-respond to common terminal queries so apps don't hang
-			if bytes.Contains(data, []byte("\x1b[6n")) {
-				// Cursor position report: ESC[row;colR
-				_, _ = a.backend.Write([]byte("\x1b[1;1R"))
-			}
-			if bytes.Contains(data, []byte("\x1b[5n")) {
-				// Status report: ESC[0n (OK)
-				_, _ = a.backend.Write([]byte("\x1b[0n"))
-			}
+		}
+		if err != nil {
+			return
 		}
 	}
+}
+
+func (a *App) appendRawLog(data []byte) {
+	if len(data) >= maxRawLogBytes {
+		a.rawLog = append(a.rawLog[:0], data[len(data)-maxRawLogBytes:]...)
+		return
+	}
+	excess := len(a.rawLog) + len(data) - maxRawLogBytes
+	if excess > 0 {
+		copy(a.rawLog, a.rawLog[excess:])
+		a.rawLog = a.rawLog[:len(a.rawLog)-excess]
+	}
+	a.rawLog = append(a.rawLog, data...)
 }
 
 func (a *App) write(data []byte) error {
@@ -133,31 +154,65 @@ func (a *App) write(data []byte) error {
 	return err
 }
 
-// Screen returns the current screen state (locked).
-func (a *App) screenState() *ansi.Screen {
+// RenderText returns a consistent plain-text screen snapshot.
+func (a *App) RenderText() string { return a.Snapshot().Text }
+
+// Snapshot captures rendered text and cursor position under one lock.
+func (a *App) Snapshot() ScreenSnapshot {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	return a.screen
+	cursor := a.screen.CurrentCursor()
+	return ScreenSnapshot{
+		Text:      a.screen.RenderText(),
+		CursorRow: cursor.Row,
+		CursorCol: cursor.Col,
+	}
 }
 
-// RenderText returns the screen as plain text, locked.
-func (a *App) RenderText() string {
+// CursorPosition returns a consistent cursor snapshot.
+func (a *App) CursorPosition() (row, col int) {
+	snapshot := a.Snapshot()
+	return snapshot.CursorRow, snapshot.CursorCol
+}
+
+func (a *App) validateCoordinates(x, y int) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	return a.screen.RenderText()
+	if x < 0 || y < 0 || x >= a.screen.Cols() || y >= a.screen.Rows() {
+		return fmt.Errorf("mouse coordinates out of range: (%d, %d) for %dx%d screen", x, y, a.screen.Cols(), a.screen.Rows())
+	}
+	return nil
 }
 
-// RawLog returns the raw bytes captured from the PTY (for debugging).
+// RawLog returns a copy of the bounded raw PTY output tail.
 func (a *App) RawLog() []byte {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	return append([]byte(nil), a.rawLog...)
 }
 
-// waitStable waits until no new output arrives for the given duration.
-func (a *App) waitStable(d time.Duration) {
-	if d == 0 {
-		d = 50 * time.Millisecond
+// waitStable waits for screen output to stop changing, up to the given timeout.
+func (a *App) waitStable(quietPeriod time.Duration) {
+	if quietPeriod <= 0 {
+		quietPeriod = 100 * time.Millisecond
 	}
-	time.Sleep(d)
+	maxWait := quietPeriod * 5
+	if maxWait < time.Second {
+		maxWait = time.Second
+	}
+	deadline := time.Now().Add(maxWait)
+	last := a.RenderText()
+	stableSince := time.Now()
+	for time.Now().Before(deadline) {
+		time.Sleep(10 * time.Millisecond)
+		current := a.RenderText()
+		if current != last {
+			last = current
+			stableSince = time.Now()
+			continue
+		}
+		if time.Since(stableSince) >= quietPeriod {
+			return
+		}
+	}
 }

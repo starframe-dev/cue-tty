@@ -1,54 +1,46 @@
 package ansi
 
 import (
-	"fmt"
-
-	"github.com/Starframe/portalis"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/rivo/uniseg"
+	"github.com/starframe-dev/portalis"
+	"strings"
 )
 
-// Cell is a single character on the screen.
+// Cell is a single character cell on the terminal screen.
 type Cell = portalis.Cell
 
-// Cursor tracks the current cursor position.
+// Cursor tracks the current terminal cursor position.
 type Cursor = portalis.Cursor
 
-// EmptyCell returns a zero-value cell (empty).
-func EmptyCell() Cell { return Cell{} }
-
-// Screen is a virtual terminal screen backed by portalis.Screen.
+// Screen is a virtual terminal screen backed by Portalis.
 type Screen struct {
 	*portalis.Screen
 	Style Style
 }
+
+// EmptyCell returns a zero-value cell.
+func EmptyCell() Cell { return Cell{} }
 
 // NewScreen creates a screen with the given dimensions.
 func NewScreen(cols, rows int) *Screen {
 	return &Screen{Screen: portalis.NewScreen(rows, cols), Style: Reset()}
 }
 
-// Resize changes the screen size, preserving top-left content.
+// Resize changes the screen size, preserving content where possible.
 func (s *Screen) Resize(cols, rows int) {
 	s.Screen.Resize(rows, cols)
 }
 
-// ClearScreen clears the entire active buffer.
-func (s *Screen) ClearScreen() {
-	s.Screen.Clear()
-}
+// ClearScreen clears the active buffer.
+func (s *Screen) ClearScreen() { s.Screen.Clear() }
 
-// CurrentCursor returns the active cursor.
-func (s *Screen) CurrentCursor() *Cursor {
-	return &s.Screen.Cursor
-}
+// CurrentCursor returns a snapshot of the active cursor.
+func (s *Screen) CurrentCursor() Cursor { return s.Screen.CursorState() }
 
-// MoveCursor sets the cursor position (0-based, clamped).
-func (s *Screen) MoveCursor(row, col int) {
-	s.Screen.SetCursor(row, col)
-}
+// MoveCursor sets the cursor position (0-based).
+func (s *Screen) MoveCursor(row, col int) { s.Screen.SetCursor(row, col) }
 
-// MoveCursorRel moves the cursor relative to current position.
+// MoveCursorRel moves the cursor relative to its current position.
 func (s *Screen) MoveCursorRel(dy, dx int) {
 	if dy < 0 {
 		s.Screen.CursorUp(-dy)
@@ -62,17 +54,10 @@ func (s *Screen) MoveCursorRel(dy, dx int) {
 	}
 }
 
-// scrollUp scrolls the scroll region up by n lines.
-func (s *Screen) scrollUp(n int) {
-	s.Screen.ScrollRegionUp(n)
-}
+func (s *Screen) scrollUp(n int)   { s.Screen.ScrollRegionUp(n) }
+func (s *Screen) scrollDown(n int) { s.Screen.ScrollRegionDown(n) }
 
-// scrollDown scrolls the scroll region down by n lines.
-func (s *Screen) scrollDown(n int) {
-	s.Screen.ScrollRegionDown(n)
-}
-
-// SwitchAltBuffer toggles between main and alternate screen buffer.
+// SwitchAltBuffer toggles between the main and alternate screen buffers.
 func (s *Screen) SwitchAltBuffer(use bool) {
 	if use {
 		s.Screen.EnterAltScreen()
@@ -81,135 +66,54 @@ func (s *Screen) SwitchAltBuffer(use bool) {
 	}
 }
 
-// RenderText renders the screen as plain text (no ANSI sequences).
+// RenderText renders visible cells as plain text.
 func (s *Screen) RenderText() string {
-	return stripANSI(s.Screen.Render())
-}
-
-// stripANSI removes ANSI escape sequences from a string.
-func stripANSI(s string) string {
-	var out []byte
-	i := 0
-	for i < len(s) {
-		if s[i] == '\x1b' {
-			// Skip escape sequence
-			i++
-			if i < len(s) && s[i] == '[' {
-				i++
-				for i < len(s) && !(s[i] >= 0x40 && s[i] <= 0x7E) {
-					i++
-				}
-				if i < len(s) {
-					i++
-				}
-			} else if i < len(s) {
-				// Two-byte escape
-				i++
+	cells := s.CellsSnapshot()
+	var out strings.Builder
+	for row, line := range cells {
+		if row > 0 {
+			out.WriteByte('\n')
+		}
+		for _, cell := range line {
+			if cell.Continuation {
+				continue
 			}
-		} else {
-			out = append(out, s[i])
-			i++
+			if cell.Rune == 0 {
+				out.WriteByte(' ')
+			} else {
+				out.WriteRune(cell.Rune)
+				out.WriteString(cell.Combining)
+			}
 		}
 	}
-	return string(out)
+	return out.String()
 }
 
-// CellsView returns a flat slice of the active buffer for inspection.
+// CellsView returns a flat snapshot of the active visible buffer.
 func (s *Screen) CellsView() []Cell {
-	flat := make([]Cell, s.Rows*s.Cols)
-	for r := 0; r < s.Rows; r++ {
-		copy(flat[r*s.Cols:(r+1)*s.Cols], s.Cells[r])
+	rows := s.CellsSnapshot()
+	flat := make([]Cell, 0, s.Rows()*s.Cols())
+	for _, row := range rows {
+		flat = append(flat, row...)
 	}
 	return flat
 }
 
-// Current returns the active buffer as a flat slice.
-func (s *Screen) Current() []Cell {
-	return s.CellsView()
+// Current returns the active visible buffer as a flat snapshot.
+func (s *Screen) Current() []Cell { return s.CellsView() }
+
+func (s *Screen) cell(row, col int) *Cell {
+	cell, ok := s.Screen.CellAt(row, col)
+	if !ok {
+		return nil
+	}
+	return &cell
 }
 
-// cell returns a pointer to the cell at (r, c).
-func (s *Screen) cell(r, c int) *Cell {
-	return &s.Screen.Cells[r][c]
-}
+func (s *Screen) clearWrapPending() { s.Screen.ClearWrapPending() }
 
-// clearWrapPending resets the wrap-pending flag.
-func (s *Screen) clearWrapPending() {
-	s.Screen.ClearWrapPending()
-}
-
-// Put writes a rune at the current cursor with the current style.
-// Handles wide characters (CJK, emoji) by advancing cursor by display width.
-func (s *Screen) Put(ch rune) {
-	s.syncStyle()
-	s.Screen.Put(ch)
-}
-
-// syncStyle copies the wrapper Style to the Portalis cursor so Put applies it.
-func (s *Screen) syncStyle() {
-	st := &s.Screen.Cursor
-	st.Style = 0
-	if s.Style.Bold {
-		st.Style |= portalis.StyleBold
-	}
-	if s.Style.Dim {
-		st.Style |= portalis.StyleDim
-	}
-	if s.Style.Italic {
-		st.Style |= portalis.StyleItalic
-	}
-	if s.Style.Underline {
-		st.Style |= portalis.StyleUnderline
-	}
-	if s.Style.Reverse {
-		st.Style |= portalis.StyleReverse
-	}
-	st.FG = colorToLipgloss(s.Style.Fg)
-	st.BG = colorToLipgloss(s.Style.Bg)
-}
-
-// colorToLipgloss converts an ansi.Color to a lipgloss.Color string.
-func colorToLipgloss(c Color) lipgloss.Color {
-	if c.Is256 {
-		return ansi256Color(int(c.Index))
-	}
-	return lipgloss.Color(rgb(int(c.R), int(c.G), int(c.B)))
-}
-
-// ansi256Color converts an ANSI color index (0-255) to a lipgloss.Color string.
-func ansi256Color(n int) lipgloss.Color {
-	if n < 0 || n > 255 {
-		return ""
-	}
-	if n < 16 {
-		colors := []string{
-			"#000000", "#800000", "#008000", "#808000",
-			"#000080", "#800080", "#008080", "#c0c0c0",
-			"#808080", "#ff0000", "#00ff00", "#ffff00",
-			"#0000ff", "#ff00ff", "#00ffff", "#ffffff",
-		}
-		return lipgloss.Color(colors[n])
-	}
-	if n < 232 {
-		n -= 16
-		r := n / 36
-		g := (n / 6) % 6
-		b := n % 6
-		return lipgloss.Color(rgb(r*42+12, g*42+12, b*42+12))
-	}
-	v := (n-232)*10 + 8
-	return lipgloss.Color(rgb(v, v, v))
-}
-
-func rgb(r, g, b int) string {
-	return "#" + hexByte(r) + hexByte(g) + hexByte(b)
-}
-
-func hexByte(n int) string {
-	return fmt.Sprintf("%02x", n)
-}
+// Put writes a rune with Portalis' current rendition.
+func (s *Screen) Put(ch rune) { s.Screen.Put(ch) }
 
 // StringWidth returns the display width of a string.
-func StringWidth(s string) int {
-	return uniseg.StringWidth(s)
-}
+func StringWidth(text string) int { return uniseg.StringWidth(text) }

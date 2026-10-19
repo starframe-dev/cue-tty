@@ -3,11 +3,65 @@ package ansi
 import (
 	"testing"
 
-	"github.com/Starframe/portalis"
+	"github.com/starframe-dev/portalis"
 )
 
-func cellAt(s *Screen, r, c int) *Cell {
-	return &s.Cells[r][c]
+func cellAt(s *Screen, r, c int) Cell {
+	cell, ok := s.Screen.CellAt(r, c)
+	if !ok {
+		return Cell{}
+	}
+	return cell
+}
+
+func TestParserCaretIsPrinted(t *testing.T) {
+	s := NewScreen(80, 24)
+	p := NewParser(s)
+	p.FeedString("a^b")
+	if cellAt(s, 0, 0).Rune != 'a' || cellAt(s, 0, 1).Rune != '^' || cellAt(s, 0, 2).Rune != 'b' {
+		t.Fatalf("expected a^b to be printed, got %q", s.RenderText())
+	}
+}
+
+func TestParserInvalidSGRPaletteIndicesDoNotPanic(t *testing.T) {
+	for _, sequence := range []string{
+		"\x1b[38;5;256mX",
+		"\x1b[48;5;999999999999999999999999mX",
+		"\x1b[38;2;999;-1;1mX",
+	} {
+		t.Run(sequence, func(t *testing.T) {
+			s := NewScreen(80, 24)
+			p := NewParser(s)
+			p.FeedString(sequence)
+			if cellAt(s, 0, 0).Rune != 'X' {
+				t.Fatalf("parser lost printable text after malformed SGR %q", sequence)
+			}
+		})
+	}
+}
+
+func FuzzParserFeed(f *testing.F) {
+	for _, seed := range [][]byte{
+		[]byte("a^b"),
+		[]byte("\x1b[38;5;256mX"),
+		[]byte("^[[6n"),
+		[]byte("\x1b]0;title\x07"),
+		[]byte("\xe2\x95\xad"),
+	} {
+		f.Add(seed)
+	}
+	f.Fuzz(func(t *testing.T, data []byte) {
+		screen := NewScreen(80, 24)
+		parser := NewParser(screen)
+		for start := 0; start < len(data); {
+			end := start + 17
+			if end > len(data) {
+				end = len(data)
+			}
+			parser.Feed(data[start:end])
+			start = end
+		}
+	})
 }
 
 func TestParserPlainText(t *testing.T) {
@@ -102,10 +156,9 @@ func TestParserSGR256Color(t *testing.T) {
 	s := NewScreen(80, 24)
 	p := NewParser(s)
 	p.FeedString("\x1b[38;5;196mRed256\x1b[0m")
-	// Color 196 is a 6x6x6 cube color: n=196, n-16=180, r=180/36=5, g=(180/6)%6=30%6=0, b=180%6=0
-	// r=5*42+12=222, g=0*42+12=12, b=0*42+12=12 → #de0c0c
-	if cellAt(s, 0, 0).FG != "#de0c0c" {
-		t.Fatalf("expected fg #de0c0c, got %q", cellAt(s, 0, 0).FG)
+	// ANSI index 196 is standard bright red in the 6x6x6 cube.
+	if cellAt(s, 0, 0).FG != "#ff0000" {
+		t.Fatalf("expected fg #ff0000, got %q", cellAt(s, 0, 0).FG)
 	}
 	if cellAt(s, 0, 0).Rune != 'R' {
 		t.Fatalf("expected R, got %c", cellAt(s, 0, 0).Rune)
@@ -149,6 +202,18 @@ func TestParserSGRCombinedTrueColor(t *testing.T) {
 	}
 }
 
+func TestParserDSRRespondsWithCurrentCursorAcrossChunks(t *testing.T) {
+	screen := NewScreen(80, 24)
+	parser := NewParser(screen)
+	var response []byte
+	parser.SetResponseCallback(func(data []byte) { response = append(response, data...) })
+	parser.FeedString("abc\x1b[")
+	parser.FeedString("6n")
+	if got, want := string(response), "\x1b[1;4R"; got != want {
+		t.Fatalf("DSR response = %q, want %q", got, want)
+	}
+}
+
 func TestParserSplitEscapeSequence(t *testing.T) {
 	s := NewScreen(80, 24)
 	p := NewParser(s)
@@ -159,8 +224,8 @@ func TestParserSplitEscapeSequence(t *testing.T) {
 	if cellAt(s, 0, 0).Rune != 'R' {
 		t.Fatalf("expected R, got %c", cellAt(s, 0, 0).Rune)
 	}
-	if cellAt(s, 0, 0).FG != "#de0c0c" {
-		t.Fatalf("expected fg #de0c0c, got %q", cellAt(s, 0, 0).FG)
+	if cellAt(s, 0, 0).FG != "#ff0000" {
+		t.Fatalf("expected fg #ff0000, got %q", cellAt(s, 0, 0).FG)
 	}
 	if cellAt(s, 0, 3).FG != "" {
 		t.Fatalf("expected reset fg after Red, got %q", cellAt(s, 0, 3).FG)

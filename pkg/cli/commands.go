@@ -7,6 +7,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/starframe-dev/cue-tty/pkg/internal/privatefs"
 )
 
 // CommandHandler handles a single CLI command.
@@ -30,6 +32,7 @@ func Commands(sm *SessionManager) map[string]CommandHandler {
 		"save":    cmdSave,
 		"resize":  cmdResize,
 		"wait":    cmdWait,
+		"waitfor": cmdWaitFor,
 		"expect":  cmdExpect,
 		"close":   cmdCloseSession,
 		"show":    makeCmdShow(sm),
@@ -52,15 +55,7 @@ func cmdLaunch(session *Session, args []string) (string, error) {
 		return "", err
 	}
 
-	// Give the app a moment to render
-	time.Sleep(300 * time.Millisecond)
-
-	text, err := session.Page.Text()
-	if err != nil {
-		return "", err
-	}
-
-	return fmt.Sprintf("Launched %q in session %q\n\n%s", command, session.Name, text), nil
+	return fmt.Sprintf("Launched %q in session %q", command, session.Name), nil
 }
 
 func cmdPress(session *Session, args []string) (string, error) {
@@ -178,7 +173,7 @@ func cmdClick(session *Session, args []string) (string, error) {
 			name = parts[1]
 		}
 
-		elems, err := FetchElements(session.HTTPAddr)
+		elems, err := FetchElementsWithToken(session.HTTPAddr, session.httpToken)
 		if err != nil {
 			return "", fmt.Errorf("fetch elements: %w", err)
 		}
@@ -304,7 +299,7 @@ func cmdNode(session *Session, args []string) (string, error) {
 
 	// If HTTP element tree is available, show that instead
 	if session.HTTPAddr != "" {
-		elems, err := FetchElements(session.HTTPAddr)
+		elems, err := FetchElementsWithToken(session.HTTPAddr, session.httpToken)
 		if err != nil {
 			return "", fmt.Errorf("fetch element tree: %w", err)
 		}
@@ -319,6 +314,9 @@ func cmdNode(session *Session, args []string) (string, error) {
 }
 
 func cmdSave(session *Session, args []string) (string, error) {
+	if !validSessionName(session.Name) {
+		return "", fmt.Errorf("invalid session name %q", session.Name)
+	}
 	if session.App == nil {
 		return "", fmt.Errorf("no app running in session %q", session.Name)
 	}
@@ -326,37 +324,55 @@ func cmdSave(session *Session, args []string) (string, error) {
 	if len(args) > 0 {
 		name = args[0]
 	}
+	if !validSessionName(name) {
+		return "", fmt.Errorf("invalid artifact name %q", name)
+	}
 
 	baseDir := session.WorkDir
 	if baseDir == "" {
 		baseDir = "."
 	}
-	dir := filepath.Join(baseDir, "cuetty-artifacts", session.Name, name)
-	if err := os.MkdirAll(dir, 0755); err != nil {
-		return "", err
+	artifactsRoot := filepath.Join(baseDir, "cuetty-artifacts")
+	sessionDir := filepath.Join(artifactsRoot, session.Name)
+	dir := filepath.Join(sessionDir, name)
+	for _, privateDir := range []string{artifactsRoot, sessionDir, dir} {
+		if err := ensurePrivateDir(privateDir); err != nil {
+			return "", err
+		}
 	}
 
-	// Save render.txt
-	text, err := session.Page.Text()
-	if err != nil {
-		return "", err
-	}
-	if err := os.WriteFile(filepath.Join(dir, "render.txt"), []byte(text), 0644); err != nil {
+	// Save render.txt and cursor from one screen snapshot.
+	snapshot := session.App.Snapshot()
+	text := snapshot.Text
+	if err := privatefs.WriteFile(filepath.Join(dir, "render.txt"), []byte(text)); err != nil {
 		return "", err
 	}
 
 	// Save state.json
-	row, col, _ := session.Page.Cursor()
 	state := fmt.Sprintf(`{
   "session": %q,
   "cursor": {"row": %d, "col": %d},
   "text": %q
-}`, session.Name, row, col, text)
-	if err := os.WriteFile(filepath.Join(dir, "state.json"), []byte(state), 0644); err != nil {
+}`, session.Name, snapshot.CursorRow, snapshot.CursorCol, text)
+	if err := privatefs.WriteFile(filepath.Join(dir, "state.json"), []byte(state)); err != nil {
 		return "", err
 	}
 
 	return fmt.Sprintf("Saved to %s/", dir), nil
+}
+
+func ensurePrivateDir(path string) error {
+	if err := os.MkdirAll(path, 0700); err != nil {
+		return err
+	}
+	info, err := os.Lstat(path)
+	if err != nil {
+		return err
+	}
+	if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() {
+		return fmt.Errorf("refusing non-directory artifact path %q", path)
+	}
+	return os.Chmod(path, 0700)
 }
 
 func cmdResize(session *Session, args []string) (string, error) {
@@ -394,6 +410,31 @@ func cmdWait(session *Session, args []string) (string, error) {
 
 	time.Sleep(time.Duration(ms) * time.Millisecond)
 	return fmt.Sprintf("Waited %dms", ms), nil
+}
+
+func cmdWaitFor(session *Session, args []string) (string, error) {
+	if session.App == nil {
+		return "", fmt.Errorf("no app running in session %q", session.Name)
+	}
+	if len(args) == 0 {
+		return "", fmt.Errorf("usage: waitfor <text> [timeout-ms]")
+	}
+	timeout := 5 * time.Second
+	textArgs := args
+	if len(args) > 1 {
+		if milliseconds, err := strconv.Atoi(args[len(args)-1]); err == nil {
+			if milliseconds <= 0 {
+				return "", fmt.Errorf("timeout must be positive")
+			}
+			timeout = time.Duration(milliseconds) * time.Millisecond
+			textArgs = args[:len(args)-1]
+		}
+	}
+	text := strings.Join(textArgs, " ")
+	if err := session.Page.WaitFor(text, timeout); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("Found %q", text), nil
 }
 
 func cmdExpect(session *Session, args []string) (string, error) {
@@ -470,6 +511,7 @@ func cmdHelp(session *Session, args []string) (string, error) {
   save [name]                 — save artifacts (render.txt + state.json)
   resize <cols> <rows>        — resize terminal
   wait <ms>                   — wait for N milliseconds
+  waitfor <text> [timeout-ms] — wait until text appears on screen
   expect <contain|not> <text> — assert text on screen
   close                       — close the current app
   show                        — show dashboard of all sessions

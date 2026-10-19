@@ -11,13 +11,13 @@ import (
 func TestFetchElements(t *testing.T) {
 	expected := []RemoteElement{
 		{
-			Role: "header",
-			Name: "Test App",
+			Role:   "header",
+			Name:   "Test App",
 			Bounds: RemoteBounds{X: 0, Y: 0, W: 80, H: 1},
 			Children: []RemoteElement{
 				{
-					Role: "button",
-					Name: "Add",
+					Role:   "button",
+					Name:   "Add",
 					Action: "add",
 					Bounds: RemoteBounds{X: 0, Y: 2, W: 5, H: 1},
 				},
@@ -52,6 +52,57 @@ func TestFetchElements(t *testing.T) {
 	}
 	if elems[0].Children[0].Name != "Add" {
 		t.Errorf("unexpected child name: %q", elems[0].Children[0].Name)
+	}
+}
+
+func TestFetchElementsWithBearerToken(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer token-secret" {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		_, _ = w.Write([]byte(`[{"role":"header","name":"authorized"}]`))
+	}))
+	defer server.Close()
+
+	if _, err := FetchElements(server.URL); err == nil {
+		t.Fatal("expected unauthenticated request to be rejected")
+	}
+	elements, err := FetchElementsWithToken(server.URL, "token-secret")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(elements) != 1 || elements[0].Name != "authorized" {
+		t.Fatalf("unexpected authorized elements: %+v", elements)
+	}
+}
+
+func TestFetchElementsRejectsBadStatusAndOversizedBody(t *testing.T) {
+	for _, test := range []struct {
+		name    string
+		handler http.HandlerFunc
+	}{
+		{
+			name: "status",
+			handler: func(w http.ResponseWriter, _ *http.Request) {
+				http.Error(w, "unavailable", http.StatusServiceUnavailable)
+			},
+		},
+		{
+			name: "oversized",
+			handler: func(w http.ResponseWriter, _ *http.Request) {
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(strings.Repeat("x", (1<<20)+1)))
+			},
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			server := httptest.NewServer(test.handler)
+			defer server.Close()
+			if _, err := FetchElements(server.URL); err == nil {
+				t.Fatal("expected an error")
+			}
+		})
 	}
 }
 
@@ -108,8 +159,8 @@ func TestFindElement(t *testing.T) {
 func TestRenderElementTree(t *testing.T) {
 	elems := []RemoteElement{
 		{
-			Role: "header",
-			Name: "App",
+			Role:   "header",
+			Name:   "App",
 			Bounds: RemoteBounds{X: 0, Y: 0, W: 80, H: 1},
 			Children: []RemoteElement{
 				{

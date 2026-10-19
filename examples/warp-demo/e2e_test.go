@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -13,7 +14,11 @@ func buildDemoApp(t *testing.T) string {
 	t.Helper()
 	binPath := filepath.Join(t.TempDir(), "warp-demo")
 	cmd := exec.Command("go", "build", "-o", binPath, ".")
-	cmd.Dir = "/Users/a/Space/Projects/Starframe/cue-tty/examples/warp-demo"
+	_, sourceFile, _, ok := runtime.Caller(0)
+	if !ok {
+		t.Fatal("resolve e2e test source path")
+	}
+	cmd.Dir = filepath.Dir(sourceFile)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("build warp-demo: %v\n%s", err, out)
@@ -54,7 +59,7 @@ func TestLaunchAndText(t *testing.T) {
 	session := "launch-text-" + t.Name()
 
 	cuetty(t, session, "launch", binPath)
-	cuetty(t, session, "wait", "500")
+	cuetty(t, session, "waitfor", "Warp Demo", "3000")
 	out := cuetty(t, session, "expect", "contain", "Warp Demo")
 
 	if !strings.Contains(out, "✅ Found") {
@@ -78,7 +83,7 @@ func TestElementTree(t *testing.T) {
 	session := "element-tree-" + t.Name()
 
 	cuetty(t, session, "launch", binPath)
-	cuetty(t, session, "wait", "500")
+	cuetty(t, session, "waitfor", "Warp Demo", "3000")
 	out := cuetty(t, session, "node")
 
 	expected := []string{
@@ -103,9 +108,9 @@ func TestClickButtonAdd(t *testing.T) {
 	session := "click-add-" + t.Name()
 
 	cuetty(t, session, "launch", binPath)
-	cuetty(t, session, "wait", "500")
+	cuetty(t, session, "waitfor", "Warp Demo", "3000")
 	cuetty(t, session, "click", "button:Add")
-	cuetty(t, session, "wait", "200")
+	cuetty(t, session, "waitfor", "Added 4 items total", "3000")
 
 	out := cuetty(t, session, "expect", "contain", "Item 4")
 	if !strings.Contains(out, "✅ Found") {
@@ -125,9 +130,9 @@ func TestClickListItem(t *testing.T) {
 	session := "click-item-" + t.Name()
 
 	cuetty(t, session, "launch", binPath)
-	cuetty(t, session, "wait", "500")
-	cuetty(t, session, "click", "listitem:\"  Item 2\"")
-	cuetty(t, session, "wait", "200")
+	cuetty(t, session, "waitfor", "Warp Demo", "3000")
+	cuetty(t, session, "click", "listitem:  Item 2")
+	cuetty(t, session, "waitfor", "Selected: Item 2", "3000")
 
 	out := cuetty(t, session, "expect", "contain", "Selected: Item 2")
 	if !strings.Contains(out, "✅ Found") {
@@ -143,11 +148,11 @@ func TestKeyboardNavigation(t *testing.T) {
 	session := "keyboard-" + t.Name()
 
 	cuetty(t, session, "launch", binPath)
-	cuetty(t, session, "wait", "500")
+	cuetty(t, session, "waitfor", "Warp Demo", "3000")
 	cuetty(t, session, "press", "Down")
 	cuetty(t, session, "press", "Down")
 	cuetty(t, session, "press", "Enter")
-	cuetty(t, session, "wait", "200")
+	cuetty(t, session, "waitfor", "Selected: Item 3", "3000")
 
 	out := cuetty(t, session, "expect", "contain", "Selected: Item 3")
 	if !strings.Contains(out, "✅ Found") {
@@ -164,16 +169,16 @@ func TestSessionIsolation(t *testing.T) {
 	sessionB := "session-b-" + t.Name()
 
 	cuetty(t, sessionA, "launch", binPath)
-	cuetty(t, sessionA, "wait", "500")
+	cuetty(t, sessionA, "waitfor", "Warp Demo", "3000")
 	cuetty(t, sessionA, "click", "button:Add")
-	cuetty(t, sessionA, "wait", "200")
+	cuetty(t, sessionA, "waitfor", "Added 4 items total", "3000")
 	out := cuetty(t, sessionA, "expect", "contain", "Added 4 items total")
 	if !strings.Contains(out, "✅ Found") {
 		t.Errorf("session-a expected to find 'Added 4 items total', got:\n%s", out)
 	}
 
 	cuetty(t, sessionB, "launch", binPath)
-	cuetty(t, sessionB, "wait", "500")
+	cuetty(t, sessionB, "waitfor", "Warp Demo", "3000")
 	out = cuetty(t, sessionB, "expect", "not", "Item 4")
 	if !strings.Contains(out, "✅ Not found") {
 		t.Errorf("session-b expected not to find 'Item 4', got:\n%s", out)
@@ -191,7 +196,7 @@ func TestSaveArtifact(t *testing.T) {
 	session := "save-test-" + t.Name()
 
 	cuettyInDir(t, artifactDir, session, "launch", binPath)
-	cuettyInDir(t, artifactDir, session, "wait", "500")
+	cuettyInDir(t, artifactDir, session, "waitfor", "Warp Demo", "3000")
 	cuettyInDir(t, artifactDir, session, "text")
 	out := cuettyInDir(t, artifactDir, session, "save", "step1")
 
@@ -226,21 +231,21 @@ func TestMultipleClicks(t *testing.T) {
 	session := "multi-click-" + t.Name()
 
 	cuetty(t, session, "launch", binPath)
-	cuetty(t, session, "wait", "500")
+	cuetty(t, session, "waitfor", "Warp Demo", "3000")
 	cuetty(t, session, "click", "button:Add")
-	cuetty(t, session, "wait", "200")
+	cuetty(t, session, "waitfor", "Added 4 items total", "3000")
 	cuetty(t, session, "click", "button:Add")
-	cuetty(t, session, "wait", "200")
+	cuetty(t, session, "waitfor", "Added 5 items total", "3000")
 
 	out := cuetty(t, session, "expect", "contain", "Item 5")
 	if !strings.Contains(out, "✅ Found") {
 		t.Errorf("expected to find 'Item 5', got:\n%s", out)
 	}
 
-	cuetty(t, session, "click", "listitem:\"  Item 5\"")
-	cuetty(t, session, "wait", "200")
+	cuetty(t, session, "click", "listitem:  Item 5")
+	cuetty(t, session, "waitfor", "Selected: Item 5", "3000")
 	cuetty(t, session, "click", "button:Remove")
-	cuetty(t, session, "wait", "200")
+	cuetty(t, session, "waitfor", "Removed: Item 5", "3000")
 
 	out = cuetty(t, session, "expect", "contain", "Removed: Item 5")
 	if !strings.Contains(out, "✅ Found") {
@@ -256,7 +261,7 @@ func TestCLISessionsList(t *testing.T) {
 	session := "list-show-" + t.Name()
 
 	cuetty(t, session, "launch", binPath)
-	cuetty(t, session, "wait", "500")
+	cuetty(t, session, "waitfor", "Warp Demo", "3000")
 	out := cuetty(t, "", "list")
 	if !strings.Contains(out, session) {
 		t.Errorf("expected list to contain session %q, got:\n%s", session, out)

@@ -36,12 +36,10 @@ func TestBubbleteaIntegration(t *testing.T) {
 
 	page := app.Page()
 
-	// Give Bubbletea time to initialize and render
-	page.WaitStable(100 * time.Millisecond)
-
-	// Enable mouse tracking
-	page.EnableMouse()
-	page.WaitStable(500 * time.Millisecond)
+	// Wait for the application to produce its first stable content.
+	if err := page.WaitFor("Pick an item", 2*time.Second); err != nil {
+		t.Fatalf("initial render failed: %v\n%s", err, mustText(page))
+	}
 
 	// Verify initial render
 	if err := Expect(page).ToContain("Pick an item"); err != nil {
@@ -53,7 +51,9 @@ func TestBubbleteaIntegration(t *testing.T) {
 
 	// Test keyboard navigation: Down
 	page.Press("Down")
-	page.WaitStable(100 * time.Millisecond)
+	if err := page.WaitFor("> Banana", time.Second); err != nil {
+		t.Fatalf("navigation did not render: %v\n%s", err, mustText(page))
+	}
 
 	if err := Expect(page).ToContain("> Banana"); err != nil {
 		t.Fatalf("expected > Banana after Down, got:\n%s", mustText(page))
@@ -61,7 +61,9 @@ func TestBubbleteaIntegration(t *testing.T) {
 
 	// Test Enter to select
 	page.Press("Enter")
-	page.WaitStable(100 * time.Millisecond)
+	if err := page.WaitFor("Selected: Banana", time.Second); err != nil {
+		t.Fatalf("selection did not render: %v\n%s", err, mustText(page))
+	}
 
 	if err := Expect(page).ToContain("Selected: Banana"); err != nil {
 		t.Fatalf("expected 'Selected: Banana' after Enter, got:\n%s", mustText(page))
@@ -69,7 +71,9 @@ func TestBubbleteaIntegration(t *testing.T) {
 
 	// Test mouse click on Cherry
 	page.MouseClick(4, 4)
-	page.WaitStable(100 * time.Millisecond)
+	if err := page.WaitFor("> Cherry", time.Second); err != nil {
+		t.Fatalf("mouse click did not render: %v\n%s", err, mustText(page))
+	}
 
 	if err := Expect(page).ToContain("> Cherry"); err != nil {
 		t.Fatalf("expected > Cherry after click, got:\n%s", mustText(page))
@@ -77,7 +81,6 @@ func TestBubbleteaIntegration(t *testing.T) {
 
 	// Quit
 	page.Press("q")
-	page.WaitStable(100 * time.Millisecond)
 
 	done := make(chan error, 1)
 	go func() { done <- app.Wait() }()

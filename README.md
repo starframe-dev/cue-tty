@@ -28,10 +28,14 @@ cuetty-cli -s demo exit
 ### Установка
 
 ```bash
+# Go-библиотека
 go get github.com/starframe-dev/cue-tty
+
+# CLI
+go install github.com/starframe-dev/cue-tty/cmd/cuetty-cli@latest
 ```
 
-`cuetty-cli` глобально доступен после сборки `./cmd/cuetty-cli`.
+Для сборки из клона: `go build -o cuetty-cli ./cmd/cuetty-cli`. CLI запускает фоновый демон автоматически при первой команде; `cuetty-cli daemon` запускает его вручную.
 
 ### Команды
 
@@ -51,7 +55,8 @@ go get github.com/starframe-dev/cue-tty
 | `node` | Граф нод / element tree |
 | `save [name]` | Сохранить артефакты |
 | `resize <cols> <rows>` | Изменить размер терминала |
-| `wait <ms>` | Подождать |
+| `wait <ms>` | Подождать заданное время |
+| `waitfor <text> [timeout-ms]` | Ждать появления текста (по умолчанию до 5 секунд) |
 | `expect <contain|not> <text>` | Ассерт |
 | `show` | Dashboard всех сессий |
 | `list` | Список сессий |
@@ -67,7 +72,7 @@ cd examples/warp-demo
 go build -o warp-demo ./...
 
 cuetty-cli -s demo launch ./warp-demo
-cuetty-cli -s demo wait 500
+cuetty-cli -s demo waitfor "Warp Demo" 3000
 cuetty-cli -s demo node
 cuetty-cli -s demo click button:Add
 cuetty-cli -s demo text
@@ -107,6 +112,8 @@ page.Press("Enter")
 err = cue.Expect(page).ToContain("hello world")
 ```
 
+`cue.WithTimeout(d)` задаёт общий предел времени жизни приложения. `page.WaitStable(d)` ждёт, пока экран не изменяется в течение `d` (с ограниченным максимальным ожиданием). `page.Type(text)` передаёт текст без обязательной задержки между символами.
+
 ### API
 
 | Method | Description |
@@ -119,7 +126,7 @@ err = cue.Expect(page).ToContain("hello world")
 | `page.MouseClick(x, y)` | Click a cell |
 | `page.MouseScrollUp(x, y)` | Scroll wheel up |
 | `page.MouseScrollDown(x, y)` | Scroll wheel down |
-| `page.EnableMouse()` | Enable mouse tracking |
+| `page.EnableMouse()` | Совместимый no-op: режим мыши задаёт само TUI-приложение |
 | `cue.Expect(page).ToContain("x")` | Assert text exists |
 | `cue.Expect(page).ToMatch("re")` | Assert regex match |
 | `cue.Expect(page).ToHaveLine(0, "x")` | Assert line content |

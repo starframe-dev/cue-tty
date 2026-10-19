@@ -34,7 +34,6 @@ Thumbs.db
 .env.local
 
 # cuetty-cli artifacts
-cuetty-cli
 cuetty-artifacts/
 
 # demo binaries
