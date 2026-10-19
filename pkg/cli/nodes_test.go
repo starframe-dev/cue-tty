@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -16,7 +18,9 @@ func TestBuildNodeTree(t *testing.T) {
 	defer app.Close()
 
 	page := app.Page()
-	time.Sleep(100 * time.Millisecond)
+	if err := page.WaitFor("hello", time.Second); err != nil {
+		t.Fatal(err)
+	}
 
 	nt, err := BuildNodeTree(page)
 	if err != nil {
@@ -34,6 +38,50 @@ func TestBuildNodeTree(t *testing.T) {
 	}
 	if !strings.Contains(nt.Lines[0].Text, "hello") {
 		t.Errorf("expected first line to contain 'hello', got %q", nt.Lines[0].Text)
+	}
+}
+
+func TestBuildNodeTreePreservesUnicodeDimensionsCellsAndStyles(t *testing.T) {
+	dir := t.TempDir()
+	program := filepath.Join(dir, "unicode-app")
+	script := "#!/bin/sh\nprintf '\\033[1;31m界é\\033[0m'\n"
+	if err := os.WriteFile(program, []byte(script), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	app, err := cue.Launch(program, cue.WithSize(8, 2))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer app.Close()
+	if err := app.Page().WaitFor("界é", time.Second); err != nil {
+		t.Fatal(err)
+	}
+
+	tree, err := BuildNodeTree(app.Page())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if tree.Cols != 8 || tree.Rows != 2 {
+		t.Fatalf("NodeTree dimensions = %dx%d, want 8x2", tree.Cols, tree.Rows)
+	}
+	if len(tree.Cells) != 16 {
+		t.Fatalf("NodeTree cells = %d, want 16", len(tree.Cells))
+	}
+	if tree.Cells[0].Rune != '界' || !tree.Cells[1].Continuation {
+		t.Fatalf("wide rune cells were not preserved: %+v %+v", tree.Cells[0], tree.Cells[1])
+	}
+	if tree.Cells[2].Rune != 'e' || !strings.ContainsRune(tree.Cells[2].Combining, '\u0301') {
+		t.Fatalf("combining sequence was not preserved: %+v", tree.Cells[2])
+	}
+	if !tree.Cells[0].Bold || tree.Cells[0].FG == "" {
+		t.Fatalf("cell style was not exported: %+v", tree.Cells[0])
+	}
+}
+
+func TestTruncateDisplayWidthDoesNotSplitGraphemes(t *testing.T) {
+	got := truncateDisplayWidth("界éx", 3)
+	if got != "界…" {
+		t.Fatalf("truncateDisplayWidth = %q, want %q", got, "界…")
 	}
 }
 

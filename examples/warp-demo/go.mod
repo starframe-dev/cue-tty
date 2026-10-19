@@ -1,6 +1,6 @@
 module github.com/starframe-dev/cue-tty/examples/warp-demo
 
-go 1.26.2
+go 1.26.9
 
 require (
 	github.com/charmbracelet/bubbletea v1.1.0
@@ -22,7 +22,7 @@ require (
 	github.com/muesli/termenv v0.15.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/sys v0.44.0 // indirect
 	golang.org/x/text v0.3.8 // indirect
 )
 

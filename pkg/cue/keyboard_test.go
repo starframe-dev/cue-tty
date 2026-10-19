@@ -12,6 +12,23 @@ func TestMouseSGRCoordinatesExceeding999(t *testing.T) {
 	}
 }
 
+func TestMouseSGRUsesRealButtonCodesForPressAndRelease(t *testing.T) {
+	for button := 0; button <= 2; button++ {
+		t.Run(string(rune('0'+button)), func(t *testing.T) {
+			press := string(MouseSGR(button, 12, 34, false))
+			wantPress := "\x1b[<" + string(rune('0'+button)) + ";13;35M"
+			if press != wantPress {
+				t.Fatalf("press = %q, want %q", press, wantPress)
+			}
+			release := string(MouseSGR(button, 12, 34, true))
+			wantRelease := "\x1b[<" + string(rune('0'+button)) + ";13;35m"
+			if release != wantRelease {
+				t.Fatalf("release = %q, want %q", release, wantRelease)
+			}
+		})
+	}
+}
+
 func TestResolveKey(t *testing.T) {
 	tests := []struct {
 		key      string

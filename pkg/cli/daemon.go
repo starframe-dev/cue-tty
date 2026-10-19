@@ -16,6 +16,12 @@ import (
 )
 
 // Daemon provides persistent session management via HTTP API over Unix socket.
+const (
+	maxCommandDuration = 60 * time.Second
+	clientTimeout      = maxCommandDuration + 10*time.Second
+	serverWriteTimeout = maxCommandDuration + 5*time.Second
+)
+
 type Daemon struct {
 	mu         sync.RWMutex
 	sm         *SessionManager
@@ -174,14 +180,20 @@ func (d *Daemon) Run() error {
 		return fmt.Errorf("chmod socket: %w", err)
 	}
 
-	d.server = &http.Server{
+	server := &http.Server{
 		Handler:           mux,
 		ReadHeaderTimeout: 2 * time.Second,
 		ReadTimeout:       5 * time.Second,
-		WriteTimeout:      5 * time.Second,
+		WriteTimeout:      serverWriteTimeout,
 		IdleTimeout:       30 * time.Second,
 	}
-	err = d.server.Serve(listener)
+	d.mu.Lock()
+	d.server = server
+	d.mu.Unlock()
+	err = server.Serve(listener)
+	d.mu.Lock()
+	d.server = nil
+	d.mu.Unlock()
 	if errors.Is(err, http.ErrServerClosed) {
 		return nil
 	}
@@ -190,10 +202,13 @@ func (d *Daemon) Run() error {
 
 // Stop stops the daemon.
 func (d *Daemon) Stop() error {
-	if d.server == nil {
+	d.mu.Lock()
+	server := d.server
+	d.mu.Unlock()
+	if server == nil {
 		return nil
 	}
-	return d.server.Close()
+	return server.Close()
 }
 
 func (d *Daemon) handleHealthz(w http.ResponseWriter, r *http.Request) {
@@ -214,30 +229,63 @@ func (d *Daemon) handleCommand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	d.mu.RLock()
 	commands := Commands(d.sm)
-	d.mu.RUnlock()
 
 	// If the command is "stop", handle it specially.
 	if req.Command == "stop" {
 		writeResponse(w, "Daemon stopped")
-		go func() {
-			time.Sleep(100 * time.Millisecond)
-			_ = d.Stop()
-		}()
+		d.stopWhenRequestEnds(r.Context())
 		return
 	}
-	if req.Command != "show" && req.Command != "list" && !validSessionName(req.Session) {
+	if req.Command == "show" || req.Command == "list" {
+		result, err := runCommandArgs(nil, commands, req.Command, req.Args)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+		writeResponse(w, result)
+		return
+	}
+	if !validSessionName(req.Session) {
 		writeError(w, fmt.Errorf("invalid session name %q", req.Session))
 		return
 	}
 
+	if req.Command == "exit" || req.Command == "quit" {
+		if err := d.sm.Close(req.Session); err != nil {
+			writeError(w, err)
+			return
+		}
+		writeResponse(w, "Session closed")
+		return
+	}
+
 	session := d.sm.GetOrCreate(req.Session)
-	session.mu.Lock()
-	defer session.mu.Unlock()
+	if req.Command == "close" {
+		session.cancelCurrent()
+	}
+	ctx, cancel := context.WithTimeout(r.Context(), maxCommandDuration)
+	defer cancel()
+	if err := session.lockContext(ctx); err != nil {
+		writeError(w, fmt.Errorf("wait for session command: %w", err))
+		return
+	}
+	if !d.sm.IsCurrent(req.Session, session) {
+		session.mu.Unlock()
+		writeError(w, fmt.Errorf("session %q was closed", req.Session))
+		return
+	}
+	session.beginCommand(ctx, cancel)
+	defer func() {
+		session.endCommand()
+		session.mu.Unlock()
+	}()
 	session.WorkDir = req.WorkDir
 	result, err := runCommandArgs(session, commands, req.Command, req.Args)
 	if err != nil {
+		if session.App != nil && session.App.ProcessState() != nil {
+			_ = session.Close()
+		}
 		writeError(w, err)
 		return
 	}
@@ -282,8 +330,12 @@ func (d *Daemon) handleStop(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeResponse(w, "Daemon stopped")
+	d.stopWhenRequestEnds(r.Context())
+}
+
+func (d *Daemon) stopWhenRequestEnds(ctx context.Context) {
 	go func() {
-		time.Sleep(100 * time.Millisecond)
+		<-ctx.Done()
 		_ = d.Stop()
 	}()
 }
@@ -309,7 +361,7 @@ func SendCommand(session, command string, args []string) (string, error) {
 	}
 
 	client := http.Client{
-		Timeout: 30 * time.Second,
+		Timeout: clientTimeout,
 		Transport: &http.Transport{
 			DialContext: func(_ context.Context, _, _ string) (net.Conn, error) {
 				return net.Dial("unix", SocketPath())

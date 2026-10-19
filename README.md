@@ -1,6 +1,6 @@
 # cue-tty
 
-Playwright for TUI applications.
+Playwright for TUI applications. Требуется Go 1.26.9 или новее.
 
 `cue-tty` — Go-библиотека + `cuetty-cli` — CLI-инструмент для автоматизации и тестирования TUI-приложений (Bubbletea, ncurses, vim, htop и др.) через PTY.
 
@@ -55,8 +55,8 @@ go install github.com/starframe-dev/cue-tty/cmd/cuetty-cli@latest
 | `node` | Граф нод / element tree |
 | `save [name]` | Сохранить артефакты |
 | `resize <cols> <rows>` | Изменить размер терминала |
-| `wait <ms>` | Подождать заданное время |
-| `waitfor <text> [timeout-ms]` | Ждать появления текста (по умолчанию до 5 секунд) |
+| `wait <ms>` | Подождать 0–60000 мс |
+| `waitfor <text> [timeout-ms]` | Ждать появления текста (по умолчанию 5 секунд, максимум 60000 мс) |
 | `expect <contain|not> <text>` | Ассерт |
 | `show` | Dashboard всех сессий |
 | `list` | Список сессий |
@@ -112,7 +112,7 @@ page.Press("Enter")
 err = cue.Expect(page).ToContain("hello world")
 ```
 
-`cue.WithTimeout(d)` задаёт общий предел времени жизни приложения. `page.WaitStable(d)` ждёт, пока экран не изменяется в течение `d` (с ограниченным максимальным ожиданием). `page.Type(text)` передаёт текст без обязательной задержки между символами.
+`cue.WithTimeout(d)` задаёт общий предел времени жизни приложения. `page.WaitStable(d)` ждёт, пока экран не изменяется в течение `d` (с ограниченным максимальным ожиданием). `page.Type(text)` передаёт текст без обязательной задержки между символами; для отмены используйте `page.TypeContext(ctx, text)`. `page.EnableMouse/DisableMouse` сохранены как deprecated no-op: режим мыши задаёт дочернее TUI.
 
 ### API
 
@@ -124,6 +124,9 @@ err = cue.Expect(page).ToContain("hello world")
 | `page.Text()` | Get plain screen text |
 | `page.Lines()` | Get screen as lines |
 | `page.MouseClick(x, y)` | Click a cell |
+| `page.MouseDown(button, x, y)` / `MouseUp` | Inject SGR button press/release; buttons 0=left, 1=middle, 2=right |
+| `page.MouseMove(x, y)` | Inject hover or drag motion |
+| `app.Resize(cols, rows)` | Resize up to 4096×4096 and 1,048,576 cells total |
 | `page.MouseScrollUp(x, y)` | Scroll wheel up |
 | `page.MouseScrollDown(x, y)` | Scroll wheel down |
 | `page.EnableMouse()` | Совместимый no-op: режим мыши задаёт само TUI-приложение |

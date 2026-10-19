@@ -67,10 +67,9 @@ func cmdPress(session *Session, args []string) (string, error) {
 	}
 
 	key := strings.Join(args, " ")
-	if err := session.Page.Press(key); err != nil {
+	if err := session.Page.PressContext(session.context(), key); err != nil {
 		return "", err
 	}
-	time.Sleep(100 * time.Millisecond)
 	return fmt.Sprintf("Pressed %q", key), nil
 }
 
@@ -83,10 +82,9 @@ func cmdType(session *Session, args []string) (string, error) {
 	}
 
 	text := strings.Join(args, " ")
-	if err := session.Page.Type(text); err != nil {
+	if err := session.Page.TypeContext(session.context(), text); err != nil {
 		return "", err
 	}
-	time.Sleep(100 * time.Millisecond)
 	return fmt.Sprintf("Typed %q", text), nil
 }
 
@@ -112,10 +110,7 @@ func cmdLines(session *Session, args []string) (string, error) {
 
 	var b strings.Builder
 	for i, line := range lines {
-		display := line
-		if len(display) > 80 {
-			display = display[:80] + "..."
-		}
+		display := truncateDisplayWidth(line, 80)
 		b.WriteString(fmt.Sprintf("[%2d] %s\n", i, display))
 	}
 	return b.String(), nil
@@ -184,10 +179,9 @@ func cmdClick(session *Session, args []string) (string, error) {
 		}
 
 		x, y := el.Bounds.Center()
-		if err := session.Page.MouseClick(x, y); err != nil {
+		if err := session.Page.MouseClickContext(session.context(), x, y); err != nil {
 			return "", err
 		}
-		time.Sleep(100 * time.Millisecond)
 		return fmt.Sprintf("Clicked <%s> %q at (%d, %d)", el.Role, el.Name, x, y), nil
 	}
 
@@ -205,10 +199,9 @@ func cmdClick(session *Session, args []string) (string, error) {
 		return "", fmt.Errorf("invalid y: %q", args[1])
 	}
 
-	if err := session.Page.MouseClick(x, y); err != nil {
+	if err := session.Page.MouseClickContext(session.context(), x, y); err != nil {
 		return "", err
 	}
-	time.Sleep(100 * time.Millisecond)
 	return fmt.Sprintf("Clicked at (%d, %d)", x, y), nil
 }
 
@@ -232,18 +225,17 @@ func cmdScroll(session *Session, args []string) (string, error) {
 
 	switch direction {
 	case "up":
-		if err := session.Page.MouseScrollUp(x, y); err != nil {
+		if err := session.Page.MouseScrollUpContext(session.context(), x, y); err != nil {
 			return "", err
 		}
 	case "down":
-		if err := session.Page.MouseScrollDown(x, y); err != nil {
+		if err := session.Page.MouseScrollDownContext(session.context(), x, y); err != nil {
 			return "", err
 		}
 	default:
 		return "", fmt.Errorf("direction must be 'up' or 'down', got %q", direction)
 	}
 
-	time.Sleep(100 * time.Millisecond)
 	return fmt.Sprintf("Scrolled %s at (%d, %d)", direction, x, y), nil
 }
 
@@ -267,11 +259,11 @@ func cmdMouse(session *Session, args []string) (string, error) {
 
 	switch action {
 	case "down":
-		if err := session.Page.MouseDown(0, x, y); err != nil {
+		if err := session.Page.MouseDownContext(session.context(), 0, x, y); err != nil {
 			return "", err
 		}
 	case "up":
-		if err := session.Page.MouseUp(0, x, y); err != nil {
+		if err := session.Page.MouseUpContext(session.context(), 0, x, y); err != nil {
 			return "", err
 		}
 	default:
@@ -403,13 +395,22 @@ func cmdWait(session *Session, args []string) (string, error) {
 		return "", fmt.Errorf("usage: wait <ms>")
 	}
 
-	ms, err := strconv.Atoi(args[0])
+	ms, err := strconv.ParseInt(args[0], 10, 64)
 	if err != nil {
 		return "", fmt.Errorf("invalid ms: %q", args[0])
 	}
-
-	time.Sleep(time.Duration(ms) * time.Millisecond)
-	return fmt.Sprintf("Waited %dms", ms), nil
+	maxMilliseconds := int64(maxCommandDuration / time.Millisecond)
+	if ms < 0 || ms > maxMilliseconds {
+		return "", fmt.Errorf("wait duration must be between 0 and %d ms", maxMilliseconds)
+	}
+	timer := time.NewTimer(time.Duration(ms) * time.Millisecond)
+	defer timer.Stop()
+	select {
+	case <-session.context().Done():
+		return "", session.context().Err()
+	case <-timer.C:
+		return fmt.Sprintf("Waited %dms", ms), nil
+	}
 }
 
 func cmdWaitFor(session *Session, args []string) (string, error) {
@@ -422,19 +423,42 @@ func cmdWaitFor(session *Session, args []string) (string, error) {
 	timeout := 5 * time.Second
 	textArgs := args
 	if len(args) > 1 {
-		if milliseconds, err := strconv.Atoi(args[len(args)-1]); err == nil {
-			if milliseconds <= 0 {
-				return "", fmt.Errorf("timeout must be positive")
+		last := args[len(args)-1]
+		milliseconds, err := strconv.ParseInt(last, 10, 64)
+		if err == nil {
+			maxMilliseconds := int64(maxCommandDuration / time.Millisecond)
+			if milliseconds <= 0 || milliseconds > maxMilliseconds {
+				return "", fmt.Errorf("timeout must be between 1 and %d ms", maxMilliseconds)
 			}
 			timeout = time.Duration(milliseconds) * time.Millisecond
 			textArgs = args[:len(args)-1]
+		} else if isIntegerToken(last) {
+			return "", fmt.Errorf("invalid timeout: %q", last)
 		}
 	}
 	text := strings.Join(textArgs, " ")
-	if err := session.Page.WaitFor(text, timeout); err != nil {
+	if err := session.Page.WaitForContext(session.context(), text, timeout); err != nil {
 		return "", err
 	}
 	return fmt.Sprintf("Found %q", text), nil
+}
+
+func isIntegerToken(value string) bool {
+	if value == "" {
+		return false
+	}
+	if value[0] == '+' || value[0] == '-' {
+		value = value[1:]
+	}
+	if value == "" {
+		return false
+	}
+	for _, r := range value {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func cmdExpect(session *Session, args []string) (string, error) {
@@ -510,8 +534,8 @@ func cmdHelp(session *Session, args []string) (string, error) {
   node                        — show node tree (screen structure) or element tree (if HTTP available)
   save [name]                 — save artifacts (render.txt + state.json)
   resize <cols> <rows>        — resize terminal
-  wait <ms>                   — wait for N milliseconds
-  waitfor <text> [timeout-ms] — wait until text appears on screen
+  wait <ms>                   — wait 0..60000 milliseconds
+  waitfor <text> [timeout-ms] — wait up to 60000ms for screen text
   expect <contain|not> <text> — assert text on screen
   close                       — close the current app
   show                        — show dashboard of all sessions
@@ -524,7 +548,7 @@ func cmdHelp(session *Session, args []string) (string, error) {
 // makeCmdShow returns a CommandHandler that shows all sessions.
 func makeCmdShow(sm *SessionManager) CommandHandler {
 	return func(session *Session, args []string) (string, error) {
-		sessions := sm.List()
+		sessions := sm.Snapshots()
 		if len(sessions) == 0 {
 			return "No active sessions", nil
 		}
@@ -533,34 +557,24 @@ func makeCmdShow(sm *SessionManager) CommandHandler {
 		b.WriteString(fmt.Sprintf("Active sessions (%d):\n", len(sessions)))
 		b.WriteString("──────────────────────────────────────────────────\n")
 
-		for _, name := range sessions {
-			s, ok := sm.Get(name)
+		for _, snapshot := range sessions {
 			status := "● running"
-			if !ok || s.App == nil {
+			if !snapshot.Running {
 				status = "○ idle"
 			}
+			b.WriteString(fmt.Sprintf("  %-20s %s\n", snapshot.Name, status))
 
-			b.WriteString(fmt.Sprintf("  %-20s %s\n", name, status))
-
-			// Show snapshot if app is running
-			if ok && s.App != nil {
-				text, err := s.Page.Text()
-				if err == nil {
-					lines := strings.Split(text, "\n")
-					maxLines := 5
-					if len(lines) < maxLines {
-						maxLines = len(lines)
-					}
-					for i := 0; i < maxLines; i++ {
-						line := lines[i]
-						if len(line) > 60 {
-							line = line[:60]
-						}
-						b.WriteString(fmt.Sprintf("    │ %s\n", line))
-					}
-					if len(lines) > maxLines {
-						b.WriteString(fmt.Sprintf("    │ ... (%d more lines)\n", len(lines)-maxLines))
-					}
+			if snapshot.Running {
+				lines := strings.Split(snapshot.Text, "\n")
+				maxLines := 5
+				if len(lines) < maxLines {
+					maxLines = len(lines)
+				}
+				for i := 0; i < maxLines; i++ {
+					b.WriteString(fmt.Sprintf("    │ %s\n", truncateDisplayWidth(lines[i], 60)))
+				}
+				if len(lines) > maxLines {
+					b.WriteString(fmt.Sprintf("    │ ... (%d more lines)\n", len(lines)-maxLines))
 				}
 			}
 			b.WriteString("\n")
@@ -573,19 +587,18 @@ func makeCmdShow(sm *SessionManager) CommandHandler {
 // makeCmdList returns a CommandHandler that lists all sessions.
 func makeCmdList(sm *SessionManager) CommandHandler {
 	return func(session *Session, args []string) (string, error) {
-		sessions := sm.List()
+		sessions := sm.Snapshots()
 		if len(sessions) == 0 {
 			return "No active sessions", nil
 		}
 
 		var b strings.Builder
-		for _, name := range sessions {
-			s, ok := sm.Get(name)
+		for _, snapshot := range sessions {
 			status := "running"
-			if !ok || s.App == nil {
+			if !snapshot.Running {
 				status = "idle"
 			}
-			b.WriteString(fmt.Sprintf("  %s  (%s)\n", name, status))
+			b.WriteString(fmt.Sprintf("  %s  (%s)\n", snapshot.Name, status))
 		}
 
 		return b.String(), nil

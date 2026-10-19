@@ -1,6 +1,7 @@
 package cue
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sync"
@@ -17,6 +18,16 @@ type ScreenSnapshot struct {
 	Text      string
 	CursorRow int
 	CursorCol int
+}
+
+// TerminalSnapshot includes terminal dimensions and cells from the same frame.
+type TerminalSnapshot struct {
+	Cols      int
+	Rows      int
+	Text      string
+	CursorRow int
+	CursorCol int
+	Cells     []ansi.Cell
 }
 
 // App represents a running TUI application.
@@ -59,7 +70,9 @@ func Launch(command string, opts ...Option) (*App, error) {
 		timeoutDone: make(chan struct{}),
 	}
 	app.parser.SetResponseCallback(func(response []byte) {
-		_, _ = app.backend.Write(response)
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		_ = app.writeContext(ctx, response)
 	})
 	if o.Timeout > 0 {
 		app.timeout = time.NewTimer(o.Timeout)
@@ -74,6 +87,9 @@ func (a *App) Page() *Page { return &Page{app: a, dragBtn: -1} }
 
 // Resize changes terminal dimensions.
 func (a *App) Resize(cols, rows int) error {
+	if err := pty.ValidateSize(cols, rows); err != nil {
+		return err
+	}
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if err := a.backend.Resize(cols, rows); err != nil {
@@ -92,6 +108,9 @@ func (a *App) Close() error {
 	})
 	return a.closeErr
 }
+
+// ProcessState returns the reaped child process state, or nil before Wait/Close completes.
+func (a *App) ProcessState() *os.ProcessState { return a.backend.ProcessState() }
 
 // Wait blocks until the process exits and the PTY reader has stopped.
 func (a *App) Wait() error {
@@ -149,13 +168,20 @@ func (a *App) appendRawLog(data []byte) {
 	a.rawLog = append(a.rawLog, data...)
 }
 
-func (a *App) write(data []byte) error {
-	_, err := a.backend.Write(data)
+func (a *App) writeContext(ctx context.Context, data []byte) error {
+	_, err := a.backend.WriteContext(ctx, data)
+	if err != nil && ctx.Err() != nil && a.backend.ProcessState() != nil {
+		a.stopTimeout()
+	}
 	return err
 }
 
 // RenderText returns a consistent plain-text screen snapshot.
-func (a *App) RenderText() string { return a.Snapshot().Text }
+func (a *App) RenderText() string {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	return a.screen.RenderText()
+}
 
 // Snapshot captures rendered text and cursor position under one lock.
 func (a *App) Snapshot() ScreenSnapshot {
@@ -169,10 +195,24 @@ func (a *App) Snapshot() ScreenSnapshot {
 	}
 }
 
+// TerminalSnapshot captures text, dimensions, cursor, and cells under one lock.
+func (a *App) TerminalSnapshot() TerminalSnapshot {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	text, cells := a.screen.Snapshot()
+	cursor := a.screen.CurrentCursor()
+	return TerminalSnapshot{
+		Cols: a.screen.Cols(), Rows: a.screen.Rows(), Text: text,
+		CursorRow: cursor.Row, CursorCol: cursor.Col, Cells: cells,
+	}
+}
+
 // CursorPosition returns a consistent cursor snapshot.
 func (a *App) CursorPosition() (row, col int) {
-	snapshot := a.Snapshot()
-	return snapshot.CursorRow, snapshot.CursorCol
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	cursor := a.screen.CurrentCursor()
+	return cursor.Row, cursor.Col
 }
 
 func (a *App) validateCoordinates(x, y int) error {

@@ -66,6 +66,31 @@ func (s *Screen) SwitchAltBuffer(use bool) {
 	}
 }
 
+// Snapshot returns rendered text and a flat copy of visible cells from the same frame.
+func (s *Screen) Snapshot() (string, []Cell) {
+	rows := s.CellsSnapshot()
+	cells := make([]Cell, 0, s.Rows()*s.Cols())
+	var out strings.Builder
+	for row, line := range rows {
+		if row > 0 {
+			out.WriteByte('\n')
+		}
+		cells = append(cells, line...)
+		for _, cell := range line {
+			if cell.Continuation {
+				continue
+			}
+			if cell.Rune == 0 {
+				out.WriteByte(' ')
+			} else {
+				out.WriteRune(cell.Rune)
+				out.WriteString(cell.Combining)
+			}
+		}
+	}
+	return out.String(), cells
+}
+
 // RenderText renders visible cells as plain text.
 func (s *Screen) RenderText() string {
 	cells := s.CellsSnapshot()

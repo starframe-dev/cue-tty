@@ -64,12 +64,9 @@ func ResolveKey(key string) []byte {
 // MouseSGR encodes a mouse event using the SGR extended protocol.
 // button: 0=left, 1=middle, 2=right, 64=scrollUp, 65=scrollDown.
 // x, y are 0-based cell coordinates.
-// release=true sends button-up.
+// release=true sends button-up using the same button code with the SGR `m` suffix.
 func MouseSGR(button, x, y int, release bool) []byte {
 	b := byte(button)
-	if release {
-		b = 0 // release button is always 0 in SGR 1006
-	}
 	suffix := byte('M')
 	if release {
 		suffix = 'm'
