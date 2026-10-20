@@ -289,13 +289,18 @@ func cmdNode(session *Session, args []string) (string, error) {
 		return "", fmt.Errorf("no app running in session %q", session.Name)
 	}
 
-	// If HTTP element tree is available, show that instead
 	if session.HTTPAddr != "" {
-		elems, err := FetchElementsWithToken(session.HTTPAddr, session.httpToken)
-		if err != nil {
-			return "", fmt.Errorf("fetch element tree: %w", err)
+		elems, receivedHTTPResponse, err := fetchElementsWithToken(session.HTTPAddr, session.httpToken)
+		if receivedHTTPResponse {
+			session.confirmInspector()
 		}
-		return "Element tree:\n" + RenderElementTree(elems, ""), nil
+		if err != nil {
+			if receivedHTTPResponse || session.hasConfirmedInspector() {
+				return "", fmt.Errorf("fetch element tree: %w", err)
+			}
+		} else if receivedHTTPResponse {
+			return "Element tree:\n" + RenderElementTree(elems, ""), nil
+		}
 	}
 
 	nt, err := BuildNodeTree(session.Page)
@@ -500,8 +505,6 @@ func cmdCloseSession(session *Session, args []string) (string, error) {
 	if err := session.Close(); err != nil {
 		return "", err
 	}
-	session.App = nil
-	session.Page = nil
 	return "Session closed", nil
 }
 
@@ -510,9 +513,6 @@ func cmdExit(session *Session, args []string) (string, error) {
 		if err := session.Close(); err != nil {
 			return "", err
 		}
-		session.App = nil
-		session.Page = nil
-		session.HTTPAddr = ""
 	}
 	return "Session closed", nil
 }

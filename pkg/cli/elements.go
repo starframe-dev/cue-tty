@@ -38,8 +38,15 @@ func FetchElements(httpAddr string) ([]RemoteElement, error) {
 
 // FetchElementsWithToken fetches an element tree using an optional bearer token.
 func FetchElementsWithToken(httpAddr, token string) ([]RemoteElement, error) {
+	elements, _, err := fetchElementsWithToken(httpAddr, token)
+	return elements, err
+}
+
+// fetchElementsWithToken reports whether the endpoint returned an HTTP response,
+// including error status codes and malformed response bodies.
+func fetchElementsWithToken(httpAddr, token string) ([]RemoteElement, bool, error) {
 	if httpAddr == "" {
-		return nil, fmt.Errorf("no HTTP address configured")
+		return nil, false, fmt.Errorf("no HTTP address configured")
 	}
 
 	baseURL := strings.TrimRight(httpAddr, "/")
@@ -57,7 +64,7 @@ func FetchElementsWithToken(httpAddr, token string) ([]RemoteElement, error) {
 	for {
 		request, requestErr := http.NewRequest(http.MethodGet, url, nil)
 		if requestErr != nil {
-			return nil, fmt.Errorf("create elements request: %w", requestErr)
+			return nil, false, fmt.Errorf("create elements request: %w", requestErr)
 		}
 		if token != "" {
 			request.Header.Set("Authorization", "Bearer "+token)
@@ -69,28 +76,28 @@ func FetchElementsWithToken(httpAddr, token string) ([]RemoteElement, error) {
 		time.Sleep(50 * time.Millisecond)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("fetch elements: %w", err)
+		return nil, false, fmt.Errorf("fetch elements: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		return nil, fmt.Errorf("fetch elements: HTTP status %s", resp.Status)
+		return nil, true, fmt.Errorf("fetch elements: HTTP status %s", resp.Status)
 	}
 
 	const maxResponseBytes = 1 << 20
 	body, err := io.ReadAll(io.LimitReader(resp.Body, maxResponseBytes+1))
 	if err != nil {
-		return nil, fmt.Errorf("read response: %w", err)
+		return nil, true, fmt.Errorf("read response: %w", err)
 	}
 	if len(body) > maxResponseBytes {
-		return nil, fmt.Errorf("elements response exceeds %d bytes", maxResponseBytes)
+		return nil, true, fmt.Errorf("elements response exceeds %d bytes", maxResponseBytes)
 	}
 
 	var elements []RemoteElement
 	if err := json.Unmarshal(body, &elements); err != nil {
-		return nil, fmt.Errorf("parse elements: %w", err)
+		return nil, true, fmt.Errorf("parse elements: %w", err)
 	}
 
-	return elements, nil
+	return elements, true, nil
 }
 
 // FindElement recursively searches elements for the first matching role/name/action.

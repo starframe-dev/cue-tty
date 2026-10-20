@@ -190,6 +190,51 @@ func TestConcurrentShowListLaunchClose(t *testing.T) {
 	}
 }
 
+func TestShowListDoNotWaitForLongRunningCommand(t *testing.T) {
+	d := NewDaemon()
+	defer d.sm.CloseAll()
+	for _, name := range []string{"long-wait", "other-session"} {
+		response := callDaemonCommand(t, d, DaemonRequest{Session: name, Command: "launch", Args: []string{"sleep", "30"}})
+		if response.Error != "" {
+			t.Fatalf("launch %s: %s", name, response.Error)
+		}
+	}
+
+	waitResult := make(chan DaemonResponse, 1)
+	go func() {
+		waitResult <- callDaemonCommand(t, d, DaemonRequest{Session: "long-wait", Command: "wait", Args: []string{"60000"}})
+	}()
+	waitingSession, _ := d.sm.Get("long-wait")
+	waitForActiveCommand(t, waitingSession)
+
+	for _, command := range []string{"show", "list"} {
+		started := time.Now()
+		response := callDaemonCommand(t, d, DaemonRequest{Command: command})
+		if elapsed := time.Since(started); elapsed > time.Second {
+			t.Fatalf("%s blocked for %s behind wait 60000", command, elapsed)
+		}
+		if response.Error != "" {
+			t.Fatalf("%s failed: %s", command, response.Error)
+		}
+		if !strings.Contains(response.Output, "long-wait") || !strings.Contains(response.Output, "other-session") {
+			t.Fatalf("%s omitted sessions while wait was active: %s", command, response.Output)
+		}
+	}
+
+	response := callDaemonCommand(t, d, DaemonRequest{Session: "long-wait", Command: "close"})
+	if response.Error != "" {
+		t.Fatalf("close long-wait session: %s", response.Error)
+	}
+	select {
+	case result := <-waitResult:
+		if result.Error == "" {
+			t.Fatal("wait 60000 unexpectedly completed instead of being canceled")
+		}
+	case <-time.After(3 * time.Second):
+		t.Fatal("wait 60000 did not stop after close")
+	}
+}
+
 func TestDaemonCloseCancelsBlockedPTYInput(t *testing.T) {
 	d := NewDaemon()
 	defer d.sm.CloseAll()

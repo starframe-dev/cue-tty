@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
@@ -75,6 +77,99 @@ func TestBuildNodeTreePreservesUnicodeDimensionsCellsAndStyles(t *testing.T) {
 	}
 	if !tree.Cells[0].Bold || tree.Cells[0].FG == "" {
 		t.Fatalf("cell style was not exported: %+v", tree.Cells[0])
+	}
+}
+
+func TestCmdNodeFallsBackForOrdinaryTUI(t *testing.T) {
+	session := &Session{Name: "ordinary"}
+	if err := session.Launch("sh", "-c", "printf 'ordinary screen\\n'; exec sleep 30"); err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+	if err := session.Page.WaitFor("ordinary screen", 2*time.Second); err != nil {
+		t.Fatal(err)
+	}
+
+	started := time.Now()
+	output, err := cmdNode(session, nil)
+	if err != nil {
+		t.Fatalf("node for ordinary TUI: %v", err)
+	}
+	if elapsed := time.Since(started); elapsed > 4*time.Second {
+		t.Fatalf("node fallback took %s", elapsed)
+	}
+	if !strings.Contains(output, "Screen 80x24") || !strings.Contains(output, "ordinary screen") {
+		t.Fatalf("node did not return screen tree: %s", output)
+	}
+	if session.hasConfirmedInspector() {
+		t.Fatal("silent non-Warp listener was marked as an available inspector")
+	}
+}
+
+func TestCmdNodeUsesConfirmedElementEndpointAndPreservesErrors(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer test-token" {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		if r.URL.Path != "/elements" {
+			http.NotFound(w, r)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`[{"role":"button","name":"Add","bounds":{"x":1,"y":2,"w":3,"h":4}}]`))
+	}))
+
+	session := &Session{Name: "warp", HTTPAddr: server.URL, httpToken: "test-token"}
+	app, err := cue.Launch("sleep", cue.WithArgs("30"))
+	if err != nil {
+		server.Close()
+		t.Fatal(err)
+	}
+	session.App = app
+	session.Page = app.Page()
+	defer session.Close()
+	defer server.Close()
+
+	output, err := cmdNode(session, nil)
+	if err != nil {
+		t.Fatalf("node for working inspector: %v", err)
+	}
+	if !strings.Contains(output, "Element tree:") || !strings.Contains(output, `<button> "Add"`) {
+		t.Fatalf("node did not return element tree: %s", output)
+	}
+	if !session.hasConfirmedInspector() {
+		t.Fatal("successful HTTP response did not confirm inspector availability")
+	}
+
+	server.Close()
+	output, err = cmdNode(session, nil)
+	if err == nil || !strings.Contains(err.Error(), "fetch element tree") {
+		t.Fatalf("node after confirmed inspector failed without diagnostic: output=%q err=%v", output, err)
+	}
+	if strings.Contains(output, "Screen ") {
+		t.Fatalf("node hid a confirmed inspector failure with screen fallback: %s", output)
+	}
+}
+
+func TestCmdNodeReportsHTTPElementEndpointError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Error(w, "inspector failed", http.StatusInternalServerError)
+	}))
+	defer server.Close()
+
+	app, err := cue.Launch("sleep", cue.WithArgs("30"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer app.Close()
+	session := &Session{App: app, Page: app.Page(), HTTPAddr: server.URL, httpToken: "token"}
+	output, err := cmdNode(session, nil)
+	if err == nil || !strings.Contains(err.Error(), "HTTP status 500") {
+		t.Fatalf("node error = %v, want HTTP 500 diagnostic", err)
+	}
+	if strings.Contains(output, "Screen ") {
+		t.Fatalf("HTTP inspector error was hidden by screen fallback: %s", output)
 	}
 }
 

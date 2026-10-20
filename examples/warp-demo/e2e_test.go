@@ -188,6 +188,41 @@ func TestSessionIsolation(t *testing.T) {
 	cuetty(t, sessionB, "exit")
 }
 
+// TestSessionIsolationBetweenWarpAndOrdinaryTUI verifies that reserved inspector
+// listeners do not make ordinary terminal applications look like Warp.
+func TestSessionIsolationBetweenWarpAndOrdinaryTUI(t *testing.T) {
+	binPath := buildDemoApp(t)
+	warpSession := "warp-mixed-" + t.Name()
+	plainSession := "plain-mixed-" + t.Name()
+	t.Cleanup(func() {
+		for _, session := range []string{warpSession, plainSession} {
+			_ = exec.Command("cuetty-cli", "-s", session, "exit").Run()
+		}
+	})
+
+	cuetty(t, warpSession, "launch", binPath)
+	cuetty(t, warpSession, "waitfor", "Warp Demo", "3000")
+	cuetty(t, plainSession, "launch", "sh", "-c", "printf 'Ordinary TUI ready'; exec sleep 30")
+	cuetty(t, plainSession, "waitfor", "Ordinary TUI ready", "3000")
+
+	warpTree := cuetty(t, warpSession, "node")
+	if !strings.Contains(warpTree, "Element tree:") || !strings.Contains(warpTree, `<header> "Warp Demo"`) {
+		t.Fatalf("Warp node did not return its element tree: %s", warpTree)
+	}
+	plainTree := cuetty(t, plainSession, "node")
+	if !strings.Contains(plainTree, "Screen 80x24") || !strings.Contains(plainTree, "Ordinary TUI ready") {
+		t.Fatalf("ordinary TUI node did not return its screen tree: %s", plainTree)
+	}
+	if strings.Contains(plainTree, "Element tree:") {
+		t.Fatalf("ordinary TUI was misidentified as Warp: %s", plainTree)
+	}
+
+	listing := cuetty(t, "", "list")
+	if !strings.Contains(listing, warpSession) || !strings.Contains(listing, plainSession) {
+		t.Fatalf("list omitted independent sessions: %s", listing)
+	}
+}
+
 // TestSaveArtifact verifies that save creates render.txt and state.json.
 func TestSaveArtifact(t *testing.T) {
 	binPath := buildDemoApp(t)

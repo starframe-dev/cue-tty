@@ -271,14 +271,14 @@ func (d *Daemon) handleCommand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if !d.sm.IsCurrent(req.Session, session) {
-		session.mu.Unlock()
+		session.commandMu.Unlock()
 		writeError(w, fmt.Errorf("session %q was closed", req.Session))
 		return
 	}
 	session.beginCommand(ctx, cancel)
 	defer func() {
 		session.endCommand()
-		session.mu.Unlock()
+		session.commandMu.Unlock()
 	}()
 	session.WorkDir = req.WorkDir
 	result, err := runCommandArgs(session, commands, req.Command, req.Args)

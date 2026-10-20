@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -48,33 +49,21 @@ func main() {
 }
 
 func run(args []string) error {
-	session := "default"
-	command := make([]string, 0, len(args))
-	for i := 0; i < len(args); i++ {
-		arg := args[i]
-		switch {
-		case arg == "-s" || arg == "--session":
-			if i+1 >= len(args) {
-				return fmt.Errorf("%s requires a session name", arg)
-			}
-			i++
-			session = args[i]
-		case len(arg) > 3 && arg[:3] == "-s=":
-			session = arg[3:]
-		case len(arg) > 10 && arg[:10] == "--session=":
-			session = arg[10:]
-		default:
-			command = append(command, arg)
-		}
-	}
+	return runWithSender(args, cli.SendCommand)
+}
 
+func runWithSender(args []string, send func(string, string, []string) (string, error)) error {
+	session, command, err := parseCLIArgs(args)
+	if err != nil {
+		return err
+	}
 	if len(command) == 0 {
 		return cli.Run(session)
 	}
 
 	if command[0] == "daemon" {
 		if len(command) > 1 && command[1] == "stop" {
-			output, err := cli.SendCommand(session, "stop", nil)
+			output, err := send(session, "stop", nil)
 			if err == nil {
 				fmt.Println(output)
 			}
@@ -83,7 +72,7 @@ func run(args []string) error {
 		return runDaemon()
 	}
 
-	output, err := cli.SendCommand(session, command[0], command[1:])
+	output, err := send(session, command[0], command[1:])
 	if err != nil {
 		return err
 	}
@@ -91,4 +80,30 @@ func run(args []string) error {
 		fmt.Println(output)
 	}
 	return nil
+}
+
+func parseCLIArgs(args []string) (string, []string, error) {
+	session := "default"
+	for i := 0; i < len(args); {
+		arg := args[i]
+		switch {
+		case arg == "--":
+			return session, append([]string(nil), args[i+1:]...), nil
+		case arg == "-s" || arg == "--session":
+			if i+1 >= len(args) {
+				return "", nil, fmt.Errorf("%s requires a session name", arg)
+			}
+			session = args[i+1]
+			i += 2
+		case strings.HasPrefix(arg, "-s="):
+			session = arg[len("-s="):]
+			i++
+		case strings.HasPrefix(arg, "--session="):
+			session = arg[len("--session="):]
+			i++
+		default:
+			return session, append([]string(nil), args[i:]...), nil
+		}
+	}
+	return session, nil, nil
 }

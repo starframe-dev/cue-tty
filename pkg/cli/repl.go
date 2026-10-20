@@ -16,37 +16,8 @@ func Run(sessionName string) error {
 	session := sm.GetOrCreate(sessionName)
 	commands := Commands(sm)
 
-	// Check if there are inline commands (non-interactive mode)
-	args := os.Args[1:]
-	// Filter out the -s flag and its value
-	filtered := make([]string, 0, len(args))
-	skipNext := false
-	for _, arg := range args {
-		if skipNext {
-			skipNext = false
-			continue
-		}
-		if arg == "-s" {
-			skipNext = true
-			continue
-		}
-		if strings.HasPrefix(arg, "-s=") {
-			continue
-		}
-		filtered = append(filtered, arg)
-	}
-
-	// If there are positional args, run them as a command
-	if len(filtered) > 0 {
-		result, err := runCommand(session, commands, strings.Join(filtered, " "))
-		if err != nil {
-			return err
-		}
-		fmt.Println(result)
-		return nil
-	}
-
-	// Interactive REPL mode
+	// Interactive REPL mode. Global flags and inline commands are handled by
+	// the CLI entry point; do not reinterpret os.Args here.
 	fmt.Printf("cue-tty> session %q ready. Type 'help' for commands.\n", sessionName)
 
 	scanner := bufio.NewScanner(os.Stdin)

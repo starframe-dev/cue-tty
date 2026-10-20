@@ -17,16 +17,18 @@ import (
 
 // Session represents a named TUI session.
 type Session struct {
-	Name           string
-	App            *cue.App
-	Page           *cue.Page
-	HTTPAddr       string // HTTP address of the app's element tree API
-	httpToken      string // per-session bearer token for the element tree API
-	WorkDir        string // working directory of the client (for save/artifacts)
-	mu             sync.Mutex
-	cancelMu       sync.Mutex
-	activeCancel   context.CancelFunc
-	commandContext context.Context
+	Name               string
+	App                *cue.App
+	Page               *cue.Page
+	HTTPAddr           string     // reserved HTTP listener address for the child process
+	httpToken          string     // per-session bearer token for the element tree API
+	WorkDir            string     // working directory of the client (for save/artifacts)
+	commandMu          sync.Mutex // serializes commands for this session
+	stateMu            sync.RWMutex
+	inspectorConfirmed bool
+	cancelMu           sync.Mutex
+	activeCancel       context.CancelFunc
+	commandContext     context.Context
 }
 
 // SessionManager manages named sessions.
@@ -119,8 +121,8 @@ func (sm *SessionManager) Close(name string) error {
 	}
 
 	s.cancelCurrent()
-	s.mu.Lock()
-	defer s.mu.Unlock()
+	s.commandMu.Lock()
+	defer s.commandMu.Unlock()
 	sm.mu.Lock()
 	if sm.sessions[name] == s {
 		delete(sm.sessions, name)
@@ -150,12 +152,14 @@ func (sm *SessionManager) CloseAll() []error {
 // Launch starts a TUI application in the session. Warp-compatible apps receive
 // an already-bound loopback listener on descriptor 3, avoiding a port rebind race.
 func (s *Session) Launch(command string, args ...string) error {
-	if s.App != nil {
+	s.stateMu.RLock()
+	appRunning := s.App != nil
+	s.stateMu.RUnlock()
+	if appRunning {
 		return fmt.Errorf("app already running in session %q, use close first", s.Name)
 	}
 
-	s.HTTPAddr = ""
-	s.httpToken = ""
+	s.setInspectorState("", "", false)
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		return fmt.Errorf("reserve HTTP inspector listener: %w", err)
@@ -178,8 +182,7 @@ func (s *Session) Launch(command string, args ...string) error {
 		return fmt.Errorf("generate HTTP inspector token: %w", err)
 	}
 	port := tcpListener.Addr().(*net.TCPAddr).Port
-	s.httpToken = token
-	s.HTTPAddr = "http://localhost:" + strconv.Itoa(port)
+	s.setInspectorState("http://localhost:"+strconv.Itoa(port), token, false)
 
 	opts := []cue.Option{
 		cue.WithArgs(args...),
@@ -197,15 +200,37 @@ func (s *Session) Launch(command string, args ...string) error {
 
 	app, err := cue.Launch(command, opts...)
 	if err != nil {
-		s.HTTPAddr = ""
-		s.httpToken = ""
+		s.setInspectorState("", "", false)
 		return fmt.Errorf("launch: %w", err)
 	}
 
+	s.stateMu.Lock()
 	s.App = app
 	s.Page = app.Page()
+	s.stateMu.Unlock()
 	return nil
 }
+
+func (s *Session) setInspectorState(addr, token string, confirmed bool) {
+	s.stateMu.Lock()
+	s.HTTPAddr = addr
+	s.httpToken = token
+	s.inspectorConfirmed = confirmed
+	s.stateMu.Unlock()
+}
+
+func (s *Session) confirmInspector() {
+	s.stateMu.Lock()
+	s.inspectorConfirmed = true
+	s.stateMu.Unlock()
+}
+
+func (s *Session) hasConfirmedInspector() bool {
+	s.stateMu.RLock()
+	defer s.stateMu.RUnlock()
+	return s.inspectorConfirmed
+}
+
 func newHTTPToken() (string, error) {
 	var token [32]byte
 	if _, err := rand.Read(token[:]); err != nil {
@@ -221,7 +246,7 @@ func (s *Session) lockContext(ctx context.Context) error {
 		if err := ctx.Err(); err != nil {
 			return err
 		}
-		if s.mu.TryLock() {
+		if s.commandMu.TryLock() {
 			return nil
 		}
 		select {
@@ -236,14 +261,14 @@ func (s *Session) beginCommand(ctx context.Context, cancel context.CancelFunc) {
 	s.cancelMu.Lock()
 	s.activeCancel = cancel
 	s.cancelMu.Unlock()
-	s.commandContext = ctx // caller holds s.mu
+	s.commandContext = ctx // caller holds commandMu
 }
 
 func (s *Session) endCommand() {
 	s.cancelMu.Lock()
 	s.activeCancel = nil
 	s.cancelMu.Unlock()
-	s.commandContext = nil // caller holds s.mu
+	s.commandContext = nil // caller holds commandMu
 }
 
 func (s *Session) cancelCurrent() {
@@ -262,29 +287,31 @@ func (s *Session) context() context.Context {
 	return context.Background()
 }
 
-// Snapshot returns status and screen text under the session lock.
+// Snapshot returns an immutable status and screen view without waiting for the
+// session command lock. The application snapshot has its own internal lock.
 func (s *Session) Snapshot() SessionSnapshot {
-	s.mu.Lock()
-	defer s.mu.Unlock()
-	snapshot := SessionSnapshot{Name: s.Name, Running: s.App != nil}
-	if s.App != nil {
-		snapshot.Text = s.App.Snapshot().Text
+	s.stateMu.RLock()
+	app := s.App
+	snapshot := SessionSnapshot{Name: s.Name, Running: app != nil}
+	s.stateMu.RUnlock()
+	if app != nil {
+		snapshot.Text = app.Snapshot().Text
 	}
 	return snapshot
 }
 
 // Close stops the application in this session.
 func (s *Session) Close() error {
-	if s.App == nil {
-		s.HTTPAddr = ""
-		s.httpToken = ""
-		s.Page = nil
-		return nil
-	}
+	s.stateMu.Lock()
 	app := s.App
 	s.App = nil
 	s.Page = nil
 	s.HTTPAddr = ""
 	s.httpToken = ""
+	s.inspectorConfirmed = false
+	s.stateMu.Unlock()
+	if app == nil {
+		return nil
+	}
 	return app.Close()
 }
