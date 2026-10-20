@@ -26,4 +26,4 @@
 - [x] Ошибки запуска закрывают parent listener/file через defer; Warp shutdown закрывает listener; тесты покрывают оба пути.
 - [x] Warp и cue-tty tidy/build/test/race/vet/govulncheck проходят локально; Warp E2E проходит на опубликованном v0.1.2.
 - [x] Warp `v0.1.2` опубликован. Warp hosted CI для Ubuntu/macOS/Windows и Go 1.22/1.26/1.27 зелёный.
-- [ ] cue-tty изменения отправлены; hosted Linux/macOS CI cue-tty зелёный.
+- [x] cue-tty изменения отправлены; hosted Linux/macOS CI зелёный.
