@@ -48,6 +48,12 @@ func ValidateSize(cols, rows int) error {
 
 // Start runs command with args inside a pseudo-terminal.
 func Start(command string, args []string, env []string, dir string, cols, rows int) (*Backend, error) {
+	return StartWithExtraFiles(command, args, env, dir, cols, rows, nil)
+}
+
+// StartWithExtraFiles runs command with files inherited at descriptors 3 and above.
+// Extra-file inheritance is supported on Unix platforms.
+func StartWithExtraFiles(command string, args []string, env []string, dir string, cols, rows int, extraFiles []*os.File) (*Backend, error) {
 	if err := ValidateSize(cols, rows); err != nil {
 		return nil, err
 	}
@@ -63,6 +69,7 @@ func Start(command string, args []string, env []string, dir string, cols, rows i
 	}
 	cmd := exec.Command(command, args...)
 	cmd.Env = env
+	cmd.ExtraFiles = extraFiles
 	if dir != "" {
 		cmd.Dir = dir
 	}

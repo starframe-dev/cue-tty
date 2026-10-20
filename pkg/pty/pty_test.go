@@ -1,6 +1,53 @@
 package pty
 
-import "testing"
+import (
+	"io"
+	"os"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestStartWithExtraFilesInheritsDescriptor(t *testing.T) {
+	reader, writer, err := os.Pipe()
+	if err != nil {
+		t.Fatal(err)
+	}
+	backend, err := StartWithExtraFiles("sh", []string{"-c", "cat <&3"}, os.Environ(), "", 80, 24, []*os.File{reader})
+	_ = reader.Close()
+	if err != nil {
+		_ = writer.Close()
+		t.Fatalf("StartWithExtraFiles failed: %v", err)
+	}
+	defer backend.Close()
+
+	if _, err := io.WriteString(writer, "listener-fd-ok\n"); err != nil {
+		_ = writer.Close()
+		t.Fatal(err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	readDone := make(chan []byte, 1)
+	go func() {
+		output, _ := io.ReadAll(backend)
+		readDone <- output
+	}()
+	var output []byte
+	select {
+	case output = <-readDone:
+	case <-time.After(5 * time.Second):
+		_ = backend.Close()
+		t.Fatal("child did not finish reading inherited descriptor")
+	}
+	if err := backend.Wait(); err != nil {
+		t.Fatalf("child process failed: %v; output=%q", err, output)
+	}
+	if !strings.Contains(string(output), "listener-fd-ok") {
+		t.Fatalf("child did not read inherited descriptor: %q", output)
+	}
+}
 
 func TestValidateSize(t *testing.T) {
 	tests := []struct {

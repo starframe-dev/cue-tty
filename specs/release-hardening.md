@@ -37,8 +37,8 @@
 Текущие `B/op`: StreamOutput 8,071/25,315; SnapshotRender 387,580/2,447,907. Существенной регрессии не видно.
 
 ## Остаточные блокеры
-- `Session.Launch` освобождает выбранный ephemeral port перед bind HTTP server в Warp child. Bearer token обнаруживает чужой endpoint, но не предотвращает редкую port-allocation race и ошибку старта; надёжное решение требует listener handoff/поддержки в Warp.
-- GitHub Actions matrix добавлен, но hosted Linux/macOS run для этого изменения не запускался.
+- Гонка порта устранена в Warp v0.1.2: cue-tty передаёт уже привязанный listener дочернему процессу через FD 3, Warp обслуживает его без повторного bind. Warp CI зелёный; cue-tty hosted matrix ещё ожидает push и выполнения.
+- В Warp dependency graph остаются только module/package-level advisories для невызываемых символов (`x/sys/windows` GO-2026-5024 и `x/text`); `govulncheck` не находит достижимых call paths. В cue-tty `x/sys` зафиксирован на исправленной v0.44.0.
 
 ## Критерии приёмки
 - [x] Root tidy/build/test/race/vet и Warp tidy/build/test/race/vet проходят на Go 1.26.9.
@@ -49,7 +49,7 @@
 - [x] Большие допустимые wait/waitfor deadline работают; отрицательные/overflow значения отклоняются; HTTP budgets согласованы.
 - [x] Mouse SGR releases, drag state, допустимость кнопок и координаты покрыты тестами.
 - [x] NodeTree размеры/ячейки/курсор берутся одним snapshot; wide и combining graphemes и styles проверены.
-- [x] Полный Warp E2E проходит локально на macOS; workflow покрывает Linux/macOS; Linux root и Warp cross-builds прошли.
+- [x] Полный Warp E2E с v0.1.2 проходит локально на macOS; workflow покрывает Linux/macOS; Linux root и Warp cross-builds прошли.
 - [x] Benchmarks выполнены; локальные результаты сверены с прежним M4 baseline.
-- [ ] Hosted Linux/macOS Actions CI зелёный (workflow обновлён, но в этом запуске hosted workflow не запускался).
-- [ ] Итоговый статус READY выставляется только после подтверждения всех критериев и hosted CI.
+- [ ] Hosted cue-tty Linux/macOS Actions CI зелёный (workflow запустится после push этой ветки).
+- [ ] Итоговый статус READY выставляется только после подтверждения всех критериев и hosted cue-tty CI.

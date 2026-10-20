@@ -4,7 +4,7 @@ go 1.26.9
 
 require (
 	github.com/charmbracelet/bubbletea v1.1.0
-	github.com/starframe-dev/warp v0.1.1
+	github.com/starframe-dev/warp v0.1.2
 )
 
 require (

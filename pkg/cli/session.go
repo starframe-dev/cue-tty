@@ -147,9 +147,8 @@ func (sm *SessionManager) CloseAll() []error {
 	return errs
 }
 
-// Launch starts a TUI application in the session.
-// If the app supports HTTP element tree (warp-based), cuetty-cli allocates
-// a free port and passes it via WARP_HTTP_PORT env variable.
+// Launch starts a TUI application in the session. Warp-compatible apps receive
+// an already-bound loopback listener on descriptor 3, avoiding a port rebind race.
 func (s *Session) Launch(command string, args ...string) error {
 	if s.App != nil {
 		return fmt.Errorf("app already running in session %q, use close first", s.Name)
@@ -157,30 +156,43 @@ func (s *Session) Launch(command string, args ...string) error {
 
 	s.HTTPAddr = ""
 	s.httpToken = ""
-	// Allocate a free port and authenticate the expected HTTP server so that
-	// a port collision cannot silently attach this session to another service.
-	port := findFreePort()
-	if port > 0 {
-		token, err := newHTTPToken()
-		if err != nil {
-			return fmt.Errorf("generate HTTP inspector token: %w", err)
-		}
-		s.httpToken = token
-		s.HTTPAddr = "http://localhost:" + strconv.Itoa(port)
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return fmt.Errorf("reserve HTTP inspector listener: %w", err)
 	}
+	tcpListener, ok := listener.(*net.TCPListener)
+	if !ok {
+		_ = listener.Close()
+		return fmt.Errorf("reserve HTTP inspector listener: unexpected listener type %T", listener)
+	}
+	listenerFile, err := tcpListener.File()
+	if err != nil {
+		_ = listener.Close()
+		return fmt.Errorf("duplicate HTTP inspector listener: %w", err)
+	}
+	defer listener.Close()
+	defer listenerFile.Close()
+
+	token, err := newHTTPToken()
+	if err != nil {
+		return fmt.Errorf("generate HTTP inspector token: %w", err)
+	}
+	port := tcpListener.Addr().(*net.TCPAddr).Port
+	s.httpToken = token
+	s.HTTPAddr = "http://localhost:" + strconv.Itoa(port)
 
 	opts := []cue.Option{
 		cue.WithArgs(args...),
 		cue.WithSize(80, 24),
+		cue.WithEnv(
+			"WARP_HTTP_PORT="+strconv.Itoa(port),
+			"WARP_HTTP_TOKEN="+s.httpToken,
+			"WARP_HTTP_FD=3",
+		),
+		cue.WithExtraFiles(listenerFile),
 	}
 	if s.WorkDir != "" {
 		opts = append(opts, cue.WithDir(s.WorkDir))
-	}
-	if port > 0 {
-		opts = append(opts, cue.WithEnv(
-			"WARP_HTTP_PORT="+strconv.Itoa(port),
-			"WARP_HTTP_TOKEN="+s.httpToken,
-		))
 	}
 
 	app, err := cue.Launch(command, opts...)
@@ -194,24 +206,12 @@ func (s *Session) Launch(command string, args ...string) error {
 	s.Page = app.Page()
 	return nil
 }
-
-// findFreePort finds a free TCP port by listening on :0.
 func newHTTPToken() (string, error) {
 	var token [32]byte
 	if _, err := rand.Read(token[:]); err != nil {
 		return "", err
 	}
 	return hex.EncodeToString(token[:]), nil
-}
-
-func findFreePort() int {
-	ln, err := net.Listen("tcp", "127.0.0.1:0")
-	if err != nil {
-		return 0
-	}
-	port := ln.Addr().(*net.TCPAddr).Port
-	ln.Close()
-	return port
 }
 
 func (s *Session) lockContext(ctx context.Context) error {

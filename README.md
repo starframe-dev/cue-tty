@@ -65,7 +65,7 @@ go install github.com/starframe-dev/cue-tty/cmd/cuetty-cli@latest
 
 ## Пример: warp-demo
 
-В `examples/warp-demo/` есть полноценный пример TUI-приложения на [warp](https://github.com/starframe-dev/warp) с HTTP `/elements` endpoint и мышью.
+В `examples/warp-demo/` есть полноценный пример TUI-приложения на [warp](https://github.com/starframe-dev/warp) с HTTP `/elements` endpoint и мышью. При запуске через cue-tty уже привязанный loopback listener передаётся приложению по файловому дескриптору (Warp v0.1.2+), поэтому порт не освобождается и не выбирается повторно.
 
 ```bash
 cd examples/warp-demo

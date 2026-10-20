@@ -56,7 +56,7 @@ func Launch(command string, opts ...Option) (*App, error) {
 		o.Env = append(os.Environ(), o.Env...)
 	}
 
-	backend, err := pty.Start(command, o.Args, o.Env, o.Dir, o.Width, o.Height)
+	backend, err := pty.StartWithExtraFiles(command, o.Args, o.Env, o.Dir, o.Width, o.Height, o.ExtraFiles)
 	if err != nil {
 		return nil, err
 	}

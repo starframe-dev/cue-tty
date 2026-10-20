@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net"
 	"os"
+	"strconv"
 	"strings"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -200,16 +202,41 @@ func main() {
 	w := warp.New()
 	w.SetRoot(p)
 
-	// Start HTTP element tree server
-	addr := "127.0.0.1:0"
-	if port := os.Getenv("WARP_HTTP_PORT"); port != "" {
-		addr = "127.0.0.1:" + port
-	}
-	if err := w.ServeHTTPWithOptions(addr, warp.InspectorOptions{BearerToken: os.Getenv("WARP_HTTP_TOKEN")}); err != nil {
+	if err := serveInspector(w); err != nil {
 		panic(err)
 	}
 
 	if err := w.Run(); err != nil {
 		panic(err)
 	}
+}
+
+func serveInspector(w *warp.Warp) error {
+	options := warp.InspectorOptions{BearerToken: os.Getenv("WARP_HTTP_TOKEN")}
+	if rawFD := os.Getenv("WARP_HTTP_FD"); rawFD != "" {
+		fd, err := strconv.Atoi(rawFD)
+		if err != nil || fd < 3 {
+			return fmt.Errorf("invalid WARP_HTTP_FD %q", rawFD)
+		}
+		file := os.NewFile(uintptr(fd), "warp-http-listener")
+		if file == nil {
+			return fmt.Errorf("WARP_HTTP_FD %d is unavailable", fd)
+		}
+		listener, err := net.FileListener(file)
+		_ = file.Close()
+		if err != nil {
+			return fmt.Errorf("import WARP_HTTP_FD %d: %w", fd, err)
+		}
+		if err := w.ServeHTTPOnListener(listener, options); err != nil {
+			_ = listener.Close()
+			return err
+		}
+		return nil
+	}
+
+	addr := "127.0.0.1:0"
+	if port := os.Getenv("WARP_HTTP_PORT"); port != "" {
+		addr = "127.0.0.1:" + port
+	}
+	return w.ServeHTTPWithOptions(addr, options)
 }

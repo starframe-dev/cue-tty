@@ -1,6 +1,7 @@
 package cue
 
 import (
+	"os"
 	"time"
 )
 
@@ -13,6 +14,7 @@ type Options struct {
 	Width       int
 	Height      int
 	Timeout     time.Duration
+	ExtraFiles  []*os.File
 }
 
 // DefaultOptions returns sensible defaults (80x24, no timeout).
@@ -63,6 +65,14 @@ func WithReplaceEnv(env ...string) Option {
 func WithDir(dir string) Option {
 	return func(o *Options) {
 		o.Dir = dir
+	}
+}
+
+// WithExtraFiles passes files to the child process as descriptors starting at 3.
+// This is supported on Unix platforms and follows os/exec.Cmd.ExtraFiles semantics.
+func WithExtraFiles(files ...*os.File) Option {
+	return func(o *Options) {
+		o.ExtraFiles = append([]*os.File(nil), files...)
 	}
 }
 
