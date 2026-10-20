@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -46,7 +47,7 @@ func TestBuildNodeTree(t *testing.T) {
 func TestBuildNodeTreePreservesUnicodeDimensionsCellsAndStyles(t *testing.T) {
 	dir := t.TempDir()
 	program := filepath.Join(dir, "unicode-app")
-	script := "#!/bin/sh\nprintf '\\033[1;31m界é\\033[0m'\n"
+	script := "#!/bin/sh\nprintf '\\033[1;31;44m界é\\033[0m'\n"
 	if err := os.WriteFile(program, []byte(script), 0o700); err != nil {
 		t.Fatal(err)
 	}
@@ -75,8 +76,52 @@ func TestBuildNodeTreePreservesUnicodeDimensionsCellsAndStyles(t *testing.T) {
 	if tree.Cells[2].Rune != 'e' || !strings.ContainsRune(tree.Cells[2].Combining, '\u0301') {
 		t.Fatalf("combining sequence was not preserved: %+v", tree.Cells[2])
 	}
-	if !tree.Cells[0].Bold || tree.Cells[0].FG == "" {
-		t.Fatalf("cell style was not exported: %+v", tree.Cells[0])
+	if !tree.Cells[0].Bold || tree.Cells[0].FG == "" || tree.Cells[0].BG == "" {
+		t.Fatalf("cell colors/style were not exported: %+v", tree.Cells[0])
+	}
+
+	detailed := tree.RenderCells()
+	for _, expected := range []string{
+		`[0,0] char="界"`,
+		`[0,1] char="" combining=""`,
+		`[0,2] char="e" combining=`,
+		`fg=`, `bg=`, `attrs=[bold]`, `continuation=true`,
+	} {
+		if !strings.Contains(detailed, expected) {
+			t.Errorf("detailed NodeTree does not contain %q:\n%s", expected, detailed)
+		}
+	}
+	if !strings.Contains(detailed, "combining="+strconv.Quote("\u0301")) {
+		t.Fatalf("detailed NodeTree omitted the combining mark:\n%s", detailed)
+	}
+	if got := strings.Count(detailed, "char="); got != 3 {
+		t.Fatalf("detailed NodeTree emitted %d cells, want 3 non-empty/wide cells:\n%s", got, detailed)
+	}
+}
+
+func TestNodeTreeRenderCellsSnapshot(t *testing.T) {
+	tree := &NodeTree{
+		Cols: 5,
+		Rows: 1,
+		Cursor: struct {
+			Row, Col int
+		}{Row: 0, Col: 3},
+		Cells: []CellNode{
+			{Row: 0, Col: 0, Rune: '界', FG: "#ff0000", BG: "#0000ff", Bold: true},
+			{Row: 0, Col: 1, Continuation: true},
+			{Row: 0, Col: 2, Rune: 'e', Combining: "\u0301"},
+			{Row: 0, Col: 3, Rune: ' ', BG: "#222222", Underline: true},
+			{Row: 0, Col: 4, Rune: ' '},
+		},
+	}
+
+	want := "Screen 5x1\nCursor: (0, 3)\nCells (row, col; zero-based):\n" +
+		"  [0,0] char=\"界\" combining=\"\" fg=\"#ff0000\" bg=\"#0000ff\" attrs=[bold] continuation=false\n" +
+		"  [0,1] char=\"\" combining=\"\" fg=\"\" bg=\"\" attrs=[] continuation=true\n" +
+		"  [0,2] char=\"e\" combining=" + strconv.Quote("\u0301") + " fg=\"\" bg=\"\" attrs=[] continuation=false\n" +
+		"  [0,3] char=\" \" combining=\"\" fg=\"\" bg=\"#222222\" attrs=[underline] continuation=false\n"
+	if got := tree.RenderCells(); got != want {
+		t.Fatalf("RenderCells() snapshot mismatch:\n--- got ---\n%s--- want ---\n%s", got, want)
 	}
 }
 
@@ -95,14 +140,64 @@ func TestCmdNodeFallsBackForOrdinaryTUI(t *testing.T) {
 	if err != nil {
 		t.Fatalf("node for ordinary TUI: %v", err)
 	}
-	if elapsed := time.Since(started); elapsed > 4*time.Second {
-		t.Fatalf("node fallback took %s", elapsed)
+	if elapsed := time.Since(started); elapsed > 400*time.Millisecond {
+		t.Fatalf("node fallback took %s, want a single bounded probe", elapsed)
 	}
 	if !strings.Contains(output, "Screen 80x24") || !strings.Contains(output, "ordinary screen") {
 		t.Fatalf("node did not return screen tree: %s", output)
 	}
 	if session.hasConfirmedInspector() {
 		t.Fatal("silent non-Warp listener was marked as an available inspector")
+	}
+
+	detailed, err := cmdNode(session, []string{"--cells"})
+	if err != nil {
+		t.Fatalf("node --cells: %v", err)
+	}
+	if !strings.Contains(detailed, "Cells (row, col; zero-based):") || !strings.Contains(detailed, `char="o"`) {
+		t.Fatalf("node --cells did not render detailed screen cells: %s", detailed)
+	}
+	if _, err := cmdNode(session, []string{"--unknown"}); err == nil {
+		t.Fatal("node accepted an unknown option")
+	}
+}
+
+func TestCmdNodeFindsWarpInspectorAfterItStarts(t *testing.T) {
+	server := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer late-token" {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		_, _ = w.Write([]byte(`[{"role":"header","name":"late Warp"}]`))
+	}))
+	defer server.Close()
+
+	app, err := cue.Launch("sleep", cue.WithArgs("30"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer app.Close()
+	session := &Session{App: app, Page: app.Page(), HTTPAddr: "http://" + server.Listener.Addr().String(), httpToken: "late-token"}
+
+	started := time.Now()
+	output, err := cmdNode(session, nil)
+	if err != nil {
+		t.Fatalf("node before inspector starts: %v", err)
+	}
+	if elapsed := time.Since(started); elapsed > 400*time.Millisecond {
+		t.Fatalf("node waited %s for an unstarted inspector", elapsed)
+	}
+	if !strings.Contains(output, "Screen 80x24") || session.hasConfirmedInspector() {
+		t.Fatalf("unstarted inspector should return an unconfirmed screen tree: output=%s confirmed=%v", output, session.hasConfirmedInspector())
+	}
+
+	server.Start()
+	output, err = cmdNode(session, nil)
+	if err != nil {
+		t.Fatalf("node after inspector starts: %v", err)
+	}
+	if !strings.Contains(output, "Element tree:") || !strings.Contains(output, "late Warp") || !session.hasConfirmedInspector() {
+		t.Fatalf("late inspector was not discovered: output=%s confirmed=%v", output, session.hasConfirmedInspector())
 	}
 }
 

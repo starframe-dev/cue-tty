@@ -14,6 +14,54 @@ import (
 	"time"
 )
 
+func TestLaunchUsesPortalisTerminalLimitsBeforeStartingChild(t *testing.T) {
+	tests := []struct {
+		name    string
+		cols    int
+		rows    int
+		wantErr bool
+	}{
+		{name: "80x24", cols: 80, rows: 24},
+		{name: "1024x128", cols: 1024, rows: 128},
+		{name: "1024x256 maximum", cols: 1024, rows: 256},
+		{name: "1024x257 over maximum", cols: 1024, rows: 257, wantErr: true},
+		{name: "1024x1024", cols: 1024, rows: 1024, wantErr: true},
+		{name: "zero columns", cols: 0, rows: 24, wantErr: true},
+		{name: "uint16 overflow", cols: 65536, rows: 24, wantErr: true},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			marker := filepath.Join(t.TempDir(), "child-started")
+			app, err := Launch("sh", WithArgs("-c", "printf started > \"$1\"", "child", marker), WithSize(test.cols, test.rows))
+			if (err != nil) != test.wantErr {
+				t.Fatalf("Launch(%dx%d) error = %v, wantErr %v", test.cols, test.rows, err, test.wantErr)
+			}
+			if test.wantErr {
+				if _, statErr := os.Stat(marker); !os.IsNotExist(statErr) {
+					t.Fatalf("invalid size started child: stat error = %v", statErr)
+				}
+				return
+			}
+			t.Cleanup(func() { _ = app.Close() })
+			if err := app.Wait(); err != nil {
+				t.Fatalf("wait for child: %v", err)
+			}
+			if _, err := os.Stat(marker); err != nil {
+				t.Fatalf("valid size did not start child: %v", err)
+			}
+			ptyCols, ptyRows, err := app.backend.Size()
+			if err != nil {
+				t.Fatal(err)
+			}
+			screen := app.TerminalSnapshot()
+			if ptyCols != test.cols || ptyRows != test.rows || screen.Cols != test.cols || screen.Rows != test.rows {
+				t.Fatalf("launch dimensions differ: PTY=%dx%d Screen=%dx%d want=%dx%d", ptyCols, ptyRows, screen.Cols, screen.Rows, test.cols, test.rows)
+			}
+		})
+	}
+}
+
 func TestLaunchEcho(t *testing.T) {
 	app, err := Launch("echo", WithArgs("hello", "world"))
 	if err != nil {
@@ -67,19 +115,43 @@ func TestResizeValidationPreservesPTYAndScreen(t *testing.T) {
 	}
 	defer app.Close()
 
-	invalid := [][2]int{{0, 24}, {80, 0}, {-1, 24}, {80, -1}, {65536, 24}, {4097, 1}, {2048, 1024}}
-	for _, size := range invalid {
-		if err := app.Resize(size[0], size[1]); err == nil {
-			t.Errorf("Resize(%d, %d) unexpectedly succeeded", size[0], size[1])
+	tests := []struct {
+		cols    int
+		rows    int
+		wantErr bool
+	}{
+		{cols: 80, rows: 24},
+		{cols: 1024, rows: 128},
+		{cols: 1024, rows: 256},
+		{cols: 1024, rows: 257, wantErr: true},
+		{cols: 1024, rows: 1024, wantErr: true},
+		{cols: 0, rows: 24, wantErr: true},
+		{cols: 65536, rows: 24, wantErr: true},
+	}
+	for _, test := range tests {
+		previousCols, previousRows, err := app.backend.Size()
+		if err != nil {
+			t.Fatal(err)
 		}
-	}
-	cols, rows, err := app.backend.Size()
-	if err != nil {
-		t.Fatal(err)
-	}
-	snapshot := app.TerminalSnapshot()
-	if cols != 80 || rows != 24 || snapshot.Cols != 80 || snapshot.Rows != 24 {
-		t.Fatalf("invalid resize changed terminal: PTY=%dx%d screen=%dx%d", cols, rows, snapshot.Cols, snapshot.Rows)
+		previousScreen := app.TerminalSnapshot()
+		err = app.Resize(test.cols, test.rows)
+		if (err != nil) != test.wantErr {
+			t.Fatalf("Resize(%d, %d) error = %v, wantErr %v", test.cols, test.rows, err, test.wantErr)
+		}
+		ptyCols, ptyRows, err := app.backend.Size()
+		if err != nil {
+			t.Fatal(err)
+		}
+		screen := app.TerminalSnapshot()
+		if test.wantErr {
+			if ptyCols != previousCols || ptyRows != previousRows || screen.Cols != previousScreen.Cols || screen.Rows != previousScreen.Rows {
+				t.Fatalf("failed resize changed terminal: PTY=%dx%d Screen=%dx%d, prior PTY=%dx%d Screen=%dx%d", ptyCols, ptyRows, screen.Cols, screen.Rows, previousCols, previousRows, previousScreen.Cols, previousScreen.Rows)
+			}
+			continue
+		}
+		if ptyCols != test.cols || ptyRows != test.rows || screen.Cols != test.cols || screen.Rows != test.rows {
+			t.Fatalf("resize dimensions differ: PTY=%dx%d Screen=%dx%d want=%dx%d", ptyCols, ptyRows, screen.Cols, screen.Rows, test.cols, test.rows)
+		}
 	}
 }
 

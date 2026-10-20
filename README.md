@@ -14,6 +14,8 @@ cuetty-cli -s demo launch ./my-app
 
 # Посмотреть структуру экрана (или element tree, если warp-based)
 cuetty-cli -s demo node
+# Подробно показать непустые ячейки, Unicode и стили
+cuetty-cli -s demo node --cells
 
 # Кликнуть по элементу
 cuetty-cli -s demo click button:Add
@@ -52,7 +54,7 @@ go install github.com/starframe-dev/cue-tty/cmd/cuetty-cli@latest
 | `click <role>:<name>` | Клик по элементу (warp /elements) |
 | `scroll <up|down> <x> <y>` | Скролл |
 | `mouse <down|up> <x> <y>` | Mouse events |
-| `node` | Граф нод / element tree |
+| `node [--cells]` | Компактный граф нод / element tree; `--cells` показывает непустые ячейки и стили |
 | `save [name]` | Сохранить артефакты |
 | `resize <cols> <rows>` | Изменить размер терминала |
 | `wait <ms>` | Подождать 0–60000 мс |
@@ -126,7 +128,7 @@ err = cue.Expect(page).ToContain("hello world")
 | `page.MouseClick(x, y)` | Click a cell |
 | `page.MouseDown(button, x, y)` / `MouseUp` | Inject SGR button press/release; buttons 0=left, 1=middle, 2=right |
 | `page.MouseMove(x, y)` | Inject hover or drag motion |
-| `app.Resize(cols, rows)` | Resize up to 4096×4096 and 1,048,576 cells total |
+| `app.Resize(cols, rows)` | Resize up to 4096 per axis and 262,144 cells total (Portalis limit) |
 | `page.MouseScrollUp(x, y)` | Scroll wheel up |
 | `page.MouseScrollDown(x, y)` | Scroll wheel down |
 | `page.EnableMouse()` | Совместимый no-op: режим мыши задаёт само TUI-приложение |

@@ -288,8 +288,12 @@ func cmdNode(session *Session, args []string) (string, error) {
 	if session.App == nil {
 		return "", fmt.Errorf("no app running in session %q", session.Name)
 	}
+	if len(args) > 1 || (len(args) == 1 && args[0] != "--cells") {
+		return "", fmt.Errorf("usage: node [--cells]")
+	}
+	showCells := len(args) == 1
 
-	if session.HTTPAddr != "" {
+	if !showCells && session.HTTPAddr != "" {
 		elems, receivedHTTPResponse, err := fetchElementsWithToken(session.HTTPAddr, session.httpToken)
 		if receivedHTTPResponse {
 			session.confirmInspector()
@@ -306,6 +310,9 @@ func cmdNode(session *Session, args []string) (string, error) {
 	nt, err := BuildNodeTree(session.Page)
 	if err != nil {
 		return "", err
+	}
+	if showCells {
+		return nt.RenderCells(), nil
 	}
 	return nt.Render(), nil
 }
@@ -531,7 +538,7 @@ func cmdHelp(session *Session, args []string) (string, error) {
   scroll <up|down> <x> <y>   — scroll at (x, y)
   mouse <down|up> <x> <y>    — mouse button down/up
   render                      — show screen text
-  node                        — show node tree (screen structure) or element tree (if HTTP available)
+  node [--cells]              — show compact node tree/element tree or detailed screen cells
   save [name]                 — save artifacts (render.txt + state.json)
   resize <cols> <rows>        — resize terminal
   wait <ms>                   — wait 0..60000 milliseconds

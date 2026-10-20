@@ -95,7 +95,9 @@ func (a *App) Resize(cols, rows int) error {
 	if err := a.backend.Resize(cols, rows); err != nil {
 		return err
 	}
-	a.screen.Resize(cols, rows)
+	if err := a.screen.ResizeChecked(cols, rows); err != nil {
+		return fmt.Errorf("resize Portalis screen: %w", err)
+	}
 	return nil
 }
 

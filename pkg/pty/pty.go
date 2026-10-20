@@ -28,11 +28,11 @@ type Backend struct {
 
 const (
 	maxTerminalDimension = 4096
-	maxTerminalCells     = 1 << 20
+	maxTerminalCells     = 1 << 18
 )
 
-// ValidateSize rejects dimensions that cannot be represented safely by the
-// PTY or that would allocate an excessive virtual screen.
+// ValidateSize rejects dimensions that cannot be represented by the PTY or
+// exceed Portalis' 262144-cell virtual screen limit.
 func ValidateSize(cols, rows int) error {
 	if cols <= 0 || rows <= 0 {
 		return fmt.Errorf("terminal dimensions must be positive: %dx%d", cols, rows)

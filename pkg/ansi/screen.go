@@ -27,8 +27,14 @@ func NewScreen(cols, rows int) *Screen {
 }
 
 // Resize changes the screen size, preserving content where possible.
+// Invalid dimensions leave the screen unchanged.
 func (s *Screen) Resize(cols, rows int) {
-	s.Screen.Resize(rows, cols)
+	_ = s.ResizeChecked(cols, rows)
+}
+
+// ResizeChecked changes the screen size or returns the Portalis validation error.
+func (s *Screen) ResizeChecked(cols, rows int) error {
+	return s.Screen.ResizeChecked(rows, cols)
 }
 
 // ClearScreen clears the active buffer.

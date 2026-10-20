@@ -42,6 +42,11 @@ func FetchElementsWithToken(httpAddr, token string) ([]RemoteElement, error) {
 	return elements, err
 }
 
+const (
+	inspectorResponseHeaderTimeout = 100 * time.Millisecond
+	inspectorRequestTimeout        = 500 * time.Millisecond
+)
+
 // fetchElementsWithToken reports whether the endpoint returned an HTTP response,
 // including error status codes and malformed response bodies.
 func fetchElementsWithToken(httpAddr, token string) ([]RemoteElement, bool, error) {
@@ -57,26 +62,31 @@ func fetchElementsWithToken(httpAddr, token string) ([]RemoteElement, bool, erro
 	// Resolve localhost explicitly to IPv4 for local Warp servers.
 	url = strings.Replace(url, "localhost", "127.0.0.1", 1)
 
-	client := &http.Client{Timeout: 500 * time.Millisecond}
-	var resp *http.Response
-	var err error
-	deadline := time.Now().Add(2 * time.Second)
-	for {
-		request, requestErr := http.NewRequest(http.MethodGet, url, nil)
-		if requestErr != nil {
-			return nil, false, fmt.Errorf("create elements request: %w", requestErr)
-		}
-		if token != "" {
-			request.Header.Set("Authorization", "Bearer "+token)
-		}
-		resp, err = client.Do(request)
-		if err == nil || time.Now().After(deadline) {
-			break
-		}
-		time.Sleep(50 * time.Millisecond)
+	roundTripper := http.DefaultTransport
+	if baseTransport, ok := roundTripper.(*http.Transport); ok {
+		transport := baseTransport.Clone()
+		transport.ResponseHeaderTimeout = inspectorResponseHeaderTimeout
+		defer transport.CloseIdleConnections()
+		roundTripper = transport
 	}
+	client := &http.Client{Timeout: inspectorRequestTimeout, Transport: roundTripper}
+	request, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		return nil, false, fmt.Errorf("fetch elements: %w", err)
+		return nil, false, fmt.Errorf("create elements request: %w", err)
+	}
+	if token != "" {
+		request.Header.Set("Authorization", "Bearer "+token)
+	}
+	resp, err := client.Do(request)
+	receivedHTTPResponse := resp != nil
+	if err != nil {
+		if resp != nil && resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+		return nil, receivedHTTPResponse, fmt.Errorf("fetch elements: %w", err)
+	}
+	if resp == nil {
+		return nil, false, fmt.Errorf("fetch elements: received no HTTP response")
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {

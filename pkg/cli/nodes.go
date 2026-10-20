@@ -93,6 +93,67 @@ func (nt *NodeTree) Render() string {
 	return b.String()
 }
 
+// RenderCells renders only occupied, styled, or wide-character continuation
+// cells. Blank default cells are omitted to keep large screen dumps readable.
+func (nt *NodeTree) RenderCells() string {
+	var b strings.Builder
+	b.WriteString(fmt.Sprintf("Screen %dx%d\n", nt.Cols, nt.Rows))
+	b.WriteString(fmt.Sprintf("Cursor: (%d, %d)\n", nt.Cursor.Row, nt.Cursor.Col))
+	b.WriteString("Cells (row, col; zero-based):\n")
+
+	count := 0
+	for _, cell := range nt.Cells {
+		if cell.isDefaultBlank() {
+			continue
+		}
+		char := ""
+		if cell.Rune != 0 {
+			char = string(cell.Rune)
+		}
+		b.WriteString(fmt.Sprintf(
+			"  [%d,%d] char=%q combining=%q fg=%q bg=%q attrs=[%s] continuation=%t\n",
+			cell.Row, cell.Col, char, cell.Combining, cell.FG, cell.BG,
+			strings.Join(cell.styleAttributes(), ","), cell.Continuation,
+		))
+		count++
+	}
+	if count == 0 {
+		b.WriteString("  (no occupied or styled cells)\n")
+	}
+	return b.String()
+}
+
+func (cell CellNode) isDefaultBlank() bool {
+	hasStyle := cell.Bold || cell.Dim || cell.Italic || cell.Underline || cell.Reverse || cell.Strikethrough
+	if cell.Continuation || cell.Combining != "" || cell.FG != "" || cell.BG != "" || hasStyle {
+		return false
+	}
+	return cell.Rune == 0 || cell.Rune == ' '
+}
+
+func (cell CellNode) styleAttributes() []string {
+	var attrs []string
+	if cell.Bold {
+		attrs = append(attrs, "bold")
+	}
+	if cell.Dim {
+		attrs = append(attrs, "dim")
+	}
+	if cell.Italic {
+		attrs = append(attrs, "italic")
+	}
+	if cell.Underline {
+		attrs = append(attrs, "underline")
+	}
+	if cell.Reverse {
+		attrs = append(attrs, "reverse")
+	}
+	if cell.Strikethrough {
+		attrs = append(attrs, "strikethrough")
+	}
+	return attrs
+}
+
 func truncateDisplayWidth(text string, maxWidth int) string {
 	if maxWidth <= 0 {
 		return ""

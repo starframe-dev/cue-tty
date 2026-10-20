@@ -57,12 +57,14 @@ func TestValidateSize(t *testing.T) {
 		wantErr bool
 	}{
 		{name: "normal", cols: 80, rows: 24},
-		{name: "maximum area", cols: 1024, rows: 1024},
+		{name: "large supported", cols: 1024, rows: 128},
+		{name: "maximum Portalis area", cols: 1024, rows: 256},
+		{name: "just over Portalis area", cols: 1024, rows: 257, wantErr: true},
+		{name: "area too large", cols: 1024, rows: 1024, wantErr: true},
 		{name: "zero cols", cols: 0, rows: 24, wantErr: true},
 		{name: "negative rows", cols: 80, rows: -1, wantErr: true},
-		{name: "uint16 overflow", cols: 65536, rows: 1, wantErr: true},
+		{name: "uint16 overflow", cols: 65536, rows: 24, wantErr: true},
 		{name: "dimension too large", cols: 4097, rows: 1, wantErr: true},
-		{name: "area too large", cols: 2048, rows: 1024, wantErr: true},
 		{name: "division overflow prevented", cols: int(^uint(0) >> 1), rows: 2, wantErr: true},
 	}
 	for _, tt := range tests {
