@@ -29,4 +29,4 @@
 - [x] `show/list` быстро возвращают полные snapshots при активном `wait 60000`; race и lifecycle-тесты не находят data races, deadlocks и утечек процессов.
 - [x] Отмена PTY-записи, управление процессами, listener handoff и мышь сохраняют существующее поведение и проходят регрессии.
 - [x] `go mod tidy`, `go build ./...`, `go test ./...`, `go test -race ./...`, `go vet ./...`, `govulncheck ./...` прошли локально.
-- [ ] Полный Warp E2E пройдёт на Linux и macOS в hosted CI. Полный локальный E2E на macOS уже прошёл без кэша (`go test -count=1 ./...` в `examples/warp-demo`).
+- [x] Полный Warp E2E прошёл на Linux и macOS в hosted CI run `39447557609`. Полный локальный E2E на macOS также прошёл без кэша (`go test -count=1 ./...` в `examples/warp-demo`).
