@@ -1,6 +1,6 @@
 # cue-tty
 
-Playwright for TUI applications. Требуется Go 1.26.9 или новее.
+Playwright for TUI applications. Требуется Go 1.26.10 или новее.
 
 `cue-tty` — Go-библиотека + `cuetty-cli` — CLI-инструмент для автоматизации и тестирования TUI-приложений (Bubbletea, ncurses, vim, htop и др.) через PTY.
 

@@ -1,6 +1,6 @@
 module github.com/starframe-dev/cue-tty/examples/warp-demo
 
-go 1.26.9
+go 1.26.10
 
 require (
 	github.com/charmbracelet/bubbletea v1.1.0
